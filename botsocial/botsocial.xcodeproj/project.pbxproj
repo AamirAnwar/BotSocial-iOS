@@ -1,0 +1,567 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 48;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		43910A9A203CC917009171CB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43910A99203CC917009171CB /* AppDelegate.swift */; };
+		43910A9C203CC917009171CB /* FirstViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43910A9B203CC917009171CB /* FirstViewController.swift */; };
+		43910A9E203CC917009171CB /* SecondViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43910A9D203CC917009171CB /* SecondViewController.swift */; };
+		43910AA1203CC917009171CB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 43910A9F203CC917009171CB /* Main.storyboard */; };
+		43910AA3203CC917009171CB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43910AA2203CC917009171CB /* Assets.xcassets */; };
+		43910AA6203CC917009171CB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 43910AA4203CC917009171CB /* LaunchScreen.storyboard */; };
+		43910AB1203CC917009171CB /* botsocialTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43910AB0203CC917009171CB /* botsocialTests.swift */; };
+		43910ABC203CC918009171CB /* botsocialUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43910ABB203CC918009171CB /* botsocialUITests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		43910AAD203CC917009171CB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 43910A8E203CC917009171CB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 43910A95203CC917009171CB;
+			remoteInfo = botsocial;
+		};
+		43910AB8203CC918009171CB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 43910A8E203CC917009171CB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 43910A95203CC917009171CB;
+			remoteInfo = botsocial;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		43910A96203CC917009171CB /* botsocial.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = botsocial.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		43910A99203CC917009171CB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		43910A9B203CC917009171CB /* FirstViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstViewController.swift; sourceTree = "<group>"; };
+		43910A9D203CC917009171CB /* SecondViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondViewController.swift; sourceTree = "<group>"; };
+		43910AA0203CC917009171CB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		43910AA2203CC917009171CB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		43910AA5203CC917009171CB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		43910AA7203CC917009171CB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		43910AAC203CC917009171CB /* botsocialTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = botsocialTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		43910AB0203CC917009171CB /* botsocialTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = botsocialTests.swift; sourceTree = "<group>"; };
+		43910AB2203CC917009171CB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		43910AB7203CC918009171CB /* botsocialUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = botsocialUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		43910ABB203CC918009171CB /* botsocialUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = botsocialUITests.swift; sourceTree = "<group>"; };
+		43910ABD203CC918009171CB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		43910A93203CC917009171CB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		43910AA9203CC917009171CB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		43910AB4203CC918009171CB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		43910A8D203CC917009171CB = {
+			isa = PBXGroup;
+			children = (
+				43910A98203CC917009171CB /* botsocial */,
+				43910AAF203CC917009171CB /* botsocialTests */,
+				43910ABA203CC918009171CB /* botsocialUITests */,
+				43910A97203CC917009171CB /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		43910A97203CC917009171CB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				43910A96203CC917009171CB /* botsocial.app */,
+				43910AAC203CC917009171CB /* botsocialTests.xctest */,
+				43910AB7203CC918009171CB /* botsocialUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		43910A98203CC917009171CB /* botsocial */ = {
+			isa = PBXGroup;
+			children = (
+				43910A99203CC917009171CB /* AppDelegate.swift */,
+				43910A9B203CC917009171CB /* FirstViewController.swift */,
+				43910A9D203CC917009171CB /* SecondViewController.swift */,
+				43910A9F203CC917009171CB /* Main.storyboard */,
+				43910AA2203CC917009171CB /* Assets.xcassets */,
+				43910AA4203CC917009171CB /* LaunchScreen.storyboard */,
+				43910AA7203CC917009171CB /* Info.plist */,
+			);
+			path = botsocial;
+			sourceTree = "<group>";
+		};
+		43910AAF203CC917009171CB /* botsocialTests */ = {
+			isa = PBXGroup;
+			children = (
+				43910AB0203CC917009171CB /* botsocialTests.swift */,
+				43910AB2203CC917009171CB /* Info.plist */,
+			);
+			path = botsocialTests;
+			sourceTree = "<group>";
+		};
+		43910ABA203CC918009171CB /* botsocialUITests */ = {
+			isa = PBXGroup;
+			children = (
+				43910ABB203CC918009171CB /* botsocialUITests.swift */,
+				43910ABD203CC918009171CB /* Info.plist */,
+			);
+			path = botsocialUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		43910A95203CC917009171CB /* botsocial */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 43910AC0203CC918009171CB /* Build configuration list for PBXNativeTarget "botsocial" */;
+			buildPhases = (
+				43910A92203CC917009171CB /* Sources */,
+				43910A93203CC917009171CB /* Frameworks */,
+				43910A94203CC917009171CB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = botsocial;
+			productName = botsocial;
+			productReference = 43910A96203CC917009171CB /* botsocial.app */;
+			productType = "com.apple.product-type.application";
+		};
+		43910AAB203CC917009171CB /* botsocialTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 43910AC3203CC918009171CB /* Build configuration list for PBXNativeTarget "botsocialTests" */;
+			buildPhases = (
+				43910AA8203CC917009171CB /* Sources */,
+				43910AA9203CC917009171CB /* Frameworks */,
+				43910AAA203CC917009171CB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				43910AAE203CC917009171CB /* PBXTargetDependency */,
+			);
+			name = botsocialTests;
+			productName = botsocialTests;
+			productReference = 43910AAC203CC917009171CB /* botsocialTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		43910AB6203CC918009171CB /* botsocialUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 43910AC6203CC918009171CB /* Build configuration list for PBXNativeTarget "botsocialUITests" */;
+			buildPhases = (
+				43910AB3203CC918009171CB /* Sources */,
+				43910AB4203CC918009171CB /* Frameworks */,
+				43910AB5203CC918009171CB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				43910AB9203CC918009171CB /* PBXTargetDependency */,
+			);
+			name = botsocialUITests;
+			productName = botsocialUITests;
+			productReference = 43910AB7203CC918009171CB /* botsocialUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		43910A8E203CC917009171CB /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0920;
+				LastUpgradeCheck = 0920;
+				ORGANIZATIONNAME = AamirAnwar;
+				TargetAttributes = {
+					43910A95203CC917009171CB = {
+						CreatedOnToolsVersion = 9.2;
+						ProvisioningStyle = Automatic;
+					};
+					43910AAB203CC917009171CB = {
+						CreatedOnToolsVersion = 9.2;
+						ProvisioningStyle = Automatic;
+						TestTargetID = 43910A95203CC917009171CB;
+					};
+					43910AB6203CC918009171CB = {
+						CreatedOnToolsVersion = 9.2;
+						ProvisioningStyle = Automatic;
+						TestTargetID = 43910A95203CC917009171CB;
+					};
+				};
+			};
+			buildConfigurationList = 43910A91203CC917009171CB /* Build configuration list for PBXProject "botsocial" */;
+			compatibilityVersion = "Xcode 8.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 43910A8D203CC917009171CB;
+			productRefGroup = 43910A97203CC917009171CB /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				43910A95203CC917009171CB /* botsocial */,
+				43910AAB203CC917009171CB /* botsocialTests */,
+				43910AB6203CC918009171CB /* botsocialUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		43910A94203CC917009171CB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				43910AA6203CC917009171CB /* LaunchScreen.storyboard in Resources */,
+				43910AA3203CC917009171CB /* Assets.xcassets in Resources */,
+				43910AA1203CC917009171CB /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		43910AAA203CC917009171CB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		43910AB5203CC918009171CB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		43910A92203CC917009171CB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				43910A9E203CC917009171CB /* SecondViewController.swift in Sources */,
+				43910A9A203CC917009171CB /* AppDelegate.swift in Sources */,
+				43910A9C203CC917009171CB /* FirstViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		43910AA8203CC917009171CB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				43910AB1203CC917009171CB /* botsocialTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		43910AB3203CC918009171CB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				43910ABC203CC918009171CB /* botsocialUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		43910AAE203CC917009171CB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 43910A95203CC917009171CB /* botsocial */;
+			targetProxy = 43910AAD203CC917009171CB /* PBXContainerItemProxy */;
+		};
+		43910AB9203CC918009171CB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 43910A95203CC917009171CB /* botsocial */;
+			targetProxy = 43910AB8203CC918009171CB /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		43910A9F203CC917009171CB /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				43910AA0203CC917009171CB /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		43910AA4203CC917009171CB /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				43910AA5203CC917009171CB /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		43910ABE203CC918009171CB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		43910ABF203CC918009171CB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		43910AC1203CC918009171CB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = C3RT9P7X65;
+				INFOPLIST_FILE = botsocial/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.aamiranwar.botsocial;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		43910AC2203CC918009171CB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = C3RT9P7X65;
+				INFOPLIST_FILE = botsocial/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.aamiranwar.botsocial;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		43910AC4203CC918009171CB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = C3RT9P7X65;
+				INFOPLIST_FILE = botsocialTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.aamiranwar.botsocialTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/botsocial.app/botsocial";
+			};
+			name = Debug;
+		};
+		43910AC5203CC918009171CB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = C3RT9P7X65;
+				INFOPLIST_FILE = botsocialTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.aamiranwar.botsocialTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/botsocial.app/botsocial";
+			};
+			name = Release;
+		};
+		43910AC7203CC918009171CB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = C3RT9P7X65;
+				INFOPLIST_FILE = botsocialUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.aamiranwar.botsocialUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = botsocial;
+			};
+			name = Debug;
+		};
+		43910AC8203CC918009171CB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = C3RT9P7X65;
+				INFOPLIST_FILE = botsocialUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.aamiranwar.botsocialUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = botsocial;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		43910A91203CC917009171CB /* Build configuration list for PBXProject "botsocial" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				43910ABE203CC918009171CB /* Debug */,
+				43910ABF203CC918009171CB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		43910AC0203CC918009171CB /* Build configuration list for PBXNativeTarget "botsocial" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				43910AC1203CC918009171CB /* Debug */,
+				43910AC2203CC918009171CB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		43910AC3203CC918009171CB /* Build configuration list for PBXNativeTarget "botsocialTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				43910AC4203CC918009171CB /* Debug */,
+				43910AC5203CC918009171CB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		43910AC6203CC918009171CB /* Build configuration list for PBXNativeTarget "botsocialUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				43910AC7203CC918009171CB /* Debug */,
+				43910AC8203CC918009171CB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 43910A8E203CC917009171CB /* Project object */;
+}
