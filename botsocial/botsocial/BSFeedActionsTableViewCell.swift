@@ -14,7 +14,6 @@ class BSFeedActionsTableViewCell: UITableViewCell {
         get {
             let button = UIButton.init(type: .system)
             button.layer.cornerRadius = kCornerRadius
-//            button.backgroundColor = UIColor.black
             button.setTitleColor(UIColor.black, for: .normal)
             button.contentEdgeInsets = UIEdgeInsets.init(top: 4, left: 4, bottom: 4, right: 4)
             return button
