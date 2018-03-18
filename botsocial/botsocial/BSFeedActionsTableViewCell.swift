@@ -39,6 +39,14 @@ class BSFeedActionsTableViewCell: UITableViewCell {
         return button
     }()
     
+    let saveButton:UIButton = {
+        let button = BSFeedActionsTableViewCell.standardButton
+        button.setTitle("Save", for: .normal)
+        return button
+    }()
+    
+    
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError()
     }
@@ -48,6 +56,8 @@ class BSFeedActionsTableViewCell: UITableViewCell {
         self.contentView.addSubview(self.likeButton)
         self.contentView.addSubview(self.dislikeButton)
         self.contentView.addSubview(self.commentButton)
+        self.contentView.addSubview(self.saveButton)
+        
         self.selectionStyle = .none
         self.likeButton.snp.makeConstraints { (make) in
             make.leading.equalToSuperview().offset(kSidePadding)
@@ -63,6 +73,12 @@ class BSFeedActionsTableViewCell: UITableViewCell {
         self.commentButton.snp.makeConstraints { (make) in
             make.leading.equalTo(self.dislikeButton.snp.trailing).offset(kInteritemPadding)
             make.centerY.equalTo(self.dislikeButton.snp.centerY)
+        }
+        
+        self.saveButton.snp.makeConstraints { (make) in
+            make.trailing.equalToSuperview().inset(kSidePadding)
+            make.centerY.equalTo(self.dislikeButton.snp.centerY)
+            make.leading.greaterThanOrEqualTo(self.commentButton.snp.trailing)
         }
     }
 }
