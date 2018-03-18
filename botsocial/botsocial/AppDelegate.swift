@@ -16,6 +16,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        self.window = UIWindow.init()
+        self.window?.makeKeyAndVisible()
+        self.window?.backgroundColor = UIColor.white
+        let rootVC = UITabBarController.init()
+        let feedVC = BSFeedViewController()
+        let accountVC = BSAccountViewController()
+        let cameraVC = BSCameraViewController()
+        let notifVC = BSNotificationsViewController()
+        cameraVC.tabBarItem.image = UIImage.init(named: "camera_tab_icon")
+        notifVC.tabBarItem.image = UIImage.init(named: "notification_tab_icon")
+        accountVC.tabBarItem.image = UIImage.init(named: "account_tab_icon")
+        
+        rootVC.viewControllers = [feedVC, cameraVC, notifVC, accountVC]
+        rootVC.tabBar.tintColor = UIColor.black
+        self.window?.rootViewController = rootVC
         return true
     }
 
