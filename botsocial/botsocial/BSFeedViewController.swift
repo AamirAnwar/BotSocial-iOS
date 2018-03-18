@@ -22,12 +22,11 @@ class BSFeedViewController: UIViewController {
         self.view.addSubview(self.tableView)
         self.tableView.delegate = self
         self.tableView.dataSource = self
-        
+        self.tableView.delaysContentTouches = false
         self.tableView.register(BSFeedTableViewCell.self, forCellReuseIdentifier: self.kFeedCellReuseIdentifier)
         self.tableView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview()
         }
-        
     }
 }
 
@@ -42,7 +41,7 @@ extension BSFeedViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: self.kFeedCellReuseIdentifier) as! BSFeedTableViewCell
-        cell.setImageURL(URL(string:kTestImageURL)!)
+//        cell.setImageURL(URL(string:kTestImageURL)!)
         return cell
     }
     
