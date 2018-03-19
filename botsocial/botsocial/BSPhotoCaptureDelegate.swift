@@ -17,7 +17,7 @@ class PhotoCaptureProcessor: NSObject {
     private(set) var requestedPhotoSettings: AVCapturePhotoSettings
     private let willCapturePhotoAnimation: () -> Void
     private let completionHandler: (PhotoCaptureProcessor) -> Void
-    private var photoData: Data?
+    var photoData: Data?
     
     init(with requestedPhotoSettings: AVCapturePhotoSettings,
          willCapturePhotoAnimation: @escaping () -> Void,
@@ -63,24 +63,24 @@ extension PhotoCaptureProcessor: AVCapturePhotoCaptureDelegate {
             didFinish()
             return
         }
-        
-        PHPhotoLibrary.requestAuthorization { status in
-            if status == .authorized {
-                PHPhotoLibrary.shared().performChanges({
-                    let options = PHAssetResourceCreationOptions()
-                    let creationRequest = PHAssetCreationRequest.forAsset()
-                    options.uniformTypeIdentifier = self.requestedPhotoSettings.processedFileType.map { $0.rawValue }
-                    creationRequest.addResource(with: .photo, data: photoData, options: options)
-                }, completionHandler: { _, error in
-                    if let error = error {
-                        print("Error occurered while saving photo to photo library: \(error)")
-                    }
-                    self.didFinish()
-                })
-            } else {
-                self.didFinish()
-            }
-        }
+        self.didFinish()
+//        PHPhotoLibrary.requestAuthorization { status in
+//            if status == .authorized {
+//                PHPhotoLibrary.shared().performChanges({
+//                    let options = PHAssetResourceCreationOptions()
+//                    let creationRequest = PHAssetCreationRequest.forAsset()
+//                    options.uniformTypeIdentifier = self.requestedPhotoSettings.processedFileType.map { $0.rawValue }
+//                    creationRequest.addResource(with: .photo, data: photoData, options: options)
+//                }, completionHandler: { _, error in
+//                    if let error = error {
+//                        print("Error occurered while saving photo to photo library: \(error)")
+//                    }
+//                    self.didFinish()
+//                })
+//            } else {
+//                self.didFinish()
+//            }
+//        }
     }
 }
 
