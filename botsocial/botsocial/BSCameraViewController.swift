@@ -20,18 +20,45 @@ class BSCameraViewController: UIViewController {
     var rearCameraInput: AVCaptureDeviceInput?
     var photoOutput: AVCapturePhotoOutput?
     var previewLayer: AVCaptureVideoPreviewLayer?
+    let captureButton = UIButton.init(type: .system)
+    let switchCameraButton = UIButton.init(type: .system)
+    private var inProgressPhotoCaptureDelegates = [Int64: PhotoCaptureProcessor]()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.createSwitchCameraButton()
+        self.createCapturePhotoButton()
         self.prepare {(error) in
             if let error = error {
                 print(error)
             }
             try? self.displayPreview(on: self.view)
         }
+    }
+    
+    func createSwitchCameraButton() {
+        self.view.addSubview(self.switchCameraButton)
+        self.switchCameraButton.setImage(#imageLiteral(resourceName: "switch_camera_icon"), for: .normal)
+        self.switchCameraButton.tintColor = UIColor.white
+        self.switchCameraButton.snp.makeConstraints { (make) in
+            make.top.equalToSuperview().offset(50)
+            make.leading.equalToSuperview().offset(kSidePadding)
+        }
+    }
+    
+    func createCapturePhotoButton() {
+        self.view.addSubview(self.captureButton)
+        self.captureButton.setImage(#imageLiteral(resourceName: "capture_button"), for: .normal)
+        self.captureButton.tintColor = UIColor.red
+        self.captureButton.snp.makeConstraints { (make) in
+            make.centerX.equalToSuperview()
+            make.bottom.equalToSuperview().inset(64)
+        }
+        self.captureButton.addTarget(self, action: #selector(didTapCapturePhoto), for: .touchUpInside)
         
     }
-
+    
     func prepare(completionHandler: @escaping (Error?) -> Void) {
         func createCaptureSession() {self.captureSession = AVCaptureSession() }
         func configureCaptureDevices() throws {
@@ -84,6 +111,7 @@ class BSCameraViewController: UIViewController {
             self.photoOutput = AVCapturePhotoOutput()
             self.photoOutput!.setPreparedPhotoSettingsArray([AVCapturePhotoSettings(format: [AVVideoCodecKey : AVVideoCodecType.jpeg])], completionHandler: nil)
             if captureSession.canAddOutput(self.photoOutput!) { captureSession.addOutput(self.photoOutput!) }
+            self.photoOutput!.isHighResolutionCaptureEnabled = true
             captureSession.startRunning()
         }
         
@@ -117,6 +145,36 @@ class BSCameraViewController: UIViewController {
         
         view.layer.insertSublayer(self.previewLayer!, at: 0)
         self.previewLayer?.frame = view.frame
+    }
+    
+    @objc func didTapCapturePhoto() {
+        guard let photoOutput = self.photoOutput else {
+            return
+        }
+        var photoSettings = AVCapturePhotoSettings()
+        // Capture HEIF photo when supported, with flash set to auto and high resolution photo enabled.
+        if  photoOutput.availablePhotoCodecTypes.contains(.hevc) {
+            photoSettings = AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.hevc])
+        }
+//        photoSettings.flashMode = .auto
+        photoSettings.isHighResolutionPhotoEnabled = true
+        if !photoSettings.__availablePreviewPhotoPixelFormatTypes.isEmpty {
+            photoSettings.previewPhotoFormat = [kCVPixelBufferPixelFormatTypeKey as String: photoSettings.__availablePreviewPhotoPixelFormatTypes.first!]
+        }
+        let photoCaptureProcessor = PhotoCaptureProcessor.init(with: photoSettings, willCapturePhotoAnimation: {
+            DispatchQueue.main.async {
+                self.previewLayer?.opacity = 0
+                UIView.animate(withDuration: 0.24, animations: {
+                    self.previewLayer?.opacity = 1
+                })
+            }
+        }) { (processor) in
+            DispatchQueue(label: "capture_photo").async {
+                self.inProgressPhotoCaptureDelegates[processor.requestedPhotoSettings.uniqueID] = nil
+            }
+        }
+        self.inProgressPhotoCaptureDelegates[photoCaptureProcessor.requestedPhotoSettings.uniqueID] = photoCaptureProcessor
+        photoOutput.capturePhoto(with: photoSettings, delegate: photoCaptureProcessor)
     }
     
 }

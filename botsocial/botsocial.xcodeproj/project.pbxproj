@@ -25,6 +25,7 @@
 		43910AA6203CC917009171CB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 43910AA4203CC917009171CB /* LaunchScreen.storyboard */; };
 		43910AB1203CC917009171CB /* botsocialTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43910AB0203CC917009171CB /* botsocialTests.swift */; };
 		43910ABC203CC918009171CB /* botsocialUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43910ABB203CC918009171CB /* botsocialUITests.swift */; };
+		43927C9820603DDE002BE1AC /* BSPhotoCaptureDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43927C9720603DDE002BE1AC /* BSPhotoCaptureDelegate.swift */; };
 		6696C21C6D06CDDC0C9C3975 /* Pods_botsocial.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E6D73461FF8EA10B5F94BD03 /* Pods_botsocial.framework */; };
 		91745515BC721B3D3F09F253 /* Pods_botsocialTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4718A2820C609AF2A7866FA5 /* Pods_botsocialTests.framework */; };
 		A2EF02B790F2FFC112BE2E00 /* Pods_botsocialUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 69B79F3524E09D553463AFD5 /* Pods_botsocialUITests.framework */; };
@@ -75,6 +76,7 @@
 		43910AB7203CC918009171CB /* botsocialUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = botsocialUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		43910ABB203CC918009171CB /* botsocialUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = botsocialUITests.swift; sourceTree = "<group>"; };
 		43910ABD203CC918009171CB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		43927C9720603DDE002BE1AC /* BSPhotoCaptureDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSPhotoCaptureDelegate.swift; sourceTree = "<group>"; };
 		4718A2820C609AF2A7866FA5 /* Pods_botsocialTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_botsocialTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		69B79F3524E09D553463AFD5 /* Pods_botsocialUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_botsocialUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8249967623E8A4519A98D9B5 /* Pods-botsocial.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-botsocial.release.xcconfig"; path = "Pods/Target Support Files/Pods-botsocial/Pods-botsocial.release.xcconfig"; sourceTree = "<group>"; };
@@ -138,6 +140,7 @@
 			children = (
 				43910A99203CC917009171CB /* AppDelegate.swift */,
 				43910AA2203CC917009171CB /* Assets.xcassets */,
+				43927C9720603DDE002BE1AC /* BSPhotoCaptureDelegate.swift */,
 				430E619F205F0C6100AECF27 /* BSCameraViewController.swift */,
 				430E61A1205F0C6D00AECF27 /* BSNotificationsViewController.swift */,
 				430E61A3205F0C7700AECF27 /* BSAccountViewController.swift */,
@@ -510,6 +513,7 @@
 				430E61B0205F1BAB00AECF27 /* BSFeedActionsTableViewCell.swift in Sources */,
 				430E61B4205F255B00AECF27 /* BSAddCommentTableViewCell.swift in Sources */,
 				430E61A8205F104600AECF27 /* Constants.swift in Sources */,
+				43927C9820603DDE002BE1AC /* BSPhotoCaptureDelegate.swift in Sources */,
 				430E61A4205F0C7700AECF27 /* BSAccountViewController.swift in Sources */,
 				430E61A6205F0FB700AECF27 /* BSUserSnippetTableViewCell.swift in Sources */,
 			);
