@@ -22,19 +22,19 @@ class BSFeedActionsTableViewCell: UITableViewCell {
     
     let likeButton:UIButton = {
         let button = BSFeedActionsTableViewCell.standardButton
-        button.setTitle("36 Likes", for: .normal)
+        button.setTitle("\(arc4random()%200) Likes", for: .normal)
         return button
     }()
     
     let dislikeButton:UIButton = {
         let button = BSFeedActionsTableViewCell.standardButton
-        button.setTitle("49 Dislikes", for: .normal)
+        button.setTitle("\(arc4random()%200) Dislikes", for: .normal)
         return button
     }()
     
     let commentButton:UIButton = {
         let button = BSFeedActionsTableViewCell.standardButton
-        button.setTitle("1,709 Comments", for: .normal)
+        button.setTitle("\(arc4random()%2000) Comments", for: .normal)
         return button
     }()
     

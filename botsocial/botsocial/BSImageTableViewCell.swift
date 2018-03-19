@@ -23,7 +23,7 @@ class BSImageTableViewCell: UITableViewCell {
         }
         self.storyImageView.contentMode = .scaleAspectFill
         self.storyImageView.clipsToBounds = true
-        self.storyImageView.pin_setImage(from: URL(string:kTestImageURL))
+        self.storyImageView.pin_setImage(from: URL(string:kTestLargeImageURL))
         self.contentView.clipsToBounds = true
         
     }

@@ -20,6 +20,7 @@
 		430E61B0205F1BAB00AECF27 /* BSFeedActionsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 430E61AF205F1BAB00AECF27 /* BSFeedActionsTableViewCell.swift */; };
 		430E61B2205F220A00AECF27 /* BSPostDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 430E61B1205F220A00AECF27 /* BSPostDetailTableViewCell.swift */; };
 		430E61B4205F255B00AECF27 /* BSAddCommentTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 430E61B3205F255B00AECF27 /* BSAddCommentTableViewCell.swift */; };
+		437590C7206073ED00A7AAEA /* BSImageCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 437590C6206073ED00A7AAEA /* BSImageCollectionViewCell.swift */; };
 		43910A9A203CC917009171CB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43910A99203CC917009171CB /* AppDelegate.swift */; };
 		43910AA3203CC917009171CB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43910AA2203CC917009171CB /* Assets.xcassets */; };
 		43910AA6203CC917009171CB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 43910AA4203CC917009171CB /* LaunchScreen.storyboard */; };
@@ -27,6 +28,7 @@
 		43910ABC203CC918009171CB /* botsocialUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43910ABB203CC918009171CB /* botsocialUITests.swift */; };
 		43927C9820603DDE002BE1AC /* BSPhotoCaptureDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43927C9720603DDE002BE1AC /* BSPhotoCaptureDelegate.swift */; };
 		43927C9A20605B09002BE1AC /* BSNotificationTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43927C9920605B09002BE1AC /* BSNotificationTableViewCell.swift */; };
+		43927C9C20606D20002BE1AC /* BSUserProfileCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43927C9B20606D20002BE1AC /* BSUserProfileCollectionViewCell.swift */; };
 		6696C21C6D06CDDC0C9C3975 /* Pods_botsocial.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E6D73461FF8EA10B5F94BD03 /* Pods_botsocial.framework */; };
 		91745515BC721B3D3F09F253 /* Pods_botsocialTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4718A2820C609AF2A7866FA5 /* Pods_botsocialTests.framework */; };
 		A2EF02B790F2FFC112BE2E00 /* Pods_botsocialUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 69B79F3524E09D553463AFD5 /* Pods_botsocialUITests.framework */; };
@@ -66,6 +68,7 @@
 		430E61AF205F1BAB00AECF27 /* BSFeedActionsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSFeedActionsTableViewCell.swift; sourceTree = "<group>"; };
 		430E61B1205F220A00AECF27 /* BSPostDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSPostDetailTableViewCell.swift; sourceTree = "<group>"; };
 		430E61B3205F255B00AECF27 /* BSAddCommentTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSAddCommentTableViewCell.swift; sourceTree = "<group>"; };
+		437590C6206073ED00A7AAEA /* BSImageCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSImageCollectionViewCell.swift; sourceTree = "<group>"; };
 		43910A96203CC917009171CB /* botsocial.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = botsocial.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		43910A99203CC917009171CB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		43910AA2203CC917009171CB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -79,6 +82,7 @@
 		43910ABD203CC918009171CB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		43927C9720603DDE002BE1AC /* BSPhotoCaptureDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSPhotoCaptureDelegate.swift; sourceTree = "<group>"; };
 		43927C9920605B09002BE1AC /* BSNotificationTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSNotificationTableViewCell.swift; sourceTree = "<group>"; };
+		43927C9B20606D20002BE1AC /* BSUserProfileCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSUserProfileCollectionViewCell.swift; sourceTree = "<group>"; };
 		4718A2820C609AF2A7866FA5 /* Pods_botsocialTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_botsocialTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		69B79F3524E09D553463AFD5 /* Pods_botsocialUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_botsocialUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8249967623E8A4519A98D9B5 /* Pods-botsocial.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-botsocial.release.xcconfig"; path = "Pods/Target Support Files/Pods-botsocial/Pods-botsocial.release.xcconfig"; sourceTree = "<group>"; };
@@ -144,6 +148,8 @@
 				43910AA2203CC917009171CB /* Assets.xcassets */,
 				43927C9720603DDE002BE1AC /* BSPhotoCaptureDelegate.swift */,
 				43927C9920605B09002BE1AC /* BSNotificationTableViewCell.swift */,
+				43927C9B20606D20002BE1AC /* BSUserProfileCollectionViewCell.swift */,
+				437590C6206073ED00A7AAEA /* BSImageCollectionViewCell.swift */,
 				430E619F205F0C6100AECF27 /* BSCameraViewController.swift */,
 				430E61A1205F0C6D00AECF27 /* BSNotificationsViewController.swift */,
 				430E61A3205F0C7700AECF27 /* BSAccountViewController.swift */,
@@ -507,6 +513,7 @@
 				430E61AC205F11B200AECF27 /* BSSeparator.swift in Sources */,
 				43927C9A20605B09002BE1AC /* BSNotificationTableViewCell.swift in Sources */,
 				430E61A0205F0C6100AECF27 /* BSCameraViewController.swift in Sources */,
+				437590C7206073ED00A7AAEA /* BSImageCollectionViewCell.swift in Sources */,
 				430E61AE205F12B000AECF27 /* BSImageTableViewCell.swift in Sources */,
 				430E619E205F076B00AECF27 /* BSFeedTableViewCell.swift in Sources */,
 				43910A9A203CC917009171CB /* AppDelegate.swift in Sources */,
@@ -515,6 +522,7 @@
 				430E619C205F066B00AECF27 /* BSFeedViewController.swift in Sources */,
 				430E61A2205F0C6D00AECF27 /* BSNotificationsViewController.swift in Sources */,
 				430E61B0205F1BAB00AECF27 /* BSFeedActionsTableViewCell.swift in Sources */,
+				43927C9C20606D20002BE1AC /* BSUserProfileCollectionViewCell.swift in Sources */,
 				430E61B4205F255B00AECF27 /* BSAddCommentTableViewCell.swift in Sources */,
 				430E61A8205F104600AECF27 /* Constants.swift in Sources */,
 				43927C9820603DDE002BE1AC /* BSPhotoCaptureDelegate.swift in Sources */,

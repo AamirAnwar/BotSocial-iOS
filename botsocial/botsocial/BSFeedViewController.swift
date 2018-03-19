@@ -9,7 +9,18 @@
 import UIKit
 import SnapKit
 
-let kTestImageURL = "https://avatars3.githubusercontent.com/u/12379620?s=460&v=4"
+//let kTestImageURL = "https://avatars3.githubusercontent.com/u/12379620?s=460&v=4"
+var kTestImageURL:String {
+    get {
+        return "https://picsum.photos/250/300?random&key=\(arc4random())"
+    }
+}
+
+var kTestLargeImageURL:String {
+    get {
+        return "https://picsum.photos/750/800?random&key=\(arc4random())"
+    }
+}
 
 class BSFeedViewController: UIViewController {
 
