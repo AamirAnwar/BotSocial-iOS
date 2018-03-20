@@ -18,6 +18,7 @@ class BSFeedTableViewCell: UITableViewCell {
     let kFeedActionsCellReuseID = "BSFeedActionsTableViewCell"
     let kFeedPostInfoCellReuseID = "BSPostDetailTableViewCell"
     let kFeedCommentInfoCellReuseID = "BSAddCommentTableViewCell"
+    var imageURLString:String?
     required init?(coder aDecoder: NSCoder) {
         fatalError()
     }
@@ -41,6 +42,11 @@ class BSFeedTableViewCell: UITableViewCell {
         self.tableView.register(BSAddCommentTableViewCell.self, forCellReuseIdentifier: kFeedCommentInfoCellReuseID)
         
     }
+    
+    func setImageURL(_ urlString:String) {
+        self.imageURLString = urlString
+        self.tableView.reloadRows(at: [IndexPath.init(row: 1, section: 0)], with: .none)
+    }
 }
 
 extension BSFeedTableViewCell:UITableViewDelegate, UITableViewDataSource {
@@ -53,7 +59,9 @@ extension BSFeedTableViewCell:UITableViewDelegate, UITableViewDataSource {
         case 0:
             return tableView.dequeueReusableCell(withIdentifier: kFeedUserSnippetCellReuseID)!
         case 1:
-            return tableView.dequeueReusableCell(withIdentifier: kFeedImageCellReuseID)!
+            let cell = tableView.dequeueReusableCell(withIdentifier: kFeedImageCellReuseID) as! BSImageTableViewCell
+            cell.setImageURL(self.imageURLString ?? "")
+            return cell
         case 2:
             return tableView.dequeueReusableCell(withIdentifier: kFeedActionsCellReuseID)!
         case 3:

@@ -64,7 +64,9 @@ extension BSAccountViewController:UICollectionViewDelegate, UICollectionViewData
         case 0:
             return collectionView.dequeueReusableCell(withReuseIdentifier: kUserProfileCellReuseID, for: indexPath)
         case 1:
-            return collectionView.dequeueReusableCell(withReuseIdentifier: kImageCellReuseID, for: indexPath)
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kImageCellReuseID, for: indexPath) as! BSImageCollectionViewCell
+            cell.setImageURL(URL(string:kTestImageURL)!)
+            return cell
         default:
             print("Something's wrong")
             return UICollectionViewCell.init()

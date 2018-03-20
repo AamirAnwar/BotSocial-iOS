@@ -11,6 +11,7 @@ import UIKit
 class BSImageCollectionViewCell: UICollectionViewCell {
     let storyImageView = UIImageView.init()
     let containerView = UIView()
+    var isExpanded = false
     required init?(coder aDecoder: NSCoder) {
         fatalError()
     }
@@ -29,7 +30,27 @@ class BSImageCollectionViewCell: UICollectionViewCell {
         }
         self.storyImageView.contentMode = .scaleAspectFill
         self.storyImageView.clipsToBounds = true
-        self.storyImageView.pin_setImage(from: URL(string:kTestImageURL))
         self.contentView.clipsToBounds = true
+    }
+    
+    func setImageURL(_ url:URL) {
+        self.storyImageView.pin_setImage(from: url)
+    }
+    
+    func expandImages() {
+        guard self.isExpanded == false else {return}
+        self.isExpanded = true
+        let offsetAmount = 50
+        self.storyImageView.snp.remakeConstraints { (make) in
+            make.leading.equalToSuperview().offset(-offsetAmount)
+            make.trailing.equalToSuperview().offset(offsetAmount)
+            make.top.equalToSuperview().offset(-offsetAmount)
+            make.bottom.equalToSuperview().offset(offsetAmount)
+        }
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        self.storyImageView.image = nil
     }
 }

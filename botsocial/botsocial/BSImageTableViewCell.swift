@@ -24,12 +24,17 @@ class BSImageTableViewCell: UITableViewCell {
         self.storyImageView.contentMode = .scaleAspectFill
         self.storyImageView.clipsToBounds = true
         self.storyImageView.backgroundColor = UIColor.gray.withAlphaComponent(0.1)
-        self.storyImageView.pin_setImage(from: URL(string:kTestLargeImageURL))
+//        self.storyImageView.pin_setImage(from: URL(string:kTestLargeImageURL))
         self.contentView.clipsToBounds = true
         
     }
     
-    public func setImageURL(_ url:URL) {
-        self.storyImageView.pin_setImage(from: url)
+    public func setImageURL(_ urlString:String) {
+        self.storyImageView.pin_setImage(from: URL(string:urlString))
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        self.storyImageView.image = nil
     }
 }
