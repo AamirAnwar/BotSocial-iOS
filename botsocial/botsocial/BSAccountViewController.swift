@@ -23,7 +23,7 @@ class BSAccountViewController: UIViewController {
     }()
     override func viewDidLoad() {
         super.viewDidLoad()
-        for _ gstin 0..<30 {
+        for _ in 0..<30 {
             userImages += [kTestImageURL]
         }
         self.view.addSubview(self.collectionView)
