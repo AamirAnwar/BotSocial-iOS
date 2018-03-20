@@ -12,7 +12,7 @@ class BSAccountViewController: UIViewController {
     let tableView = UITableView.init(frame: .zero, style: .plain)
     let kUserProfileCellReuseID = "BSUserProfileTableViewCell"
     let kImageCellReuseID = "BSImageCollectionViewCell"
-    
+    var userImages = [String]()
     let collectionView:UICollectionView = {
         let layout = UICollectionViewFlowLayout.init()
         layout.minimumInteritemSpacing = 0
@@ -23,6 +23,9 @@ class BSAccountViewController: UIViewController {
     }()
     override func viewDidLoad() {
         super.viewDidLoad()
+        for _ gstin 0..<30 {
+            userImages += [kTestImageURL]
+        }
         self.view.addSubview(self.collectionView)
         self.collectionView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview()
@@ -43,7 +46,7 @@ extension BSAccountViewController:UICollectionViewDelegate, UICollectionViewData
         switch section {
         case 0:
             return 1
-        case 1: return 24
+        case 1: return userImages.count
         default:
             return 0
         }
@@ -65,7 +68,7 @@ extension BSAccountViewController:UICollectionViewDelegate, UICollectionViewData
             return collectionView.dequeueReusableCell(withReuseIdentifier: kUserProfileCellReuseID, for: indexPath)
         case 1:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kImageCellReuseID, for: indexPath) as! BSImageCollectionViewCell
-            cell.setImageURL(URL(string:kTestImageURL)!)
+            cell.setImageURL(URL(string:userImages[indexPath.row])!)
             return cell
         default:
             print("Something's wrong")
@@ -75,7 +78,11 @@ extension BSAccountViewController:UICollectionViewDelegate, UICollectionViewData
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        self.navigationController?.pushViewController(BSPostViewController(), animated: true)
+        if indexPath.section == 1 {
+            let vc = BSPostViewController()
+            vc.setImageURLString(userImages[indexPath.row])
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
     }
 }
 

@@ -24,7 +24,6 @@ class BSImageTableViewCell: UITableViewCell {
         self.storyImageView.contentMode = .scaleAspectFill
         self.storyImageView.clipsToBounds = true
         self.storyImageView.backgroundColor = UIColor.gray.withAlphaComponent(0.1)
-//        self.storyImageView.pin_setImage(from: URL(string:kTestLargeImageURL))
         self.contentView.clipsToBounds = true
         
     }
