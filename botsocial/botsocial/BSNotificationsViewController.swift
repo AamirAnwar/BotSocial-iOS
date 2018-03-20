@@ -8,7 +8,7 @@
 
 import UIKit
 
-class BSNotificationsViewController: UIViewController {
+class BSNotificationsViewController: UIViewController, UIGestureRecognizerDelegate {
     let tableView = UITableView.init(frame: .zero, style: .plain)
     let kNotifCellReuseID = "BSNotificationTableViewCell"
     override func viewDidLoad() {
@@ -20,6 +20,8 @@ class BSNotificationsViewController: UIViewController {
         self.tableView.delegate = self
         self.tableView.dataSource = self
         self.tableView.register(BSNotificationTableViewCell.self, forCellReuseIdentifier: kNotifCellReuseID)
+        self.navigationController?.interactivePopGestureRecognizer?.delegate = self
+        
     }
 }
 
@@ -30,5 +32,9 @@ extension BSNotificationsViewController:UITableViewDelegate, UITableViewDataSour
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         return tableView.dequeueReusableCell(withIdentifier: kNotifCellReuseID)!
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        self.navigationController?.pushViewController(BSPostViewController(), animated: true)
     }
 }

@@ -19,6 +19,8 @@ class BSImageCollectionViewCell: UICollectionViewCell {
         self.contentView.addSubview(self.containerView)
         self.containerView.backgroundColor = UIColor.gray.withAlphaComponent(0.1)
         self.containerView.addSubview(self.storyImageView)
+        self.containerView.layer.cornerRadius = kCornerRadius
+        self.containerView.clipsToBounds = true
         self.containerView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview().inset(1)
         }

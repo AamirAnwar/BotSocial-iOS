@@ -24,6 +24,7 @@ class BSPostViewController: UITableViewController, UIGestureRecognizerDelegate {
         self.tableView.register(BSFeedActionsTableViewCell.self, forCellReuseIdentifier: kFeedActionsCellReuseID)
         self.tableView.register(BSPostDetailTableViewCell.self, forCellReuseIdentifier: kFeedPostInfoCellReuseID)
         self.tableView.register(BSAddCommentTableViewCell.self, forCellReuseIdentifier: kFeedCommentInfoCellReuseID)
+        self.tableView.delaysContentTouches = false
         self.navigationController?.interactivePopGestureRecognizer?.delegate = self
     }
     

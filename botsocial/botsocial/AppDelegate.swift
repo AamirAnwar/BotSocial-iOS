@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Firebase
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -16,6 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        FirebaseApp.configure()
         self.window = UIWindow.init()
         self.window?.makeKeyAndVisible()
         self.window?.backgroundColor = UIColor.white
@@ -23,7 +25,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let feedVC = BSFeedViewController()
         let accountVC = getAccountPage()
         let cameraVC = BSCameraViewController()
-        let notifVC = BSNotificationsViewController()
+        let notifVC = getNotificationsPage()
         cameraVC.tabBarItem.image = UIImage.init(named: "camera_tab_icon")
         notifVC.tabBarItem.image = UIImage.init(named: "notification_tab_icon")
         accountVC.tabBarItem.image = UIImage.init(named: "account_tab_icon")
@@ -39,6 +41,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         navVC.isNavigationBarHidden = true
         return navVC
     }
+    
+    func getNotificationsPage() -> UIViewController {
+        let navVC = UINavigationController.init(rootViewController: BSNotificationsViewController())
+        navVC.isNavigationBarHidden = true
+        return navVC
+    }
+    
+    
 
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.

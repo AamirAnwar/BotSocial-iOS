@@ -8,6 +8,7 @@ target 'botsocial' do
   # Pods for botsocial
   pod 'PINRemoteImage', '3.0.0-beta.13'
    pod 'SnapKit', '~> 4.0.0'
+   pod 'Firebase/Core'
   target 'botsocialTests' do
     inherit! :search_paths
     # Pods for testing
