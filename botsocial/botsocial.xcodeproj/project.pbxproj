@@ -21,6 +21,7 @@
 		430E61B2205F220A00AECF27 /* BSPostDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 430E61B1205F220A00AECF27 /* BSPostDetailTableViewCell.swift */; };
 		430E61B4205F255B00AECF27 /* BSAddCommentTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 430E61B3205F255B00AECF27 /* BSAddCommentTableViewCell.swift */; };
 		437590C7206073ED00A7AAEA /* BSImageCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 437590C6206073ED00A7AAEA /* BSImageCollectionViewCell.swift */; };
+		437590C92060DED600A7AAEA /* BSPostViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 437590C82060DED600A7AAEA /* BSPostViewController.swift */; };
 		43910A9A203CC917009171CB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43910A99203CC917009171CB /* AppDelegate.swift */; };
 		43910AA3203CC917009171CB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43910AA2203CC917009171CB /* Assets.xcassets */; };
 		43910AA6203CC917009171CB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 43910AA4203CC917009171CB /* LaunchScreen.storyboard */; };
@@ -69,6 +70,7 @@
 		430E61B1205F220A00AECF27 /* BSPostDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSPostDetailTableViewCell.swift; sourceTree = "<group>"; };
 		430E61B3205F255B00AECF27 /* BSAddCommentTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSAddCommentTableViewCell.swift; sourceTree = "<group>"; };
 		437590C6206073ED00A7AAEA /* BSImageCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSImageCollectionViewCell.swift; sourceTree = "<group>"; };
+		437590C82060DED600A7AAEA /* BSPostViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSPostViewController.swift; sourceTree = "<group>"; };
 		43910A96203CC917009171CB /* botsocial.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = botsocial.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		43910A99203CC917009171CB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		43910AA2203CC917009171CB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -154,6 +156,7 @@
 				430E61A1205F0C6D00AECF27 /* BSNotificationsViewController.swift */,
 				430E61A3205F0C7700AECF27 /* BSAccountViewController.swift */,
 				43910AA4203CC917009171CB /* LaunchScreen.storyboard */,
+				437590C82060DED600A7AAEA /* BSPostViewController.swift */,
 				43910AA7203CC917009171CB /* Info.plist */,
 				430E619B205F066B00AECF27 /* BSFeedViewController.swift */,
 				430E619D205F076B00AECF27 /* BSFeedTableViewCell.swift */,
@@ -520,6 +523,7 @@
 				430E61AA205F117900AECF27 /* CustomUIKitExtensions.swift in Sources */,
 				430E61B2205F220A00AECF27 /* BSPostDetailTableViewCell.swift in Sources */,
 				430E619C205F066B00AECF27 /* BSFeedViewController.swift in Sources */,
+				437590C92060DED600A7AAEA /* BSPostViewController.swift in Sources */,
 				430E61A2205F0C6D00AECF27 /* BSNotificationsViewController.swift in Sources */,
 				430E61B0205F1BAB00AECF27 /* BSFeedActionsTableViewCell.swift in Sources */,
 				43927C9C20606D20002BE1AC /* BSUserProfileCollectionViewCell.swift in Sources */,

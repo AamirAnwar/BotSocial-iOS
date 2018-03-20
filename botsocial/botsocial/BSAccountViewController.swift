@@ -70,7 +70,10 @@ extension BSAccountViewController:UICollectionViewDelegate, UICollectionViewData
             return UICollectionViewCell.init()
             
         }
-        
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        self.navigationController?.pushViewController(BSPostViewController(), animated: true)
     }
 }
 

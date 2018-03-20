@@ -21,7 +21,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window?.backgroundColor = UIColor.white
         let rootVC = UITabBarController.init()
         let feedVC = BSFeedViewController()
-        let accountVC = BSAccountViewController()
+        let accountVC = getAccountPage()
         let cameraVC = BSCameraViewController()
         let notifVC = BSNotificationsViewController()
         cameraVC.tabBarItem.image = UIImage.init(named: "camera_tab_icon")
@@ -32,6 +32,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         rootVC.tabBar.tintColor = UIColor.black
         self.window?.rootViewController = rootVC
         return true
+    }
+    
+    func getAccountPage() -> UIViewController {
+        let navVC = UINavigationController.init(rootViewController: BSAccountViewController())
+        navVC.isNavigationBarHidden = true
+        return navVC
     }
 
     func applicationWillResignActive(_ application: UIApplication) {

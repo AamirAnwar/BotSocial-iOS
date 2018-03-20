@@ -1,54 +1,38 @@
 //
-//  BSFeedTableViewCell.swift
+//  BSPostViewController.swift
 //  botsocial
 //
-//  Created by Aamir  on 19/03/18.
+//  Created by Aamir  on 20/03/18.
 //  Copyright © 2018 AamirAnwar. All rights reserved.
 //
 
 import UIKit
-import SnapKit
-import PINRemoteImage
 
-class BSFeedTableViewCell: UITableViewCell {
-    
-    let tableView = UITableView.init(frame: .zero, style: .plain)
+class BSPostViewController: UITableViewController, UIGestureRecognizerDelegate {
     let kFeedImageCellReuseID = "BSImageTableViewCell"
     let kFeedUserSnippetCellReuseID = "BSUserSnippetTableViewCell"
     let kFeedActionsCellReuseID = "BSFeedActionsTableViewCell"
     let kFeedPostInfoCellReuseID = "BSPostDetailTableViewCell"
     let kFeedCommentInfoCellReuseID = "BSAddCommentTableViewCell"
-    required init?(coder aDecoder: NSCoder) {
-        fatalError()
-    }
-    
-    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        self.contentView.addSubview(self.tableView)
-        self.tableView.isScrollEnabled = false
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // Do any additional setup after loading the view.
         self.tableView.delegate = self
         self.tableView.dataSource = self
-        self.tableView.delaysContentTouches = false
-        self.tableView.tableFooterView = UIView.init()
-        self.tableView.snp.makeConstraints { (make) in
-            make.edges.equalToSuperview()
-            make.height.equalTo(700)
-        }
         self.tableView.register(BSUserSnippetTableViewCell.self, forCellReuseIdentifier: kFeedUserSnippetCellReuseID)
         self.tableView.register(BSImageTableViewCell.self, forCellReuseIdentifier: kFeedImageCellReuseID)
         self.tableView.register(BSFeedActionsTableViewCell.self, forCellReuseIdentifier: kFeedActionsCellReuseID)
         self.tableView.register(BSPostDetailTableViewCell.self, forCellReuseIdentifier: kFeedPostInfoCellReuseID)
         self.tableView.register(BSAddCommentTableViewCell.self, forCellReuseIdentifier: kFeedCommentInfoCellReuseID)
-        
-    }
-}
-
-extension BSFeedTableViewCell:UITableViewDelegate, UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 5
+        self.navigationController?.interactivePopGestureRecognizer?.delegate = self
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 5
+        
+    }
+    
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         switch indexPath.row {
         case 0:
             return tableView.dequeueReusableCell(withIdentifier: kFeedUserSnippetCellReuseID)!
@@ -63,5 +47,8 @@ extension BSFeedTableViewCell:UITableViewDelegate, UITableViewDataSource {
         default:
             return UITableViewCell()
         }
+    
     }
 }
+
+
