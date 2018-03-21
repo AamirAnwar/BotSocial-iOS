@@ -55,7 +55,8 @@ class BSFeedViewController: UIViewController {
     }
     
     @objc func didTapCameraButton() {
-        self.present(BSCameraViewController(), animated: true)
+        let navVC = UINavigationController.init(rootViewController: BSCameraViewController())
+        self.present(navVC, animated: true)
     }
 }
 

@@ -8,8 +8,6 @@
 
 import UIKit
 import AVFoundation
-import Sharaku
-
 
 let kCameraViewHeight:CGFloat = UIScreen.main.bounds.width
 class BSCameraViewController: UIViewController {
@@ -38,11 +36,19 @@ class BSCameraViewController: UIViewController {
         button.setTitleColor(UIColor.black, for: .normal)
         return button
     }()
+    
+    let nextButton:UIButton = {
+        let button = UIButton.init(type: .system)
+        button.setTitle("Next", for: .normal)
+        button.setTitleColor(UIColor.black, for: .normal)
+        return button
+    }()
     let filterView = BSFilterView()
-  
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.navigationController?.isNavigationBarHidden = true
         NotificationCenter.default.addObserver(self, selector: #selector(willShowKeyboard(notification:)), name: kNotificationWillShowKeyboard.name, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(willHideKeyboard), name: kNotificationWillHideKeyboard.name, object: nil)
         self.view.backgroundColor = UIColor.white
@@ -54,6 +60,7 @@ class BSCameraViewController: UIViewController {
         self.view.addSubview(self.filterView)
         self.view.addSubview(self.captureButton)
         self.view.addSubview(self.backButton)
+        self.view.addSubview(self.nextButton)
         
         self.cameraView.addSubview(self.switchCameraButton)
         
@@ -94,6 +101,14 @@ class BSCameraViewController: UIViewController {
             make.top.equalToSuperview().offset(2*kInteritemPadding)
         }
         
+        // Next button
+        self.nextButton.addTarget(self, action: #selector(didTapNextButton), for: .touchUpInside)
+        self.nextButton.isHidden = true
+        self.nextButton.snp.makeConstraints { (make) in
+            make.trailing.equalToSuperview().inset(kSidePadding)
+            make.top.equalToSuperview().offset(2*kInteritemPadding)
+        }
+        
         self.createSwitchCameraButton()
         self.createCapturePhotoButton()
         self.prepare {(error) in
@@ -122,11 +137,36 @@ class BSCameraViewController: UIViewController {
         self.capturedImageView.addGestureRecognizer(leftSwipe)
         
     }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        self.stopSessionIfNeeded()
+        super.viewWillDisappear(animated)
+    }
+    
+//    override func viewWillAppear(_ animated: Bool) {
+//        super.viewWillAppear(animated)
+//        self.startSessionIfNeeded()
+//    }
+    
+    func startSessionIfNeeded() {
+        if let session = self.captureSession, session.isRunning == false {
+            session.startRunning()
+        }
+    }
+    
+    func stopSessionIfNeeded() {
+        DispatchQueue(label: "prepare").async {
+            if let session = self.captureSession, session.isRunning == true {
+                session.stopRunning()
+            }
+        }
+    }
 
     
     func createSwitchCameraButton() {
         self.switchCameraButton.setImage(#imageLiteral(resourceName: "switch_camera_icon"), for: .normal)
         self.switchCameraButton.tintColor = UIColor.white
+        self.switchCameraButton.addTarget(self, action: #selector(didTapSwitchCameraButton), for: .touchUpInside)
         self.switchCameraButton.snp.makeConstraints { (make) in
             make.bottom.equalToSuperview().inset(kInteritemPadding)
             make.leading.equalToSuperview().offset(kSidePadding)
@@ -257,7 +297,10 @@ class BSCameraViewController: UIViewController {
             DispatchQueue(label: "capture_photo").async {
                 self.inProgressPhotoCaptureDelegates[processor.requestedPhotoSettings.uniqueID] = nil
             }
-            if let data = processor.photoData, let image = UIImage(data: data) {
+            if let data = processor.photoData, var image = UIImage(data: data) {
+                if self.currentCameraPosition == .front {
+                    image = UIImage.init(cgImage: image.cgImage!, scale: 1.0, orientation: UIImageOrientation.leftMirrored)
+                }
                 DispatchQueue.main.async {
                     self.showCapturedImage(image: image)
                 }
@@ -275,7 +318,9 @@ class BSCameraViewController: UIViewController {
         self.capturedImageView.isHidden = false
         self.cancelButton.isHidden = true
         self.backButton.isHidden = false
+        self.nextButton.isHidden = false
         self.captureButton.isHidden = true
+        self.stopSessionIfNeeded()
     }
     
     
@@ -300,8 +345,10 @@ class BSCameraViewController: UIViewController {
         })
     }
     
-    @objc func didTapPostButton() {
-        // Create post!
+    @objc func didTapNextButton() {
+        let vc = BSShareViewController()
+        vc.postImage = self.capturedImageView.image
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func didTapCancelButton() {
@@ -312,16 +359,83 @@ class BSCameraViewController: UIViewController {
         self.capturedImageView.isHidden = true
         self.capturedImageView.image = nil
         self.backButton.isHidden = true
+        self.nextButton.isHidden = true
         self.cancelButton.isHidden = false
         self.captureButton.isHidden = false
         self.filterView.isHidden = true
+        self.startSessionIfNeeded()
     }
     
-    @objc func didTapApplyFilters() {
-//        let imageToBeFiltered = UIImage(named: "targetImage")
-        let vc = SHViewController(image: self.capturedImageView.image!)
-//        vc.delegate = self
-        self.present(vc, animated:true, completion: nil)
+    
+    func switchCameras() throws {
+        guard let currentCameraPosition = currentCameraPosition, let captureSession = self.captureSession, captureSession.isRunning else { throw CameraControllerError.captureSessionIsMissing }
+        
+        captureSession.beginConfiguration()
+        
+        func switchToFrontCamera() throws {
+            let inputs = captureSession.inputs
+            guard let rearCameraInput = self.rearCameraInput, inputs.contains(rearCameraInput),
+                let frontCamera = self.frontCamera else { throw CameraControllerError.invalidOperation }
+            
+            self.frontCameraInput = try AVCaptureDeviceInput(device: frontCamera)
+            
+            captureSession.removeInput(rearCameraInput)
+            
+            if captureSession.canAddInput(self.frontCameraInput!) {
+                captureSession.addInput(self.frontCameraInput!)
+                
+                self.currentCameraPosition = .front
+            }
+                
+            else { throw CameraControllerError.invalidOperation }
+        }
+        
+        func switchToRearCamera() throws {
+            let inputs = captureSession.inputs
+            guard let frontCameraInput = self.frontCameraInput, inputs.contains(frontCameraInput),
+                let rearCamera = self.rearCamera else { throw CameraControllerError.invalidOperation }
+            
+            self.rearCameraInput = try AVCaptureDeviceInput(device: rearCamera)
+            captureSession.removeInput(frontCameraInput)
+            
+            if captureSession.canAddInput(self.rearCameraInput!) {
+                captureSession.addInput(self.rearCameraInput!)
+                
+                self.currentCameraPosition = .rear
+            }
+                
+            else { throw CameraControllerError.invalidOperation }
+        }
+        
+        switch currentCameraPosition {
+        case .front:
+            try switchToRearCamera()
+            
+        case .rear:
+            try switchToFrontCamera()
+        }
+        captureSession.commitConfiguration()
+    }
+    
+    @objc func didTapSwitchCameraButton() {
+        do {
+            try self.switchCameras()
+        }
+            
+        catch {
+            print(error)
+        }
+        
+//        switch self.currentCameraPosition {
+//        case .some(.front):
+//            toggleCameraButton.setImage(#imageLiteral(resourceName: "Front Camera Icon"), for: .normal)
+//
+//        case .some(.rear):
+//            toggleCameraButton.setImage(#imageLiteral(resourceName: "Rear Camera Icon"), for: .normal)
+//
+//        case .none:
+//            return
+//        }
     }
 }
 

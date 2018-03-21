@@ -33,6 +33,7 @@
 		43927C9C20606D20002BE1AC /* BSUserProfileCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43927C9B20606D20002BE1AC /* BSUserProfileCollectionViewCell.swift */; };
 		43A5174220629E3D00F49ADF /* BSFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A5174120629E3D00F49ADF /* BSFilterView.swift */; };
 		43A5174420629FAC00F49ADF /* BSFilterCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A5174320629FAC00F49ADF /* BSFilterCollectionViewCell.swift */; };
+		43A517462062B7D400F49ADF /* BSShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A517452062B7D400F49ADF /* BSShareViewController.swift */; };
 		43A98C06206122B500739551 /* BSFeaturedPostTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A98C05206122B500739551 /* BSFeaturedPostTableViewCell.swift */; };
 		6696C21C6D06CDDC0C9C3975 /* Pods_botsocial.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E6D73461FF8EA10B5F94BD03 /* Pods_botsocial.framework */; };
 		91745515BC721B3D3F09F253 /* Pods_botsocialTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4718A2820C609AF2A7866FA5 /* Pods_botsocialTests.framework */; };
@@ -92,6 +93,7 @@
 		43927C9B20606D20002BE1AC /* BSUserProfileCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSUserProfileCollectionViewCell.swift; sourceTree = "<group>"; };
 		43A5174120629E3D00F49ADF /* BSFilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSFilterView.swift; sourceTree = "<group>"; };
 		43A5174320629FAC00F49ADF /* BSFilterCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSFilterCollectionViewCell.swift; sourceTree = "<group>"; };
+		43A517452062B7D400F49ADF /* BSShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSShareViewController.swift; sourceTree = "<group>"; };
 		43A98C05206122B500739551 /* BSFeaturedPostTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSFeaturedPostTableViewCell.swift; sourceTree = "<group>"; };
 		4718A2820C609AF2A7866FA5 /* Pods_botsocialTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_botsocialTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		69B79F3524E09D553463AFD5 /* Pods_botsocialUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_botsocialUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -180,6 +182,7 @@
 				43A98C05206122B500739551 /* BSFeaturedPostTableViewCell.swift */,
 				43A5174120629E3D00F49ADF /* BSFilterView.swift */,
 				43A5174320629FAC00F49ADF /* BSFilterCollectionViewCell.swift */,
+				43A517452062B7D400F49ADF /* BSShareViewController.swift */,
 			);
 			path = botsocial;
 			sourceTree = "<group>";
@@ -600,6 +603,7 @@
 				430E61A8205F104600AECF27 /* Constants.swift in Sources */,
 				43927C9820603DDE002BE1AC /* BSPhotoCaptureDelegate.swift in Sources */,
 				430E61A4205F0C7700AECF27 /* BSAccountViewController.swift in Sources */,
+				43A517462062B7D400F49ADF /* BSShareViewController.swift in Sources */,
 				430E61A6205F0FB700AECF27 /* BSUserSnippetTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
