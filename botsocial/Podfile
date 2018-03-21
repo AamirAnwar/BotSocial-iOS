@@ -10,6 +10,7 @@ target 'botsocial' do
    pod 'SnapKit', '~> 4.0.0'
    pod 'Firebase/Core'
    pod 'FirebaseUI'
+   pod "Sharaku"
   target 'botsocialTests' do
     inherit! :search_paths
     # Pods for testing

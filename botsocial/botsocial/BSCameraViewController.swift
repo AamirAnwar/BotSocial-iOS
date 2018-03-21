@@ -8,6 +8,9 @@
 
 import UIKit
 import AVFoundation
+import Sharaku
+
+
 let kCameraViewHeight:CGFloat = UIScreen.main.bounds.width
 class BSCameraViewController: UIViewController {
     var captureSession: AVCaptureSession?
@@ -35,15 +38,26 @@ class BSCameraViewController: UIViewController {
         button.setTitleColor(UIColor.black, for: .normal)
         return button
     }()
-    
+    let filterView = BSFilterView()
+  
     
     override func viewDidLoad() {
         super.viewDidLoad()
         NotificationCenter.default.addObserver(self, selector: #selector(willShowKeyboard(notification:)), name: kNotificationWillShowKeyboard.name, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(willHideKeyboard), name: kNotificationWillHideKeyboard.name, object: nil)
         self.view.backgroundColor = UIColor.white
-        // Cancel button
+        
+        
         self.view.addSubview(self.cancelButton)
+        self.view.addSubview(self.cameraView)
+        self.view.addSubview(self.capturedImageView)
+        self.view.addSubview(self.filterView)
+        self.view.addSubview(self.captureButton)
+        self.view.addSubview(self.backButton)
+        
+        self.cameraView.addSubview(self.switchCameraButton)
+        
+        // Cancel button
         self.cancelButton.addTarget(self, action: #selector(didTapCancelButton), for: .touchUpInside)
         self.cancelButton.snp.makeConstraints { (make) in
             make.leading.equalToSuperview().offset(kSidePadding)
@@ -52,7 +66,6 @@ class BSCameraViewController: UIViewController {
         }
         
         // Camera view
-        self.view.addSubview(self.cameraView)
         self.cameraView.backgroundColor = UIColor.black
         self.cameraView.snp.makeConstraints { (make) in
             make.leading.equalToSuperview()
@@ -63,20 +76,23 @@ class BSCameraViewController: UIViewController {
         
         // Captured Image View
         self.capturedImageView.isHidden = true
-        self.view.addSubview(self.capturedImageView)
+        self.capturedImageView.contentMode = .scaleAspectFill
+        self.capturedImageView.clipsToBounds = true
         self.capturedImageView.snp.makeConstraints { (make) in
-            make.edges.equalTo(self.cameraView)
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview()
+            make.top.equalTo(self.backButton.snp.bottom).offset(kInteritemPadding)
+            make.height.equalTo(kCameraViewHeight)
         }
         
+        
         // Back button
-        self.view.addSubview(self.backButton)
         self.backButton.addTarget(self, action: #selector(didTapBackButton), for: .touchUpInside)
         self.backButton.isHidden = true
         self.backButton.snp.makeConstraints { (make) in
-            make.leading.equalTo(self.cancelButton.snp.leading)
-            make.top.equalTo(self.backButton.snp.top)
+            make.leading.equalToSuperview().offset(kSidePadding)
+            make.top.equalToSuperview().offset(2*kInteritemPadding)
         }
-        
         
         self.createSwitchCameraButton()
         self.createCapturePhotoButton()
@@ -86,11 +102,29 @@ class BSCameraViewController: UIViewController {
             }
             try? self.displayPreview(on: self.cameraView)
         }
+        
+        // Filter View
+        self.filterView.isHidden = true
+        self.filterView.snp.makeConstraints { (make) in
+            make.top.equalTo(self.capturedImageView.snp.bottom).offset(kInteritemPadding)
+            make.bottom.equalToSuperview()
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview()
+        }
+        
+        let rightSwipe = UISwipeGestureRecognizer.init(target: self.filterView, action: #selector(self.filterView.imageViewDidSwipeRight))
+        rightSwipe.direction = .right
+        self.capturedImageView.addGestureRecognizer(rightSwipe)
+        
+        let leftSwipe = UISwipeGestureRecognizer.init(target: self.filterView, action: #selector(self.filterView.imageViewDidSwipeLeft))
+        leftSwipe.direction = .left
+        self.capturedImageView.isUserInteractionEnabled = true
+        self.capturedImageView.addGestureRecognizer(leftSwipe)
+        
     }
 
     
     func createSwitchCameraButton() {
-        self.cameraView.addSubview(self.switchCameraButton)
         self.switchCameraButton.setImage(#imageLiteral(resourceName: "switch_camera_icon"), for: .normal)
         self.switchCameraButton.tintColor = UIColor.white
         self.switchCameraButton.snp.makeConstraints { (make) in
@@ -100,7 +134,6 @@ class BSCameraViewController: UIViewController {
     }
     
     func createCapturePhotoButton() {
-        self.view.addSubview(self.captureButton)
         self.captureButton.setImage(#imageLiteral(resourceName: "capture_button"), for: .normal)
         self.captureButton.tintColor = UIColor.red
         self.captureButton.snp.makeConstraints { (make) in
@@ -237,6 +270,8 @@ class BSCameraViewController: UIViewController {
     
     func showCapturedImage(image:UIImage) {
         self.capturedImageView.image = image
+        self.filterView.capturedImageView = self.capturedImageView
+        self.filterView.isHidden = false
         self.capturedImageView.isHidden = false
         self.cancelButton.isHidden = true
         self.backButton.isHidden = false
@@ -279,6 +314,14 @@ class BSCameraViewController: UIViewController {
         self.backButton.isHidden = true
         self.cancelButton.isHidden = false
         self.captureButton.isHidden = false
+        self.filterView.isHidden = true
+    }
+    
+    @objc func didTapApplyFilters() {
+//        let imageToBeFiltered = UIImage(named: "targetImage")
+        let vc = SHViewController(image: self.capturedImageView.image!)
+//        vc.delegate = self
+        self.present(vc, animated:true, completion: nil)
     }
 }
 
@@ -305,3 +348,5 @@ extension BSCameraViewController {
         case rear
     }
 }
+
+
