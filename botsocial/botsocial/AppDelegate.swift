@@ -8,9 +8,13 @@
 
 import UIKit
 import Firebase
+import FirebaseAuthUI
+import FirebaseGoogleAuthUI
+
+
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, FUIAuthDelegate {
 
     var window: UIWindow?
 
@@ -18,22 +22,41 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         FirebaseApp.configure()
+        let authUI = FUIAuth.defaultAuthUI()
+        
+        let providers: [FUIAuthProvider] = [
+            FUIGoogleAuth()
+            ]
+        authUI?.providers = providers
+
+        // You need to adopt a FUIAuthDelegate protocol to receive callback
+        authUI?.delegate = self
+        let authViewController = authUI!.authViewController()
+
+
         self.window = UIWindow.init()
         self.window?.makeKeyAndVisible()
         self.window?.backgroundColor = UIColor.white
         let rootVC = UITabBarController.init()
-        let feedVC = BSFeedViewController()
+        let feedVC = getFeedPage()
         let accountVC = getAccountPage()
-        let cameraVC = BSCameraViewController()
+//        let cameraVC = BSCameraViewController()
         let notifVC = getNotificationsPage()
-        cameraVC.tabBarItem.image = UIImage.init(named: "camera_tab_icon")
+//        cameraVC.tabBarItem.image = UIImage.init(named: "camera_tab_icon")
+        feedVC.tabBarItem.image = UIImage.init(named: "feed_tab_icon")
         notifVC.tabBarItem.image = UIImage.init(named: "notification_tab_icon")
         accountVC.tabBarItem.image = UIImage.init(named: "account_tab_icon")
         
-        rootVC.viewControllers = [feedVC, cameraVC, notifVC, accountVC]
+        rootVC.viewControllers = [feedVC, notifVC, accountVC]
         rootVC.tabBar.tintColor = UIColor.black
         self.window?.rootViewController = rootVC
+        rootVC.present(authViewController, animated: true)
         return true
+    }
+    
+    func getFeedPage() -> UIViewController {
+        let navVC = UINavigationController.init(rootViewController: BSFeedViewController())
+        return navVC
     }
     
     func getAccountPage() -> UIViewController {
@@ -47,7 +70,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         navVC.isNavigationBarHidden = true
         return navVC
     }
+    func authUI(_ authUI: FUIAuth, didSignInWith user: User?, error: Error?) {
+        // handle user and error as necessary
+        if let user = user {
+            print("User found!")
+            if let name = user.displayName {
+                print("\(name)")
+            }
+        
+        }
+    }
+
     
+    func application(_ app: UIApplication, open url: URL,
+                     options: [UIApplicationOpenURLOptionsKey : Any]) -> Bool {
+        let sourceApplication = options[UIApplicationOpenURLOptionsKey.sourceApplication] as! String?
+        if FUIAuth.defaultAuthUI()?.handleOpen(url, sourceApplication: sourceApplication) ?? false {
+            return true
+        }
+        // other URL handling goes here.
+        return false
+    }
+
     
 
     func applicationWillResignActive(_ application: UIApplication) {

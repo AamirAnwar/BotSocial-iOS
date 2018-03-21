@@ -40,8 +40,9 @@ class BSFeedViewController: UIViewController {
         for _ in 0..<20 {
             postImages += [kTestLargeImageURL]
         }
-        print(postImages)
-        self.tabBarItem.image = UIImage.init(named: "feed_tab_icon")
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem.init(image: #imageLiteral(resourceName: "camera_tab_icon"), style: .plain, target: self, action: #selector(didTapCameraButton))
+        self.navigationItem.leftBarButtonItem?.tintColor = UIColor.black
+        self.navigationController?.navigationBar.tintColor = UIColor.black
         self.view.addSubview(self.tableView)
         self.tableView.delegate = self
         self.tableView.dataSource = self
@@ -51,6 +52,10 @@ class BSFeedViewController: UIViewController {
         self.tableView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview()
         }
+    }
+    
+    @objc func didTapCameraButton() {
+        self.present(BSCameraViewController(), animated: true)
     }
 }
 

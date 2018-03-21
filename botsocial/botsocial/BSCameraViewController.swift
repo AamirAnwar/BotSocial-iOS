@@ -8,10 +8,7 @@
 
 import UIKit
 import AVFoundation
-
-let kNotificationWillShowKeyboard = Notification(name: Notification.Name.UIKeyboardWillShow)
-let kNotificationWillHideKeyboard = Notification(name: Notification.Name.UIKeyboardWillHide)
-
+let kCameraViewHeight:CGFloat = UIScreen.main.bounds.width
 class BSCameraViewController: UIViewController {
     var captureSession: AVCaptureSession?
     var frontCamera: AVCaptureDevice?
@@ -24,96 +21,80 @@ class BSCameraViewController: UIViewController {
     let captureButton = UIButton.init(type: .system)
     let switchCameraButton = UIButton.init(type: .system)
     private var inProgressPhotoCaptureDelegates = [Int64: PhotoCaptureProcessor]()
-    let postContainerView = UIView()
-    let captureImageView = UIImageView()
-    let closeButton:UIButton = {
+    let cameraView = UIView()
+    let capturedImageView = UIImageView()
+    let cancelButton:UIButton = {
         let button = UIButton.init(type: .system)
-        button.setImage(#imageLiteral(resourceName: "close_icon"), for: .normal)
-        button.tintColor = UIColor.white
+        button.setTitle("Cancel", for: .normal)
+        button.setTitleColor(UIColor.black, for: .normal)
+        return button
+    }()
+    let backButton:UIButton = {
+        let button = UIButton.init(type: .system)
+        button.setTitle("Back", for: .normal)
+        button.setTitleColor(UIColor.black, for: .normal)
         return button
     }()
     
-    let postButton:UIButton = {
-        let button = UIButton.init(type: .system)
-        button.setTitle("Post", for: .normal)
-        button.tintColor = UIColor.white
-        return button
-    }()
-    
-    let textField = UITextField()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         NotificationCenter.default.addObserver(self, selector: #selector(willShowKeyboard(notification:)), name: kNotificationWillShowKeyboard.name, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(willHideKeyboard), name: kNotificationWillHideKeyboard.name, object: nil)
-        self.createPostContainerView()
+        self.view.backgroundColor = UIColor.white
+        // Cancel button
+        self.view.addSubview(self.cancelButton)
+        self.cancelButton.addTarget(self, action: #selector(didTapCancelButton), for: .touchUpInside)
+        self.cancelButton.snp.makeConstraints { (make) in
+            make.leading.equalToSuperview().offset(kSidePadding)
+            make.top.equalToSuperview().offset(2*kInteritemPadding)
+            
+        }
+        
+        // Camera view
+        self.view.addSubview(self.cameraView)
+        self.cameraView.backgroundColor = UIColor.black
+        self.cameraView.snp.makeConstraints { (make) in
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview()
+            make.top.equalTo(self.cancelButton.snp.bottom).offset(kInteritemPadding)
+            make.height.equalTo(kCameraViewHeight)
+        }
+        
+        // Captured Image View
+        self.capturedImageView.isHidden = true
+        self.view.addSubview(self.capturedImageView)
+        self.capturedImageView.snp.makeConstraints { (make) in
+            make.edges.equalTo(self.cameraView)
+        }
+        
+        // Back button
+        self.view.addSubview(self.backButton)
+        self.backButton.addTarget(self, action: #selector(didTapBackButton), for: .touchUpInside)
+        self.backButton.isHidden = true
+        self.backButton.snp.makeConstraints { (make) in
+            make.leading.equalTo(self.cancelButton.snp.leading)
+            make.top.equalTo(self.backButton.snp.top)
+        }
+        
+        
         self.createSwitchCameraButton()
         self.createCapturePhotoButton()
         self.prepare {(error) in
             if let error = error {
                 print(error)
             }
-            try? self.displayPreview(on: self.view)
+            try? self.displayPreview(on: self.cameraView)
         }
     }
-    
-    func createPostContainerView() {
-        self.view.addSubview(self.postContainerView)
-        self.postContainerView.isHidden = true
-        self.postContainerView.snp.makeConstraints { (make) in
-            make.edges.equalToSuperview()
-        }
-        
-        self.postContainerView.addSubview(self.captureImageView)
-        self.captureImageView.snp.makeConstraints { (make) in
-            make.edges.equalToSuperview()
-        }
-        
-        self.postContainerView.addSubview(self.closeButton)
-        let closeButtonSize:CGFloat = 88
-        self.closeButton.backgroundColor = UIColor.red.withAlphaComponent(0.7)
-        self.closeButton.snp.makeConstraints { (make) in
-            make.leading.equalToSuperview().offset(kSidePadding)
-            make.top.equalToSuperview().offset(50)
-            make.size.equalTo(closeButtonSize)
-        }
-        self.closeButton.addTarget(self, action: #selector(didTapCloseButton), for: .touchUpInside)
-        self.closeButton.layer.cornerRadius = closeButtonSize/2
-        self.textField.attributedPlaceholder = NSAttributedString.init(string: " Say something", attributes:[NSAttributedStringKey.foregroundColor:UIColor.white])
-        
-        self.textField.textColor = UIColor.white
-        self.textField.layer.borderColor = UIColor.white.cgColor
-        self.textField.delegate = self
-        self.textField.layer.borderWidth = 1
-        self.textField.layer.cornerRadius = 2*kCornerRadius
-        self.textField.backgroundColor = UIColor.black
-        
-        
-        self.postContainerView.addSubview(self.textField)
-        self.textField.snp.makeConstraints { (make) in
-            make.bottom.equalToSuperview().inset(64)
-            make.leading.equalToSuperview().offset(kSidePadding)
-            make.trailing.equalToSuperview().inset(kSidePadding)
-            make.height.equalTo(40)
-        }
-        
-        self.postContainerView.addSubview(self.postButton)
-        self.postButton.layer.cornerRadius = closeButtonSize/2
-        self.postButton.backgroundColor = UIColor.blue.withAlphaComponent(0.7)
-        self.postButton.snp.makeConstraints { (make) in
-            make.trailing.equalToSuperview().inset(kSidePadding)
-            make.centerY.equalTo(self.closeButton.snp.centerY)
-            make.size.equalTo(self.closeButton.snp.size)
-        }
-        self.postButton.addTarget(self, action: #selector(didTapPostButton), for: .touchUpInside)
-    }
+
     
     func createSwitchCameraButton() {
-        self.view.addSubview(self.switchCameraButton)
+        self.cameraView.addSubview(self.switchCameraButton)
         self.switchCameraButton.setImage(#imageLiteral(resourceName: "switch_camera_icon"), for: .normal)
         self.switchCameraButton.tintColor = UIColor.white
         self.switchCameraButton.snp.makeConstraints { (make) in
-            make.top.equalToSuperview().offset(50)
+            make.bottom.equalToSuperview().inset(kInteritemPadding)
             make.leading.equalToSuperview().offset(kSidePadding)
         }
     }
@@ -124,7 +105,7 @@ class BSCameraViewController: UIViewController {
         self.captureButton.tintColor = UIColor.red
         self.captureButton.snp.makeConstraints { (make) in
             make.centerX.equalToSuperview()
-            make.bottom.equalToSuperview().inset(64)
+            make.centerY.equalTo(self.cameraView.snp.bottom).offset((self.view.height() - 10 - kCameraViewHeight)/2)
         }
         self.captureButton.addTarget(self, action: #selector(didTapCapturePhoto), for: .touchUpInside)
         
@@ -215,7 +196,7 @@ class BSCameraViewController: UIViewController {
         self.previewLayer?.connection?.videoOrientation = .portrait
         
         view.layer.insertSublayer(self.previewLayer!, at: 0)
-        self.previewLayer?.frame = view.frame
+        self.previewLayer?.frame = view.bounds
     }
     
     @objc func didTapCapturePhoto() {
@@ -255,16 +236,13 @@ class BSCameraViewController: UIViewController {
     }
     
     func showCapturedImage(image:UIImage) {
-        self.captureImageView.image = image
-        self.view.bringSubview(toFront: self.postContainerView)
-        self.postContainerView.isHidden = false
-        
+        self.capturedImageView.image = image
+        self.capturedImageView.isHidden = false
+        self.cancelButton.isHidden = true
+        self.backButton.isHidden = false
+        self.captureButton.isHidden = true
     }
     
-    @objc func didTapCloseButton() {
-        self.postContainerView.isHidden = true
-        self.textField.text = ""
-    }
     
     @objc func willShowKeyboard(notification:NSNotification) {
         guard self.view.window != nil else {return}
@@ -275,9 +253,7 @@ class BSCameraViewController: UIViewController {
             if let tabbar = self.tabBarController?.tabBar {
                 tabBarHeight = tabbar.height()
             }
-            UIView.animate(withDuration: 1, animations: {
-                self.textField.transform = self.textField.transform.translatedBy(x: 0, y: -(keyboardHeight - tabBarHeight))
-            })
+            
             
         }
     }
@@ -285,12 +261,24 @@ class BSCameraViewController: UIViewController {
     @objc func willHideKeyboard() {
         guard self.view.window != nil else {return}
         UIView.animate(withDuration: 1, animations: {
-            self.textField.transform = .identity
+            
         })
     }
     
     @objc func didTapPostButton() {
         // Create post!
+    }
+    
+    @objc func didTapCancelButton() {
+        self.dismiss(animated: true)
+    }
+    
+    @objc func didTapBackButton() {
+        self.capturedImageView.isHidden = true
+        self.capturedImageView.image = nil
+        self.backButton.isHidden = true
+        self.cancelButton.isHidden = false
+        self.captureButton.isHidden = false
     }
 }
 
