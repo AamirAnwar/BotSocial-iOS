@@ -102,6 +102,7 @@ extension BSFeedViewController: UITableViewDelegate, UITableViewDataSource {
             switch indexPath.row {
             case 0:
                 let cell = tableView.dequeueReusableCell(withIdentifier: kFeedUserSnippetCellReuseID) as! BSUserSnippetTableViewCell
+                cell.usernameLabel.text = post.authorName
                 if let authorID = post.authorID {
                     APIService.sharedInstance.getProfilePictureFor(userID: authorID, completion: {[weak cell] (url) in
                         if let strongCell = cell {
@@ -132,6 +133,28 @@ extension BSFeedViewController: UITableViewDelegate, UITableViewDataSource {
                 return UITableViewCell()
             }
         }
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        guard indexPath.section > 0 else {return}
+        let postIndex = indexPath.section - 1
+        let post = self.posts[postIndex]
+        if let authorID = post.authorID {
+            switch indexPath.row {
+            case 0:
+                APIService.sharedInstance.getUserWith(userID: authorID, completion: { (user) in
+                    if let user = user {
+                        let vc = BSAccountViewController()
+                        vc.user = user
+                        self.navigationController?.pushViewController(vc, animated: true)
+                    }
+                })
+            default:
+                break
+            }
+        }
+   
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {

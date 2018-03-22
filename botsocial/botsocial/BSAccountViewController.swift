@@ -12,6 +12,7 @@ class BSAccountViewController: UIViewController, UIGestureRecognizerDelegate {
     let kUserProfileCellReuseID = "BSUserProfileCollectionViewCell"
     let kImageCellReuseID = "BSImageCollectionViewCell"
     var userPosts = [BSPost]()
+    var user:BSUser?
     let collectionView:UICollectionView = {
         let layout = UICollectionViewFlowLayout.init()
         layout.minimumInteritemSpacing = 0
@@ -26,14 +27,24 @@ class BSAccountViewController: UIViewController, UIGestureRecognizerDelegate {
 //            userImages += [kTestImageURL]
 //        }
         self.navigationController?.interactivePopGestureRecognizer?.delegate = self
-        
-        APIService.sharedInstance.getUserPosts { (post) in
-            if let post = post {
-                self.userPosts.insert(post, at: 0)
-                self.collectionView.reloadData()
-            }
+        if let user = self.user {
+            APIService.sharedInstance.getPostsWith(userID: user.id, completion: { (post) in
+                if let post = post {
+                    self.userPosts.insert(post, at: 0)
+                    self.collectionView.reloadData()
+                }
+            })
             
         }
+        else {
+            APIService.sharedInstance.getUserPosts { (post) in
+                if let post = post {
+                    self.userPosts.insert(post, at: 0)
+                    self.collectionView.reloadData()
+                }
+            }
+        }
+        
         self.view.addSubview(self.collectionView)
         self.collectionView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview()
@@ -75,6 +86,10 @@ extension BSAccountViewController:UICollectionViewDelegate, UICollectionViewData
         case 0:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kUserProfileCellReuseID, for: indexPath) as! BSUserProfileCollectionViewCell
             cell.delegate = self
+            cell.configureWithUser(user: self.user)
+            if let _ = self.user {
+                cell.settingsButton.isHidden = true
+            }
             return cell
         case 1:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kImageCellReuseID, for: indexPath) as! BSImageCollectionViewCell

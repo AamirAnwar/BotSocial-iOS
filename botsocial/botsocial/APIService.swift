@@ -33,6 +33,16 @@ class APIService: NSObject {
         })
     }
     
+    
+    func getPostsWith(userID:String, completion:@escaping ((_ post:BSPost?) -> Void)) {
+        guard userID.isEmpty == false else {return}
+        self.databaseRef.child("user-posts").child("\(userID)").observe(DataEventType.childAdded, with: { (snapshot) in
+            guard let value = snapshot.value as? [String:AnyObject] else {completion(nil);return}
+            let post = BSPost.initWith(postID: snapshot.key, dict: value)
+            completion(post)
+        })
+    }
+    
     func getRecentPosts(completion:@escaping ((_ posts:BSPost?) -> Void)) {
         guard let _ = self.currentUser else {return}
         self.databaseRef.child("posts").observe(DataEventType.childAdded, with: { (snapshot) in
@@ -71,7 +81,20 @@ class APIService: NSObject {
         })
     }
     
+    func updateUserDetails() {
+        guard let user = self.currentUser, let name = user.displayName else {return}
+        self.databaseRef.child("users").child(user.uid).updateChildValues(["display_name":name])
+    }
     
+    func getUserWith(userID:String,  completion:@escaping(_ user:BSUser?)->Void) {
+        guard userID.isEmpty == false else {completion(nil);return}
+        self.databaseRef.child("users").child(userID).observeSingleEvent(of: .value) { (snapshot) in
+            if let value = snapshot.value as? [String:AnyObject] {
+                let userObject = BSUser.initWith(userID: userID, dict: value)
+                completion(userObject)
+            }
+        }
+    }
     
     func updateUserProfilePicture(image:UIImage, completion:@escaping()->Void) {
         if let user = self.currentUser {

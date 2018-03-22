@@ -54,7 +54,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, FUIAuthDelegate {
             self.resetApp()
             print("User found!")
             if let name = user.displayName {
-                print("\(name)")
+                
             }
         
         }

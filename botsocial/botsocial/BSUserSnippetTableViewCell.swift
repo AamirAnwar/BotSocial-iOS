@@ -32,7 +32,6 @@ class BSUserSnippetTableViewCell: UITableViewCell {
         self.contentView.addSubview(self.userImageView)
         self.contentView.addSubview(self.usernameLabel)
         
-        self.usernameLabel.text = "aamiranwar"
         self.userImageView.backgroundColor = UIColor.gray.withAlphaComponent(0.1)
         self.userImageView.snp.makeConstraints { (make) in
             make.leading.equalToSuperview().offset(kSidePadding)

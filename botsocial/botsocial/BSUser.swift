@@ -17,11 +17,11 @@ class BSUser: NSObject {
     var phone:String?
     var displayName:String!
     
-    static func initWith(userID:String, dict:[String:String]) -> BSUser{
+    static func initWith(userID:String, dict:[String:AnyObject]) -> BSUser{
         let user = BSUser.init()
         user.id = userID
-        user.profilePictureURL = dict[kProfilePictureURLKey] ?? ""
-        user.displayName = dict[kDisplayNameKey] ?? ""
+        user.profilePictureURL = dict[kProfilePictureURLKey] as? String ?? ""
+        user.displayName = dict[kDisplayNameKey] as? String ?? ""
         return user
     }
 }

@@ -30,12 +30,6 @@ class BSUserProfileCollectionViewCell: UICollectionViewCell {
             make.size.equalTo(88)
         })
         imageView.layer.cornerRadius = 44
-        APIService.sharedInstance.getUserProfileImageURL(completion: { (url) in
-            if let url = url {
-                imageView.pin_setImage(from: url)
-            }
-        })
-        
         return imageView
     }()
     
@@ -67,12 +61,30 @@ class BSUserProfileCollectionViewCell: UICollectionViewCell {
             make.top.greaterThanOrEqualToSuperview().offset(kInteritemPadding)
             
         }
-        self.usernameLabel.text = Auth.auth().currentUser?.displayName
+        
         self.usernameLabel.snp.makeConstraints { (make) in
             make.leading.equalTo(self.userThumbnailImageView.snp.leading)
             make.top.equalTo(self.userThumbnailImageView.snp.bottom).offset(8)
             make.bottom.equalToSuperview().inset(kInteritemPadding)
             
+        }
+    }
+    
+    func configureWithUser(user:BSUser? = nil) {
+        if let user = user {
+            self.usernameLabel.text = user.displayName
+            APIService.sharedInstance.getProfilePictureFor(userID: user.id, completion: { (url) in
+                self.userThumbnailImageView.pin_setImage(from: url)
+                
+            })
+        }
+        else {
+            self.usernameLabel.text = Auth.auth().currentUser?.displayName
+            APIService.sharedInstance.getUserProfileImageURL(completion: { (url) in
+                if let url = url {
+                    self.userThumbnailImageView.pin_setImage(from: url)
+                }
+            })
         }
     }
     
