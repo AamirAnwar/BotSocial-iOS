@@ -52,7 +52,7 @@ class BSUserSnippetTableViewCell: UITableViewCell {
         
     }
     
-    func setImageURL(_ url:URL) {
+    func setImageURL(_ url:URL?) {
         self.userImageView.pin_setImage(from:url)
     }
     

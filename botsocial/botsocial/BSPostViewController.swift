@@ -36,7 +36,7 @@ class BSPostViewController: UITableViewController, UIGestureRecognizerDelegate {
     
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 5
+        return 4
         
     }
     
@@ -44,14 +44,12 @@ class BSPostViewController: UITableViewController, UIGestureRecognizerDelegate {
         switch indexPath.row {
         case 0:
             let cell = tableView.dequeueReusableCell(withIdentifier: kFeedUserSnippetCellReuseID) as! BSUserSnippetTableViewCell
-            APIService.sharedInstance.getUserProfileImageURL(completion: {[weak cell] (url) in
-                if let strongCell = cell {
-                    if let url = url {
-                        strongCell.setImageURL(url)
-                    }
-                }
-                
-            })
+            if let post = self.post {
+                cell.usernameLabel.text = self.post?.authorName
+                APIService.sharedInstance.getProfilePictureFor(userID: post.authorID, completion: { (url) in
+                    cell.setImageURL(url)
+                })
+            }
             return cell
         case 1:
             let cell = tableView.dequeueReusableCell(withIdentifier: kFeedImageCellReuseID) as! BSImageTableViewCell
@@ -60,15 +58,37 @@ class BSPostViewController: UITableViewController, UIGestureRecognizerDelegate {
             }
             return cell
         case 2:
-            return tableView.dequeueReusableCell(withIdentifier: kFeedActionsCellReuseID)!
+            let cell = tableView.dequeueReusableCell(withIdentifier: kFeedActionsCellReuseID) as! BSFeedActionsTableViewCell
+            cell.post = self.post
+            cell.delegate = self
+            return cell
         case 3:
-            return tableView.dequeueReusableCell(withIdentifier: kFeedPostInfoCellReuseID)!
+            let cell = tableView.dequeueReusableCell(withIdentifier: kFeedPostInfoCellReuseID) as! BSPostDetailTableViewCell
+            cell.post = self.post
+            return cell
         case 4:
             return tableView.dequeueReusableCell(withIdentifier: kFeedCommentInfoCellReuseID)!
         default:
             return UITableViewCell()
         }
+        
+    }
+}
+
+extension BSPostViewController:BSFeedActionsTableViewCellDelegate {
+    func didTapLikeButton(forIndexPath indexPath: IndexPath?) {
+        if  let post = self.post {
+            APIService.sharedInstance.likePost(post:post)
+        }
+    }
     
+    func didTapCommentsButton(forIndexPath indexPath: IndexPath?) {
+        if let post = self.post {
+            let vc = BSPostCommentsViewController()
+            vc.post = post
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+        
     }
 }
 

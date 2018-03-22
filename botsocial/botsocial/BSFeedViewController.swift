@@ -211,8 +211,5 @@ extension BSFeedViewController:BSFeedActionsTableViewCellDelegate {
             self.navigationController?.pushViewController(vc, animated: true)
         }
     }
-    
-    
-    
 }
 
