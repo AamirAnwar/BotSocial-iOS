@@ -73,6 +73,12 @@ extension BSFeaturedPostTableViewCell:UICollectionViewDelegate, UICollectionView
         if let urlString = featuredPosts[indexPath.row].imageURL, let url = URL(string:urlString) {
             cell.setImageURL(url)
         }
+        if indexPath.row == 1 && cell.isExpanded == false {
+            let cellFrame = collectionView.convert(cell.frame, to: self.contentView)
+            let translationX = cellFrame.origin.x / 5
+            cell.storyImageView.transform = CGAffineTransform(translationX: translationX, y: 0)
+            cell.layer.transform = animateCell(cellFrame: cellFrame)
+        }
         cell.expandImages()
         return cell
         
@@ -86,15 +92,19 @@ extension BSFeaturedPostTableViewCell: UIScrollViewDelegate {
 //        let offsetY = scrollView.contentOffset.y
         if let collectionView = scrollView as? UICollectionView {
             for cell in collectionView.visibleCells as! [BSImageCollectionViewCell] {
-                let indexPath = collectionView.indexPath(for: cell)!
-                let attributes = collectionView.layoutAttributesForItem(at: indexPath)!
-                let cellFrame = collectionView.convert(attributes.frame, to: self.contentView)
-                
-                let translationX = cellFrame.origin.x / 5
-                cell.storyImageView.transform = CGAffineTransform(translationX: translationX, y: 0)
-                cell.layer.transform = animateCell(cellFrame: cellFrame)
+                configure(cell)
             }
         }
+    }
+    
+    func configure(_ cell:BSImageCollectionViewCell) {
+        let indexPath = collectionView.indexPath(for: cell)!
+        let attributes = collectionView.layoutAttributesForItem(at: indexPath)!
+        let cellFrame = collectionView.convert(attributes.frame, to: self.contentView)
+        
+        let translationX = cellFrame.origin.x / 5
+        cell.storyImageView.transform = CGAffineTransform(translationX: translationX, y: 0)
+        cell.layer.transform = animateCell(cellFrame: cellFrame)
     }
     
     func animateCell(cellFrame: CGRect) -> CATransform3D {
