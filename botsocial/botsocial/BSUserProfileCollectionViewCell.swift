@@ -7,17 +7,28 @@
 //
 
 import UIKit
+import Firebase
+protocol BSUserProfileCollectionViewCellDelegate {
+    func didTapUserProfileThumb()
+}
 
 class BSUserProfileCollectionViewCell: UICollectionViewCell {
+    var delegate:BSUserProfileCollectionViewCellDelegate?
     let userThumbnailImageView:UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
+        imageView.backgroundColor = UIColor.gray.withAlphaComponent(0.1)
         imageView.snp.makeConstraints({ (make) in
             make.size.equalTo(88)
         })
         imageView.layer.cornerRadius = 44
-        imageView.pin_setImage(from: URL(string:kTestImageURL)!)
+        APIService.sharedInstance.getUserProfileImageURL(completion: { (url) in
+            if let url = url {
+                imageView.pin_setImage(from: url)
+            }
+        })
+        
         return imageView
     }()
     
@@ -34,17 +45,25 @@ class BSUserProfileCollectionViewCell: UICollectionViewCell {
     func createViews() {
         self.contentView.addSubview(self.userThumbnailImageView)
         self.contentView.addSubview(self.usernameLabel)
+        
+        self.userThumbnailImageView.isUserInteractionEnabled = true
+        
+        self.userThumbnailImageView.addGestureRecognizer(UITapGestureRecognizer.init(target: self, action: #selector(didTapThumb)))
         self.userThumbnailImageView.snp.makeConstraints { (make) in
             make.leading.equalToSuperview().offset(kSidePadding)
             make.top.greaterThanOrEqualToSuperview().offset(kInteritemPadding)
             
         }
-        self.usernameLabel.text = "Aamir Anwar"
+        self.usernameLabel.text = Auth.auth().currentUser?.displayName
         self.usernameLabel.snp.makeConstraints { (make) in
             make.leading.equalTo(self.userThumbnailImageView.snp.leading)
             make.top.equalTo(self.userThumbnailImageView.snp.bottom).offset(8)
             make.bottom.equalToSuperview().inset(kInteritemPadding)
             
         }
+    }
+    
+    @objc func didTapThumb() {
+        self.delegate?.didTapUserProfileThumb()
     }
 }

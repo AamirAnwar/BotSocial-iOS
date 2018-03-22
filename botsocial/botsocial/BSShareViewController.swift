@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import Firebase
+
 let kPlaceholderText = "Write a caption..."
 class BSShareViewController: UIViewController, UIGestureRecognizerDelegate {
     var postImage:UIImage? {
@@ -102,8 +104,17 @@ class BSShareViewController: UIViewController, UIGestureRecognizerDelegate {
     @objc func didTapBackButton() {
         self.navigationController?.popViewController(animated: true)
     }
+    
     @objc func didTapShareButton() {
-        
+        if let image = self.postImage {
+            var caption = ""
+            if  self.textView.text.isEmpty == false && self.textView.text != kPlaceholderText {
+                caption = self.textView.text
+            }
+            APIService.sharedInstance.createPost(caption: caption, image: image) {
+                self.presentingViewController?.dismiss(animated: true)
+            }
+        }
     }
     @objc func didTapView() {
         self.contentView.endEditing(true)

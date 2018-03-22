@@ -167,6 +167,7 @@ PODS:
 
 DEPENDENCIES:
   - Firebase/Core
+  - Firebase/Storage
   - FirebaseUI
   - PINRemoteImage (= 3.0.0-beta.13)
   - Sharaku
@@ -207,6 +208,6 @@ SPEC CHECKSUMS:
   TwitterCore: 644d59e75abccb26cf0a9050d2c4dea0e5412241
   TwitterKit: a2e60ddcedbf54091eac6f27685ca7a87681e1d7
 
-PODFILE CHECKSUM: 0a5101966488f51e308996bb3f6ae80600b5030e
+PODFILE CHECKSUM: e3351582427180c893d134fd81fe3baa8d10ed97
 
 COCOAPODS: 1.4.0

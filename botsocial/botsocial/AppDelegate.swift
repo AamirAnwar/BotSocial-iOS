@@ -50,7 +50,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, FUIAuthDelegate {
         rootVC.viewControllers = [feedVC, notifVC, accountVC]
         rootVC.tabBar.tintColor = UIColor.black
         self.window?.rootViewController = rootVC
-//        rootVC.present(authViewController, animated: true)
+        if Auth.auth().currentUser == nil {
+            rootVC.present(authViewController, animated: true)
+        }
+        
         return true
     }
     

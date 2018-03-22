@@ -41,7 +41,16 @@ class BSPostViewController: UITableViewController, UIGestureRecognizerDelegate {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         switch indexPath.row {
         case 0:
-            return tableView.dequeueReusableCell(withIdentifier: kFeedUserSnippetCellReuseID)!
+            let cell = tableView.dequeueReusableCell(withIdentifier: kFeedUserSnippetCellReuseID) as! BSUserSnippetTableViewCell
+            APIService.sharedInstance.getUserProfileImageURL(completion: {[weak cell] (url) in
+                if let strongCell = cell {
+                    if let url = url {
+                        strongCell.setImageURL(url)
+                    }
+                }
+                
+            })
+            return cell
         case 1:
             let cell = tableView.dequeueReusableCell(withIdentifier: kFeedImageCellReuseID) as! BSImageTableViewCell
             cell.setImageURL(self.imageURLString ?? "")

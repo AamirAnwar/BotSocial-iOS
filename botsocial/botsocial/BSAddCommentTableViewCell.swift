@@ -38,7 +38,12 @@ class BSAddCommentTableViewCell: UITableViewCell {
         self.contentView.addSubview(self.commentCountLabel)
         self.contentView.addSubview(self.userImageView)
         self.selectionStyle = .none
-        self.userImageView.pin_setImage(from: URL(string:kTestImageURL)!)
+        APIService.sharedInstance.getUserProfileImageURL { (url) in
+            if let url = url {
+                self.userImageView.pin_setImage(from: url)
+            }
+        }
+        
         self.userImageView.layer.cornerRadius =  20
         self.commentCountLabel.snp.makeConstraints { (make) in
             make.top.equalToSuperview().offset(kInteritemPadding)

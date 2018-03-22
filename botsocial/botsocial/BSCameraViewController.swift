@@ -18,12 +18,14 @@ class BSCameraViewController: UIViewController {
     var frontCameraInput: AVCaptureDeviceInput?
     var rearCameraInput: AVCaptureDeviceInput?
     var photoOutput: AVCapturePhotoOutput?
+    var imagePickerController = UIImagePickerController()
     var previewLayer: AVCaptureVideoPreviewLayer?
     let captureButton = UIButton.init(type: .system)
     let switchCameraButton = UIButton.init(type: .system)
     private var inProgressPhotoCaptureDelegates = [Int64: PhotoCaptureProcessor]()
     let cameraView = UIView()
     let capturedImageView = UIImageView()
+    var flowType = FlowType.Post
     let cancelButton:UIButton = {
         let button = UIButton.init(type: .system)
         button.setTitle("Cancel", for: .normal)
@@ -43,11 +45,21 @@ class BSCameraViewController: UIViewController {
         button.setTitleColor(UIColor.black, for: .normal)
         return button
     }()
-    let filterView = BSFilterView()
     
+    let saveButton:UIButton = {
+        let button = UIButton.init(type: .system)
+        button.setTitle("Save", for: .normal)
+        button.setTitleColor(UIColor.black, for: .normal)
+        return button
+    }()
+    let filterView = BSFilterView()
+    let libPreviewButton:UIButton = UIButton.init(type: .system)
     
     override func viewDidLoad() {
         super.viewDidLoad()
+//        self.imagePickerController.modalPresentationStyle = .currentContext
+        imagePickerController.sourceType = UIImagePickerControllerSourceType.photoLibrary
+        self.imagePickerController.delegate = self
         self.navigationController?.isNavigationBarHidden = true
         NotificationCenter.default.addObserver(self, selector: #selector(willShowKeyboard(notification:)), name: kNotificationWillShowKeyboard.name, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(willHideKeyboard), name: kNotificationWillHideKeyboard.name, object: nil)
@@ -61,6 +73,8 @@ class BSCameraViewController: UIViewController {
         self.view.addSubview(self.captureButton)
         self.view.addSubview(self.backButton)
         self.view.addSubview(self.nextButton)
+        self.view.addSubview(self.saveButton)
+        self.view.addSubview(self.libPreviewButton)
         
         self.cameraView.addSubview(self.switchCameraButton)
         
@@ -109,6 +123,15 @@ class BSCameraViewController: UIViewController {
             make.top.equalToSuperview().offset(2*kInteritemPadding)
         }
         
+        //Save button
+        self.saveButton.isHidden = true
+        self.saveButton.addTarget(self, action: #selector(didTapSaveButton), for: .touchUpInside)
+        self.saveButton.isHidden = true
+        self.saveButton.snp.makeConstraints { (make) in
+            make.trailing.equalToSuperview().inset(kSidePadding)
+            make.top.equalToSuperview().offset(2*kInteritemPadding)
+        }
+        
         self.createSwitchCameraButton()
         self.createCapturePhotoButton()
         self.prepare {(error) in
@@ -136,6 +159,27 @@ class BSCameraViewController: UIViewController {
         self.capturedImageView.isUserInteractionEnabled = true
         self.capturedImageView.addGestureRecognizer(leftSwipe)
         
+        // LibImage Thumbnail View
+        self.libPreviewButton.tintColor = UIColor.gray.withAlphaComponent(0.1)
+//        self.libPreviewButton.imageView?.contentMode = .scaleAspectFill
+//        self.libPreviewButton.imageView?.clipsToBounds = true
+        self.libPreviewButton.layer.cornerRadius = kCornerRadius
+        self.libPreviewButton.imageView?.backgroundColor = UIColor.gray.withAlphaComponent(0.1)
+        
+        self.libPreviewButton.snp.makeConstraints { (make) in
+            make.leading.equalToSuperview().offset(2*kSidePadding)
+            make.centerY.equalTo(self.cameraView.snp.bottom).offset((self.view.height() - 10 - kCameraViewHeight)/2)
+            make.size.equalTo(kLibPhotoPreviewSize)
+        }
+        self.libPreviewButton.addTarget(self, action: #selector(didTapLibPreviewThumb(_:)), for: .touchUpInside)
+        BSCommons.getLatestPhotoFromLibrary { (image) in
+            if let image = image {
+                self.libPreviewButton.setBackgroundImage(image, for: .normal)
+            }
+            
+            
+        }
+        
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -143,10 +187,10 @@ class BSCameraViewController: UIViewController {
         super.viewWillDisappear(animated)
     }
     
-//    override func viewWillAppear(_ animated: Bool) {
-//        super.viewWillAppear(animated)
-//        self.startSessionIfNeeded()
-//    }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.startSessionIfNeeded()
+    }
     
     func startSessionIfNeeded() {
         if let session = self.captureSession, session.isRunning == false {
@@ -318,8 +362,17 @@ class BSCameraViewController: UIViewController {
         self.capturedImageView.isHidden = false
         self.cancelButton.isHidden = true
         self.backButton.isHidden = false
-        self.nextButton.isHidden = false
+        if self.flowType == .ProfilePicture {
+            self.saveButton.isHidden = false
+            self.nextButton.isHidden = true
+        }
+        else {
+            self.saveButton.isHidden = true
+            self.nextButton.isHidden = false
+        }
+        
         self.captureButton.isHidden = true
+        self.libPreviewButton.isHidden = true
         self.stopSessionIfNeeded()
     }
     
@@ -356,11 +409,13 @@ class BSCameraViewController: UIViewController {
     }
     
     @objc func didTapBackButton() {
+        self.saveButton.isHidden = true
         self.capturedImageView.isHidden = true
         self.capturedImageView.image = nil
         self.backButton.isHidden = true
         self.nextButton.isHidden = true
         self.cancelButton.isHidden = false
+        self.libPreviewButton.isHidden = false
         self.captureButton.isHidden = false
         self.filterView.isHidden = true
         self.startSessionIfNeeded()
@@ -437,6 +492,18 @@ class BSCameraViewController: UIViewController {
 //            return
 //        }
     }
+    
+    @objc func didTapLibPreviewThumb(_ sender:AnyObject) {
+        self.showImagePicker()
+    }
+    @objc func didTapSaveButton() {
+        if let image = self.capturedImageView.image {
+            APIService.sharedInstance.updateUserProfilePicture(image: image, completion: {
+                self.dismiss(animated: true)
+            })
+        }
+        
+    }
 }
 
 extension BSCameraViewController:UITextFieldDelegate {
@@ -461,6 +528,32 @@ extension BSCameraViewController {
         case front
         case rear
     }
+    
+    public enum FlowType {
+        case Post
+        case ProfilePicture
+    }
 }
 
+extension BSCameraViewController:UIImagePickerControllerDelegate,UINavigationControllerDelegate {
+    fileprivate func showImagePicker() {
+        present(imagePickerController, animated: true)
+    }
+    
+    // MARK: - UIImagePickerControllerDelegate
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        let image = info[UIImagePickerControllerOriginalImage]
+        if let image = image as? UIImage {
+            self.showCapturedImage(image: image)
+            self.imagePickerController.dismiss(animated: true, completion: nil)
+        }
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        dismiss(animated: true, completion: {
+            // Done cancel dismiss of image picker.
+        })
+    }
+}
 

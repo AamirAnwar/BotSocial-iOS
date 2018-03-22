@@ -10,7 +10,7 @@ import UIKit
 
 class BSFeaturedPostTableViewCell: UITableViewCell {
     let kImageCellReuseID = "BSImageCollectionViewCell"
-    var featuredImages:[String] = []
+    var featuredPosts:[BSPost] = []
     let collectionView:UICollectionView = {
         let layout = UICollectionViewFlowLayout.init()
         layout.minimumInteritemSpacing = 0
@@ -28,8 +28,17 @@ class BSFeaturedPostTableViewCell: UITableViewCell {
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
-        for _ in 0..<25 {
-            featuredImages += [kTestFeaturedImageURL]
+//        for _ in 0..<25 {
+//            featuredPosts += [kTestFeaturedImageURL]
+//        }
+        APIService.sharedInstance.getRecentPosts { (post) in
+            if let post = post {
+                self.featuredPosts += [post]
+                DispatchQueue.main.async {
+                    self.collectionView.reloadData()
+                }
+            }
+            
         }
         
         self.contentView.addSubview(self.collectionView)
@@ -52,7 +61,7 @@ extension BSFeaturedPostTableViewCell:UICollectionViewDelegate, UICollectionView
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return featuredImages.count
+        return featuredPosts.count
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -61,7 +70,9 @@ extension BSFeaturedPostTableViewCell:UICollectionViewDelegate, UICollectionView
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kImageCellReuseID, for: indexPath) as! BSImageCollectionViewCell
-        cell.setImageURL(URL(string:featuredImages[indexPath.row])!)
+        if let urlString = featuredPosts[indexPath.row].imageURL, let url = URL(string:urlString) {
+            cell.setImageURL(url)
+        }
         cell.expandImages()
         return cell
         

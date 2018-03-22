@@ -9,8 +9,7 @@
 import UIKit
 
 class BSAccountViewController: UIViewController {
-    let tableView = UITableView.init(frame: .zero, style: .plain)
-    let kUserProfileCellReuseID = "BSUserProfileTableViewCell"
+    let kUserProfileCellReuseID = "BSUserProfileCollectionViewCell"
     let kImageCellReuseID = "BSImageCollectionViewCell"
     var userImages = [String]()
     let collectionView:UICollectionView = {
@@ -23,8 +22,13 @@ class BSAccountViewController: UIViewController {
     }()
     override func viewDidLoad() {
         super.viewDidLoad()
-        for _ in 0..<30 {
-            userImages += [kTestImageURL]
+//        for _ in 0..<30 {
+//            userImages += [kTestImageURL]
+//        }
+        
+        APIService.sharedInstance.getUserPosts { (posts) in
+            self.userImages = posts
+            self.collectionView.reloadData()
         }
         self.view.addSubview(self.collectionView)
         self.collectionView.snp.makeConstraints { (make) in
@@ -65,10 +69,14 @@ extension BSAccountViewController:UICollectionViewDelegate, UICollectionViewData
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         switch indexPath.section {
         case 0:
-            return collectionView.dequeueReusableCell(withReuseIdentifier: kUserProfileCellReuseID, for: indexPath)
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kUserProfileCellReuseID, for: indexPath) as! BSUserProfileCollectionViewCell
+            cell.delegate = self
+            return cell
         case 1:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kImageCellReuseID, for: indexPath) as! BSImageCollectionViewCell
-            cell.setImageURL(URL(string:userImages[indexPath.row])!)
+            if let url = URL(string:userImages[indexPath.row]) {
+                cell.setImageURL(url)
+            }
             return cell
         default:
             print("Something's wrong")
@@ -83,6 +91,15 @@ extension BSAccountViewController:UICollectionViewDelegate, UICollectionViewData
             vc.setImageURLString(userImages[indexPath.row])
             self.navigationController?.pushViewController(vc, animated: true)
         }
+    }
+}
+
+extension BSAccountViewController:BSUserProfileCollectionViewCellDelegate {
+    func didTapUserProfileThumb() {
+        let vc = BSCameraViewController()
+        vc.flowType = .ProfilePicture
+        let navVC = UINavigationController.init(rootViewController: vc)
+        self.present(navVC, animated: true)
     }
 }
 

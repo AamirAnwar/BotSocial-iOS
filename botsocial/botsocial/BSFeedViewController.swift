@@ -9,37 +9,21 @@
 import UIKit
 import SnapKit
 
-//let kTestImageURL = "https://avatars3.githubusercontent.com/u/12379620?s=460&v=4"
-var kTestImageURL:String {
-    get {
-        return "https://picsum.photos/250/300?random&key=\(arc4random())"
-    }
-}
-
-var kTestFeaturedImageURL:String {
-    get {
-        return "https://picsum.photos/808/696?random&key=\(arc4random())"
-    }
-}
-
-var kTestLargeImageURL:String {
-    get {
-        return "https://picsum.photos/750/800?random&key=\(arc4random())"
-    }
-}
-
 class BSFeedViewController: UIViewController {
 
     let tableView = UITableView.init(frame: .zero, style: .plain)
-    var postImages = [String]()
+    var posts = [BSPost]()
     let kFeedCellReuseIdentifier = "Feed_BSFeedTableViewCell"
     let kFeaturedCellReuseID = "BSFeaturedPostTableViewCell"
+    let kFeedImageCellReuseID = "BSImageTableViewCell"
+    let kFeedUserSnippetCellReuseID = "BSUserSnippetTableViewCell"
+    let kFeedActionsCellReuseID = "BSFeedActionsTableViewCell"
+    let kFeedPostInfoCellReuseID = "BSPostDetailTableViewCell"
+    let kFeedCommentInfoCellReuseID = "BSAddCommentTableViewCell"
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        for _ in 0..<20 {
-            postImages += [kTestLargeImageURL]
-        }
+        
         self.navigationItem.leftBarButtonItem = UIBarButtonItem.init(image: #imageLiteral(resourceName: "camera_tab_icon"), style: .plain, target: self, action: #selector(didTapCameraButton))
         self.navigationItem.leftBarButtonItem?.tintColor = UIColor.black
         self.navigationController?.navigationBar.tintColor = UIColor.black
@@ -49,9 +33,27 @@ class BSFeedViewController: UIViewController {
         self.tableView.delaysContentTouches = false
         self.tableView.register(BSFeaturedPostTableViewCell.self, forCellReuseIdentifier: self.kFeaturedCellReuseID)
         self.tableView.register(BSFeedTableViewCell.self, forCellReuseIdentifier: self.kFeedCellReuseIdentifier)
+        self.tableView.register(BSUserSnippetTableViewCell.self, forCellReuseIdentifier: kFeedUserSnippetCellReuseID)
+        self.tableView.register(BSImageTableViewCell.self, forCellReuseIdentifier: kFeedImageCellReuseID)
+        self.tableView.register(BSFeedActionsTableViewCell.self, forCellReuseIdentifier: kFeedActionsCellReuseID)
+        self.tableView.register(BSPostDetailTableViewCell.self, forCellReuseIdentifier: kFeedPostInfoCellReuseID)
+        self.tableView.register(BSAddCommentTableViewCell.self, forCellReuseIdentifier: kFeedCommentInfoCellReuseID)
         self.tableView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview()
         }
+        
+        APIService.sharedInstance.getRecentPosts { (post) in
+            if let post = post {
+                self.posts += [post]
+                DispatchQueue.main.async {
+                    self.tableView.reloadData()
+                }
+            }
+            
+        }
+//        for _ in 0..<20 {
+//            postImages += [kTestLargeImageURL]
+//        }
     }
     
     @objc func didTapCameraButton() {
@@ -62,33 +64,63 @@ class BSFeedViewController: UIViewController {
 
 extension BSFeedViewController: UITableViewDelegate, UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
+        return 1 + self.posts.count
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch section {
         case 0:
             return 1
-        case 1:
-            return postImages.count
-            
         default:
-            return 0
+            return 4
         }
         
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
         switch indexPath.section {
         case 0:
             return tableView.dequeueReusableCell(withIdentifier: self.kFeaturedCellReuseID)!
-        case 1:
-            let cell = tableView.dequeueReusableCell(withIdentifier: self.kFeedCellReuseIdentifier) as! BSFeedTableViewCell
-            cell.setImageURL(postImages[indexPath.row])
-            return cell
         default:
-            return UITableViewCell()
+            let post = self.posts[indexPath.section - 1]
+            switch indexPath.row {
+            case 0:
+                let cell = tableView.dequeueReusableCell(withIdentifier: kFeedUserSnippetCellReuseID) as! BSUserSnippetTableViewCell
+                if let authorID = post.authorID {
+                    APIService.sharedInstance.getProfilePictureFor(userID: authorID, completion: {[weak cell] (url) in
+                        if let strongCell = cell {
+                            if let url = url {
+                                strongCell.setImageURL(url)
+                            }
+                        }
+                    })
+                }
+                return cell
+            case 1:
+                let cell = tableView.dequeueReusableCell(withIdentifier: kFeedImageCellReuseID) as! BSImageTableViewCell
+                cell.setImageURL(post.imageURL ?? "")
+                return cell
+            case 2:
+                let cell = tableView.dequeueReusableCell(withIdentifier: kFeedActionsCellReuseID) as! BSFeedActionsTableViewCell
+                cell.delegate = self
+                cell.post = post
+                return cell
+            case 3:
+                let cell = tableView.dequeueReusableCell(withIdentifier: kFeedPostInfoCellReuseID) as! BSPostDetailTableViewCell
+                cell.post = post
+                return cell
+            case 4:
+                return tableView.dequeueReusableCell(withIdentifier: kFeedCommentInfoCellReuseID)!
+            default:
+                return UITableViewCell()
+            }
         }
     }
     
 }
+extension BSFeedViewController:BSFeedActionsTableViewCellDelegate {
+    func didTapLikeButton() {
+    }
+}
+
