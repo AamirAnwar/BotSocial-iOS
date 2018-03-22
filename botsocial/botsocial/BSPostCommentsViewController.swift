@@ -148,11 +148,13 @@ extension BSPostCommentsViewController:UITableViewDelegate, UITableViewDataSourc
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: kNotifCellReuseID) as! BSNotificationTableViewCell
         let comment = comments[indexPath.row]
-        if let authorImageURL = comment.authorImageURL, let url = URL.init(string: authorImageURL) {
-            cell.configureWith(title: comment.text, imageURL: url)
-        }
-        else if let authorName = comment.authorName, let comment = comment.text {
-            cell.configureWith(title: "\(authorName) \(comment)", imageURL: URL(string:kTestImageURL)!)
+        
+         if let authorName = comment.authorName, let commentText = comment.text {
+            cell.configureWith(title: "\(authorName) \(commentText)")
+            APIService.sharedInstance.getProfilePictureFor(userID: comment.authorID, completion: { (url) in
+                cell.userThumbnailImageView.pin_setImage(from: url)
+            })
+            
         }
         return cell
     }

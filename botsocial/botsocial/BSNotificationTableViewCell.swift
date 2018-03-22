@@ -67,7 +67,7 @@ class BSNotificationTableViewCell: UITableViewCell {
         }
     }
     
-    func configureWith(title:String, imageURL:URL) {
+    func configureWith(title:String, imageURL:URL? = nil) {
         self.titleLabel.text = title
         self.userThumbnailImageView.pin_setImage(from: imageURL)
     }
