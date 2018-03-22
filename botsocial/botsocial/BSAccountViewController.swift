@@ -120,6 +120,7 @@ extension BSAccountViewController:BSUserProfileCollectionViewCellDelegate {
     }
     
     func didTapUserProfileThumb() {
+        guard self.user == nil else {return}
         let vc = BSCameraViewController()
         vc.flowType = .ProfilePicture
         let navVC = UINavigationController.init(rootViewController: vc)

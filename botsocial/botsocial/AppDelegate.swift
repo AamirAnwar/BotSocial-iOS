@@ -51,12 +51,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, FUIAuthDelegate {
     func authUI(_ authUI: FUIAuth, didSignInWith user: User?, error: Error?) {
         // handle user and error as necessary
         if let user = user {
+            APIService.sharedInstance.updateUserDetails()
             self.resetApp()
-            print("User found!")
-            if let name = user.displayName {
-                
-            }
-        
         }
     }
 

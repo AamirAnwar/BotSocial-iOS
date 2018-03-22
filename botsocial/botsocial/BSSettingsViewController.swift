@@ -16,6 +16,7 @@ class BSSettingsViewController: UIViewController,UIGestureRecognizerDelegate {
         super.viewDidLoad()
         self.view.backgroundColor = UIColor.white
         self.view.addSubview(self.tableView)
+        self.tableView.tableFooterView = UIView()
         self.tableView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview()
         }

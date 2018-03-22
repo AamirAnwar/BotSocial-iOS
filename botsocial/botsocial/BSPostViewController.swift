@@ -25,6 +25,7 @@ class BSPostViewController: UITableViewController, UIGestureRecognizerDelegate {
         // Do any additional setup after loading the view.
         self.tableView.delegate = self
         self.tableView.dataSource = self
+        self.tableView.tableFooterView = UIView()
         self.tableView.register(BSUserSnippetTableViewCell.self, forCellReuseIdentifier: kFeedUserSnippetCellReuseID)
         self.tableView.register(BSImageTableViewCell.self, forCellReuseIdentifier: kFeedImageCellReuseID)
         self.tableView.register(BSFeedActionsTableViewCell.self, forCellReuseIdentifier: kFeedActionsCellReuseID)
@@ -71,7 +72,17 @@ class BSPostViewController: UITableViewController, UIGestureRecognizerDelegate {
         default:
             return UITableViewCell()
         }
-        
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        if let authorID = self.post?.authorID {
+            APIService.sharedInstance.getUserWith(userID: authorID, completion: { (user) in
+                let vc = BSAccountViewController()
+                vc.user = user
+                self.navigationController?.pushViewController(vc, animated: true)
+            })
+        }
     }
 }
 

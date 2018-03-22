@@ -63,7 +63,7 @@ class BSPostCommentsViewController: UIViewController, UIGestureRecognizerDelegat
         self.tableView.register(BSNotificationTableViewCell.self, forCellReuseIdentifier: kNotifCellReuseID)
         self.navigationController?.interactivePopGestureRecognizer?.delegate = self
         
-//        self.commentTextView.backgroundColor = UIColor.red
+        //        self.commentTextView.backgroundColor = UIColor.red
         self.commentTextView.snp.makeConstraints { (make) in
             make.trailing.equalTo(self.postButton.snp.leading).offset(-8)
             make.leading.equalTo(self.userImageView.snp.trailing).offset(8)
@@ -77,7 +77,7 @@ class BSPostCommentsViewController: UIViewController, UIGestureRecognizerDelegat
                 self.userImageView.pin_setImage(from: url)
             }
         }
-//        self.userImageView.pin_setImage(from: URL(string:kTestImageURL)!)
+        //        self.userImageView.pin_setImage(from: URL(string:kTestImageURL)!)
         self.userImageView.contentMode = .scaleAspectFill
         self.userImageView.clipsToBounds = true
         self.userImageView.snp.makeConstraints { (make) in
@@ -90,7 +90,7 @@ class BSPostCommentsViewController: UIViewController, UIGestureRecognizerDelegat
         self.postButton.snp.makeConstraints { (make) in
             make.trailing.equalToSuperview().inset(kSidePadding)
             make.centerY.equalTo(self.userImageView.snp.centerY)
-//            make.bottom.equalToSuperview().inset(kInteritemPadding + self.tabBarHeight)
+            //            make.bottom.equalToSuperview().inset(kInteritemPadding + self.tabBarHeight)
         }
         
     }
@@ -123,7 +123,7 @@ class BSPostCommentsViewController: UIViewController, UIGestureRecognizerDelegat
     }
     
     @objc func didTapPostButton() {
-//        post comment
+        //        post comment
         if let post = self.post, let commentText = self.commentTextView.text {
             APIService.sharedInstance.commentOnPostWith(post: post, comment: commentText) {
                 self.commentTextView.text = ""
@@ -149,7 +149,7 @@ extension BSPostCommentsViewController:UITableViewDelegate, UITableViewDataSourc
         let cell = tableView.dequeueReusableCell(withIdentifier: kNotifCellReuseID) as! BSNotificationTableViewCell
         let comment = comments[indexPath.row]
         
-         if let authorName = comment.authorName, let commentText = comment.text {
+        if let authorName = comment.authorName, let commentText = comment.text {
             cell.configureWith(title: "\(authorName) \(commentText)")
             APIService.sharedInstance.getProfilePictureFor(userID: comment.authorID, completion: { (url) in
                 cell.userThumbnailImageView.pin_setImage(from: url)
@@ -160,6 +160,15 @@ extension BSPostCommentsViewController:UITableViewDelegate, UITableViewDataSourc
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        self.navigationController?.pushViewController(BSPostViewController(), animated: true)
+        tableView.deselectRow(at: indexPath, animated: true)
+        let comment = comments[indexPath.row]
+        if let authorID = comment.authorID {
+            APIService.sharedInstance.getUserWith(userID: authorID, completion: { (user) in
+                let vc = BSAccountViewController()
+                vc.user = user
+                self.navigationController?.pushViewController(vc, animated: true)
+            })
+        }
+        
     }
 }
