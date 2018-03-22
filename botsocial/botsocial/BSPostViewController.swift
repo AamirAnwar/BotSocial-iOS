@@ -76,14 +76,17 @@ class BSPostViewController: UITableViewController, UIGestureRecognizerDelegate {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        if let authorID = self.post?.authorID {
-            APIService.sharedInstance.getUserWith(userID: authorID, completion: { (user) in
-                let vc = BSAccountViewController()
-                vc.user = user
-                self.navigationController?.pushViewController(vc, animated: true)
-            })
+        if indexPath.row == 0 {
+            if let authorID = self.post?.authorID {
+                APIService.sharedInstance.getUserWith(userID: authorID, completion: { (user) in
+                    let vc = BSAccountViewController()
+                    vc.user = user
+                    self.navigationController?.pushViewController(vc, animated: true)
+                })
+            }
         }
     }
+    
 }
 
 extension BSPostViewController:BSFeedActionsTableViewCellDelegate {
