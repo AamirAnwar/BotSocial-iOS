@@ -14,7 +14,12 @@ class BSPostViewController: UITableViewController, UIGestureRecognizerDelegate {
     let kFeedActionsCellReuseID = "BSFeedActionsTableViewCell"
     let kFeedPostInfoCellReuseID = "BSPostDetailTableViewCell"
     let kFeedCommentInfoCellReuseID = "BSAddCommentTableViewCell"
-    var imageURLString:String?
+    var post:BSPost? {
+        didSet {
+            self.tableView.reloadData()
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -29,9 +34,6 @@ class BSPostViewController: UITableViewController, UIGestureRecognizerDelegate {
         self.navigationController?.interactivePopGestureRecognizer?.delegate = self
     }
     
-    func setImageURLString(_ urlString:String) {
-        self.imageURLString = urlString
-    }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 5
@@ -53,7 +55,9 @@ class BSPostViewController: UITableViewController, UIGestureRecognizerDelegate {
             return cell
         case 1:
             let cell = tableView.dequeueReusableCell(withIdentifier: kFeedImageCellReuseID) as! BSImageTableViewCell
-            cell.setImageURL(self.imageURLString ?? "")
+            if let post = self.post, let imageURLString = post.imageURL {
+                cell.setImageURL(imageURLString)
+            }
             return cell
         case 2:
             return tableView.dequeueReusableCell(withIdentifier: kFeedActionsCellReuseID)!

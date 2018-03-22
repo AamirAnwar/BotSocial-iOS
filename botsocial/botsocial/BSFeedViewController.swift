@@ -120,6 +120,18 @@ extension BSFeedViewController: UITableViewDelegate, UITableViewDataSource {
         }
     }
     
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let y = scrollView.contentOffset.y
+        if y + scrollView.height() >= (scrollView.contentSize.height - 10) {
+            // Show coachmark
+            
+        }
+    }
+    
+    func showCoachmark() {
+        
+    }
+    
 }
 
 

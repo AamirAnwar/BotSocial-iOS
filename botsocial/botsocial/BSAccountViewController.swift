@@ -8,10 +8,10 @@
 
 import UIKit
 
-class BSAccountViewController: UIViewController {
+class BSAccountViewController: UIViewController, UIGestureRecognizerDelegate {
     let kUserProfileCellReuseID = "BSUserProfileCollectionViewCell"
     let kImageCellReuseID = "BSImageCollectionViewCell"
-    var userImages = [String]()
+    var userPosts = [BSPost]()
     let collectionView:UICollectionView = {
         let layout = UICollectionViewFlowLayout.init()
         layout.minimumInteritemSpacing = 0
@@ -25,10 +25,14 @@ class BSAccountViewController: UIViewController {
 //        for _ in 0..<30 {
 //            userImages += [kTestImageURL]
 //        }
+        self.navigationController?.interactivePopGestureRecognizer?.delegate = self
         
-        APIService.sharedInstance.getUserPosts { (posts) in
-            self.userImages = posts
-            self.collectionView.reloadData()
+        APIService.sharedInstance.getUserPosts { (post) in
+            if let post = post {
+                self.userPosts.insert(post, at: 0)
+                self.collectionView.reloadData()
+            }
+            
         }
         self.view.addSubview(self.collectionView)
         self.collectionView.snp.makeConstraints { (make) in
@@ -50,7 +54,7 @@ extension BSAccountViewController:UICollectionViewDelegate, UICollectionViewData
         switch section {
         case 0:
             return 1
-        case 1: return userImages.count
+        case 1: return userPosts.count
         default:
             return 0
         }
@@ -74,7 +78,7 @@ extension BSAccountViewController:UICollectionViewDelegate, UICollectionViewData
             return cell
         case 1:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kImageCellReuseID, for: indexPath) as! BSImageCollectionViewCell
-            if let url = URL(string:userImages[indexPath.row]) {
+            if let url = URL(string:userPosts[indexPath.row].imageURL) {
                 cell.setImageURL(url)
             }
             return cell
@@ -88,7 +92,7 @@ extension BSAccountViewController:UICollectionViewDelegate, UICollectionViewData
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if indexPath.section == 1 {
             let vc = BSPostViewController()
-            vc.setImageURLString(userImages[indexPath.row])
+            vc.post = userPosts[indexPath.row]
             self.navigationController?.pushViewController(vc, animated: true)
         }
     }

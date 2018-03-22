@@ -116,9 +116,6 @@ class BSFeedActionsTableViewCell: UITableViewCell {
                 self.likeButton.transform = .identity
             })
         }
-        if let post = post {
-            APIService.sharedInstance.likePost(post:post)
-        }
         self.delegate?.didTapLikeButton(forIndexPath: self.indexPath)
     }
 }

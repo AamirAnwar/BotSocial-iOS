@@ -24,24 +24,12 @@ class APIService: NSObject {
         }
     }
     
-    func getUserPosts(completion:@escaping ((_ posts:[String]) -> Void)) {
+    func getUserPosts(completion:@escaping ((_ post:BSPost?) -> Void)) {
         guard let user = self.currentUser else {return}
-        self.databaseRef.child("user-posts").child("\(user.uid)").observe(DataEventType.value, with: { (snapshot) in
-            let value = snapshot.value as? [String:AnyObject]
-            //            print("Fetching user posts!")
-            if let dict = value {
-                let images = dict.values.map({ (post) -> String in
-                    if let subdict = post as? [String:String] {
-                        return "\(subdict["image_url"] ?? "")"
-                    }
-                    return ""
-                })
-                //                print("Parsed images array! \(images)")
-                completion(images)
-            }
-            else {
-                completion([])
-            }
+        self.databaseRef.child("user-posts").child("\(user.uid)").observe(DataEventType.childAdded, with: { (snapshot) in
+            guard let value = snapshot.value as? [String:AnyObject] else {completion(nil);return}
+            let post = BSPost.initWith(postID: snapshot.key, dict: value)
+            completion(post)
         })
     }
     
@@ -52,6 +40,15 @@ class APIService: NSObject {
             let post = BSPost.initWith(postID: snapshot.key, dict: dict)
             completion(post)
         })
+    }
+    
+    func getPostWith(postID:String, completion:@escaping ((_ posts:BSPost?) -> Void)) {
+        self.databaseRef.child("posts").child(postID).observeSingleEvent(of: .value) { (snapshot) in
+            guard let postDict = snapshot.value as? [String:AnyObject] else {completion(nil);return}
+            let post = BSPost.initWith(postID: snapshot.key, dict: postDict)
+            completion(post)
+            
+        }
     }
     
     func getUserProfileImageURL(completion:@escaping ((_ url:URL?)->Void)) {
@@ -148,13 +145,39 @@ class APIService: NSObject {
                 for path in paths {
                     self.databaseRef.child(path).removeValue()
                 }
+                if let postAuthorID = post.authorID {
+                    self.databaseRef.child("users").child("\(postAuthorID)").child("notifications").child("\(user.uid)_\(postID)_like").removeValue()
+                }
             }
             else {
                 var childUpdates:[String:Any] = [:]
                 for path in paths {
                     childUpdates[path] = true
                 }
-                self.databaseRef.updateChildValues(childUpdates)
+                self.databaseRef.updateChildValues(childUpdates, withCompletionBlock: { (error, ref) in
+                    if let username = user.displayName, let postAuthorID = post.authorID {
+                        let notification = [
+                            "text":"\(username) just liked your post",
+                            "user_id": user.uid,
+                            "post_id": postID
+                        ]
+                        let newNotificationChild = self.databaseRef.child("users").child("\(postAuthorID)").child("notifications").child("\(user.uid)_\(postID)_like")
+                        newNotificationChild.setValue(notification)
+                    }
+                })
+            }
+        }
+    }
+    
+    func getNotifications(completion:@escaping ((_ notification:BSNotification?) -> Void) ) {
+        guard let user = self.currentUser else {completion(nil);return}
+        self.databaseRef.child("users").child("\(user.uid)").child("notifications").observe(.childAdded) { (snapshot) in
+            if let value = snapshot.value as? [String:AnyObject] {
+                let notif = BSNotification.initWith(notifID:snapshot.key, notifDict:value)
+                completion(notif)
+            }
+            else {
+                completion(nil)
             }
         }
     }
@@ -175,8 +198,8 @@ class APIService: NSObject {
         }
     }
     
-    func commentOnPostWith(postID:String, comment:String, completion:@escaping (() -> Void)) {
-        guard let user = self.currentUser else {
+    func commentOnPostWith(post:BSPost, comment:String, completion:@escaping (() -> Void)) {
+        guard let user = self.currentUser, let postID = post.id else {
             completion()
             return
         }
@@ -187,7 +210,7 @@ class APIService: NSObject {
                        ]
         let childUpdates:[String:Any] = ["/comments/\(commentKey)/": commentPayload,
                                             "/posts/\(postID)/comments/\(commentKey)/":commentPayload,
-                                            "/user-posts/\(postID)/comments/\(commentKey)/":commentPayload]
+                                            "/user-posts/\(post.authorID)/\(postID)/comments/\(commentKey)/":commentPayload]
         self.databaseRef.updateChildValues(childUpdates)
         completion()
         

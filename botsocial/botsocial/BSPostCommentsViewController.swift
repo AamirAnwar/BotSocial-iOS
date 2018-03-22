@@ -125,7 +125,7 @@ class BSPostCommentsViewController: UIViewController, UIGestureRecognizerDelegat
     @objc func didTapPostButton() {
 //        post comment
         if let post = self.post, let commentText = self.commentTextView.text {
-            APIService.sharedInstance.commentOnPostWith(postID: post.id, comment: commentText) {
+            APIService.sharedInstance.commentOnPostWith(post: post, comment: commentText) {
                 self.commentTextView.text = ""
                 self.commentTextView.resignFirstResponder()
             }
