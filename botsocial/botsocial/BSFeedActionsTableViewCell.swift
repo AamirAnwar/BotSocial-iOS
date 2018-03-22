@@ -8,11 +8,13 @@
 
 import UIKit
 protocol BSFeedActionsTableViewCellDelegate {
-    func didTapLikeButton()
+    func didTapLikeButton(forIndexPath indexPath:IndexPath?)
+    func didTapCommentsButton(forIndexPath indexPath:IndexPath?)
 }
 
 class BSFeedActionsTableViewCell: UITableViewCell {
     var delegate:BSFeedActionsTableViewCellDelegate?
+    var indexPath:IndexPath?
     static var standardButton:UIButton {
         get {
             let button = UIButton.init(type: .system)
@@ -37,7 +39,7 @@ class BSFeedActionsTableViewCell: UITableViewCell {
     
     let commentButton:UIButton = {
         let button = BSFeedActionsTableViewCell.standardButton
-        button.setTitle("\(arc4random()%2000) Comments", for: .normal)
+        button.setTitle("No Comments", for: .normal)
         return button
     }()
     
@@ -52,6 +54,11 @@ class BSFeedActionsTableViewCell: UITableViewCell {
                 APIService.sharedInstance.getLikesForPost(post: post, completion: { (likes) in
                     let pluralCorrection = likes == 1 ? "Like":"Likes"
                     self.likeButton.setTitle("\(likes) \(pluralCorrection)", for: .normal)
+                })
+                
+                APIService.sharedInstance.getCommentCountForPost(post: post, completion: { (commentCount) in
+                    let pluralCorrection = commentCount == 1 ? "Comment":"Comments"
+                    self.commentButton.setTitle("\(commentCount) \(pluralCorrection)", for: .normal)
                 })
                 
             }
@@ -83,7 +90,7 @@ class BSFeedActionsTableViewCell: UITableViewCell {
 //            make.leading.equalTo(self.likeButton.snp.trailing).offset(kInteritemPadding)
 //            make.centerY.equalTo(self.likeButton.snp.centerY)
 //        }
-        
+        self.commentButton.addTarget(self, action: #selector(commentButtonTapped), for: .touchUpInside)
         self.commentButton.snp.makeConstraints { (make) in
             make.leading.equalTo(self.likeButton.snp.trailing).offset(kInteritemPadding)
             make.centerY.equalTo(self.likeButton.snp.centerY)
@@ -94,6 +101,11 @@ class BSFeedActionsTableViewCell: UITableViewCell {
             make.centerY.equalTo(self.commentButton.snp.centerY)
             make.leading.greaterThanOrEqualTo(self.commentButton.snp.trailing)
         }
+    }
+    
+    @objc func commentButtonTapped() {
+        
+        self.delegate?.didTapCommentsButton(forIndexPath: self.indexPath)
     }
     
     @objc func didTapLikeButton() {
@@ -107,6 +119,6 @@ class BSFeedActionsTableViewCell: UITableViewCell {
         if let post = post {
             APIService.sharedInstance.likePost(post:post)
         }
-        self.delegate?.didTapLikeButton()
+        self.delegate?.didTapLikeButton(forIndexPath: self.indexPath)
     }
 }

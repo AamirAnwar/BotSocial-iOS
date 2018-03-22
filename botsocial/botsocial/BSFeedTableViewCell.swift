@@ -77,7 +77,7 @@ extension BSFeedTableViewCell:UITableViewDelegate, UITableViewDataSource {
             return cell
         case 2:
             let cell = tableView.dequeueReusableCell(withIdentifier: kFeedActionsCellReuseID) as! BSFeedActionsTableViewCell
-            cell.delegate = self
+//            cell.delegate = self
             cell.post = self.post
             return cell
         case 3:
@@ -91,11 +91,14 @@ extension BSFeedTableViewCell:UITableViewDelegate, UITableViewDataSource {
         }
     }
 }
+//
+//extension BSFeedTableViewCell:BSFeedActionsTableViewCellDelegate {
+//    func didTapLikeButton() {
+//        if let post = post {
+//            APIService.sharedInstance.likePost(post:post)
+//        }
+//    }
+//
+//
+//}
 
-extension BSFeedTableViewCell:BSFeedActionsTableViewCellDelegate {
-    func didTapLikeButton() {
-        if let post = post {
-            APIService.sharedInstance.likePost(post:post)
-        }
-    }
-}

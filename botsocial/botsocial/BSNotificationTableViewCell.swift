@@ -17,7 +17,7 @@ class BSNotificationTableViewCell: UITableViewCell {
             make.size.equalTo(44)
         })
         imageView.layer.cornerRadius = 22
-        imageView.pin_setImage(from: URL(string:kTestImageURL)!)
+//        imageView.pin_setImage(from: URL(string:kTestImageURL)!)
         return imageView
     }()
     
@@ -65,6 +65,11 @@ class BSNotificationTableViewCell: UITableViewCell {
             make.bottom.equalTo(self.titleLabel.snp.bottom).offset(kInteritemPadding).priority(100)
 
         }
+    }
+    
+    func configureWith(title:String, imageURL:URL) {
+        self.titleLabel.text = title
+        self.userThumbnailImageView.pin_setImage(from: imageURL)
     }
  
 }

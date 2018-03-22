@@ -28,7 +28,7 @@ class APIService: NSObject {
         guard let user = self.currentUser else {return}
         self.databaseRef.child("user-posts").child("\(user.uid)").observe(DataEventType.value, with: { (snapshot) in
             let value = snapshot.value as? [String:AnyObject]
-//            print("Fetching user posts!")
+            //            print("Fetching user posts!")
             if let dict = value {
                 let images = dict.values.map({ (post) -> String in
                     if let subdict = post as? [String:String] {
@@ -36,7 +36,7 @@ class APIService: NSObject {
                     }
                     return ""
                 })
-//                print("Parsed images array! \(images)")
+                //                print("Parsed images array! \(images)")
                 completion(images)
             }
             else {
@@ -140,7 +140,7 @@ class APIService: NSObject {
         self.databaseRef.child("/posts/\(postID)/likes/\(user.uid)").observeSingleEvent(of: .value) { (snapshot) in
             let isLiked = snapshot.exists()
             let paths = [
-            "/posts/\(postID)/likes/\(user.uid)",
+                "/posts/\(postID)/likes/\(user.uid)",
                 "/user-posts/\(user.uid)/\(postID)/likes/\(user.uid)",
                 "users/\(user.uid)/likes/\(postID)"
             ]
@@ -165,5 +165,41 @@ class APIService: NSObject {
                 completion(Int(data.childrenCount))
             })
         }
+    }
+    
+    func getCommentCountForPost(post:BSPost, completion:@escaping ((_ commentCount:Int) -> Void) ) {
+        if let postID = post.id, postID.isEmpty == false {
+            self.databaseRef.child("posts").child(postID).child("comments").observe(DataEventType.value, with: { (data) in
+                completion(Int(data.childrenCount))
+            })
+        }
+    }
+    
+    func commentOnPostWith(postID:String, comment:String, completion:@escaping (() -> Void)) {
+        guard let user = self.currentUser else {
+            completion()
+            return
+        }
+        let commentKey = self.databaseRef.child("comments").childByAutoId().key
+        let commentPayload = ["author_id": user.uid,
+                       "author_name": user.displayName!,
+                       "text": comment,
+                       ]
+        let childUpdates:[String:Any] = ["/comments/\(commentKey)/": commentPayload,
+                                            "/posts/\(postID)/comments/\(commentKey)/":commentPayload,
+                                            "/user-posts/\(postID)/comments/\(commentKey)/":commentPayload]
+        self.databaseRef.updateChildValues(childUpdates)
+        completion()
+        
+    }
+    
+    func getCommentsForPostWith(postID:String, completion:@escaping ((_ comment:BSComment) -> Void)) {
+        guard postID.isEmpty == false else {return}
+        self.databaseRef.child("posts").child(postID).child("comments").observe(DataEventType.childAdded, with: { (snapshot) in
+            guard let commentDict = snapshot.value as? [String:AnyObject] else {return}
+                let comment = BSComment.initWith(commentID: snapshot.key, dict: commentDict)
+                completion(comment)
+        })
+        
     }
 }

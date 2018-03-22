@@ -83,7 +83,8 @@ extension BSFeedViewController: UITableViewDelegate, UITableViewDataSource {
         case 0:
             return tableView.dequeueReusableCell(withIdentifier: self.kFeaturedCellReuseID)!
         default:
-            let post = self.posts[indexPath.section - 1]
+            let currentPostIndex = indexPath.section - 1
+            let post = self.posts[currentPostIndex]
             switch indexPath.row {
             case 0:
                 let cell = tableView.dequeueReusableCell(withIdentifier: kFeedUserSnippetCellReuseID) as! BSUserSnippetTableViewCell
@@ -105,6 +106,7 @@ extension BSFeedViewController: UITableViewDelegate, UITableViewDataSource {
                 let cell = tableView.dequeueReusableCell(withIdentifier: kFeedActionsCellReuseID) as! BSFeedActionsTableViewCell
                 cell.delegate = self
                 cell.post = post
+                cell.indexPath = IndexPath.init(row: indexPath.row, section: currentPostIndex)
                 return cell
             case 3:
                 let cell = tableView.dequeueReusableCell(withIdentifier: kFeedPostInfoCellReuseID) as! BSPostDetailTableViewCell
@@ -119,8 +121,27 @@ extension BSFeedViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
 }
+
+
+
 extension BSFeedViewController:BSFeedActionsTableViewCellDelegate {
-    func didTapLikeButton() {
+    func didTapLikeButton(forIndexPath indexPath: IndexPath?) {
+        if let indexPath = indexPath {
+            let post = self.posts[indexPath.section]
+            APIService.sharedInstance.likePost(post:post)
+        }
     }
+    
+    func didTapCommentsButton(forIndexPath indexPath: IndexPath?) {
+        if let indexPath = indexPath {
+            let post = self.posts[indexPath.section]
+            let vc = BSPostCommentsViewController()
+            vc.post = post
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+    }
+    
+    
+    
 }
 

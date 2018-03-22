@@ -27,6 +27,8 @@
 		437590C7206073ED00A7AAEA /* BSImageCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 437590C6206073ED00A7AAEA /* BSImageCollectionViewCell.swift */; };
 		437590C92060DED600A7AAEA /* BSPostViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 437590C82060DED600A7AAEA /* BSPostViewController.swift */; };
 		437590CB2060E8B900A7AAEA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 437590CA2060E8B800A7AAEA /* GoogleService-Info.plist */; };
+		437A0D1D2063DF8B00964245 /* BSPostCommentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 437A0D1C2063DF8B00964245 /* BSPostCommentsViewController.swift */; };
+		437A0D1F2063E21300964245 /* BSComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 437A0D1E2063E21300964245 /* BSComment.swift */; };
 		43910A9A203CC917009171CB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43910A99203CC917009171CB /* AppDelegate.swift */; };
 		43910AA3203CC917009171CB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43910AA2203CC917009171CB /* Assets.xcassets */; };
 		43910AA6203CC917009171CB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 43910AA4203CC917009171CB /* LaunchScreen.storyboard */; };
@@ -85,6 +87,8 @@
 		437590C6206073ED00A7AAEA /* BSImageCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSImageCollectionViewCell.swift; sourceTree = "<group>"; };
 		437590C82060DED600A7AAEA /* BSPostViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSPostViewController.swift; sourceTree = "<group>"; };
 		437590CA2060E8B800A7AAEA /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		437A0D1C2063DF8B00964245 /* BSPostCommentsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSPostCommentsViewController.swift; sourceTree = "<group>"; };
+		437A0D1E2063E21300964245 /* BSComment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSComment.swift; sourceTree = "<group>"; };
 		43910A96203CC917009171CB /* botsocial.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = botsocial.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		43910A99203CC917009171CB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		43910AA2203CC917009171CB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -142,6 +146,7 @@
 		43910A8D203CC917009171CB = {
 			isa = PBXGroup;
 			children = (
+				437A0D1E2063E21300964245 /* BSComment.swift */,
 				43910A98203CC917009171CB /* botsocial */,
 				43910AAF203CC917009171CB /* botsocialTests */,
 				43910ABA203CC918009171CB /* botsocialUITests */,
@@ -195,6 +200,7 @@
 				436913CA206309FC0034F527 /* BSFunctions.swift */,
 				436913CC20631BDF0034F527 /* BSPost.swift */,
 				436913CE20631D9B0034F527 /* BSUser.swift */,
+				437A0D1C2063DF8B00964245 /* BSPostCommentsViewController.swift */,
 			);
 			path = botsocial;
 			sourceTree = "<group>";
@@ -605,8 +611,10 @@
 				430E619E205F076B00AECF27 /* BSFeedTableViewCell.swift in Sources */,
 				43910A9A203CC917009171CB /* AppDelegate.swift in Sources */,
 				430E61AA205F117900AECF27 /* CustomUIKitExtensions.swift in Sources */,
+				437A0D1F2063E21300964245 /* BSComment.swift in Sources */,
 				430E61B2205F220A00AECF27 /* BSPostDetailTableViewCell.swift in Sources */,
 				430E619C205F066B00AECF27 /* BSFeedViewController.swift in Sources */,
+				437A0D1D2063DF8B00964245 /* BSPostCommentsViewController.swift in Sources */,
 				43A98C06206122B500739551 /* BSFeaturedPostTableViewCell.swift in Sources */,
 				437590C92060DED600A7AAEA /* BSPostViewController.swift in Sources */,
 				436913CB206309FC0034F527 /* BSFunctions.swift in Sources */,
