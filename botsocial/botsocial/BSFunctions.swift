@@ -8,6 +8,8 @@
 
 import Foundation
 import Photos
+import FirebaseAuthUI
+import FirebaseGoogleAuthUI
 
 enum BSCommons {
     static func getLatestPhotoFromLibrary(completion:@escaping(_ image:UIImage?)->Void) {
@@ -22,6 +24,25 @@ enum BSCommons {
             })
         }
     }
+    
+    static func showLoginPage(delegate:FUIAuthDelegate) {
+        let authUI = FUIAuth.defaultAuthUI()
+        
+        let providers: [FUIAuthProvider] = [
+            FUIGoogleAuth()
+        ]
+        authUI?.providers = providers
+        
+        // You need to adopt a FUIAuthDelegate protocol to receive callback
+        authUI?.delegate = delegate
+        let authViewController = authUI!.authViewController()
+        if let appDelegate = UIApplication.shared.delegate {
+            appDelegate.window??.rootViewController?.present(authViewController, animated: true)
+        }
+    }
 }
+
+
+
 
 

@@ -10,10 +10,17 @@ import UIKit
 import Firebase
 protocol BSUserProfileCollectionViewCellDelegate {
     func didTapUserProfileThumb()
+    func didTapSettingsButton()
 }
 
 class BSUserProfileCollectionViewCell: UICollectionViewCell {
     var delegate:BSUserProfileCollectionViewCellDelegate?
+    let settingsButton:UIButton = {
+        let button = UIButton.init(type: .system)
+        button.setBackgroundImage(#imageLiteral(resourceName: "settings_icon"), for: .normal)
+        button.tintColor = UIColor.black
+        return button
+    }()
     let userThumbnailImageView:UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
@@ -45,9 +52,15 @@ class BSUserProfileCollectionViewCell: UICollectionViewCell {
     func createViews() {
         self.contentView.addSubview(self.userThumbnailImageView)
         self.contentView.addSubview(self.usernameLabel)
+        self.contentView.addSubview(self.settingsButton)
+        self.settingsButton.addTarget(self, action: #selector(didTapSettingsButton), for: .touchUpInside)
+        self.settingsButton.snp.makeConstraints { (make) in
+            make.trailing.equalToSuperview().inset(kSidePadding)
+            make.top.equalTo(self.userThumbnailImageView.snp.top)
+            make.size.equalTo(22)
+        }
         
         self.userThumbnailImageView.isUserInteractionEnabled = true
-        
         self.userThumbnailImageView.addGestureRecognizer(UITapGestureRecognizer.init(target: self, action: #selector(didTapThumb)))
         self.userThumbnailImageView.snp.makeConstraints { (make) in
             make.leading.equalToSuperview().offset(kSidePadding)
@@ -65,5 +78,8 @@ class BSUserProfileCollectionViewCell: UICollectionViewCell {
     
     @objc func didTapThumb() {
         self.delegate?.didTapUserProfileThumb()
+    }
+    @objc func didTapSettingsButton() {
+        self.delegate?.didTapSettingsButton()
     }
 }

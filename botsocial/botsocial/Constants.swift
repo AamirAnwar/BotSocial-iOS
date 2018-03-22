@@ -9,6 +9,8 @@
 import Foundation
 import UIKit
 
+let kCoachmarkButtonWidth:CGFloat = 120
+let kCoachmarkButtonHeight:CGFloat = 30
 let kUserThumbnailImageHeight:CGFloat = 44
 let kSidePadding:CGFloat = 13
 let kInteritemPadding:CGFloat = 8

@@ -20,6 +20,8 @@ class BSFeedViewController: UIViewController {
     let kFeedActionsCellReuseID = "BSFeedActionsTableViewCell"
     let kFeedPostInfoCellReuseID = "BSPostDetailTableViewCell"
     let kFeedCommentInfoCellReuseID = "BSAddCommentTableViewCell"
+    let coachmarkButton = UIButton.init(type: .system)
+    var isShowingCoachmark = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,6 +30,18 @@ class BSFeedViewController: UIViewController {
         self.navigationItem.leftBarButtonItem?.tintColor = UIColor.black
         self.navigationController?.navigationBar.tintColor = UIColor.black
         self.view.addSubview(self.tableView)
+        self.view.addSubview(self.coachmarkButton)
+        self.coachmarkButton.titleLabel?.adjustsFontSizeToFitWidth = true
+        self.coachmarkButton.frame = CGRect.init(x: (view.width() - kCoachmarkButtonWidth)/2, y: view.height(), width: kCoachmarkButtonWidth, height: kCoachmarkButtonHeight)
+        self.coachmarkButton.setTitle("Back to top", for: .normal)
+        self.coachmarkButton.layer.cornerRadius = kCoachmarkButtonHeight/2
+        self.coachmarkButton.backgroundColor = UIColor.white
+        self.coachmarkButton.layer.borderWidth = 1
+        self.coachmarkButton.layer.borderColor = UIColor.black.cgColor
+        self.coachmarkButton.setTitleColor(UIColor.black, for: .normal)
+        self.coachmarkButton.addTarget(self, action: #selector(didTapCoachmark), for: .touchUpInside)
+        
+        self.tableView.contentInset = UIEdgeInsets.init(top: 0, left: 0, bottom: kCoachmarkButtonHeight, right: 0)
         self.tableView.delegate = self
         self.tableView.dataSource = self
         self.tableView.delaysContentTouches = false
@@ -44,7 +58,7 @@ class BSFeedViewController: UIViewController {
         
         APIService.sharedInstance.getRecentPosts { (post) in
             if let post = post {
-                self.posts += [post]
+                self.posts.insert(post, at: 0)
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
                 }
@@ -122,14 +136,36 @@ extension BSFeedViewController: UITableViewDelegate, UITableViewDataSource {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let y = scrollView.contentOffset.y
-        if y + scrollView.height() >= (scrollView.contentSize.height - 10) {
+        if y + scrollView.height() >= (scrollView.contentSize.height) {
             // Show coachmark
-            
+            showCoachmark()
+        }
+        else {
+            hideCoachmark()
         }
     }
     
     func showCoachmark() {
+        guard isShowingCoachmark == false else {return}
+        UIView.animate(withDuration: 0.3, animations: {
+            self.coachmarkButton.frame = CGRect.init(x: (self.view.width() - self.coachmarkButton.width())/2, y: self.view.height() - 44 - kInteritemPadding - self.coachmarkButton.height(), width: self.coachmarkButton.width(), height: self.coachmarkButton.height())
+        }) { (_) in
+            self.isShowingCoachmark = true
+        }
         
+    }
+    
+    func hideCoachmark() {
+        guard isShowingCoachmark == true else {return}
+        UIView.animate(withDuration: 0.3, animations: {
+            self.coachmarkButton.frame = CGRect.init(x: (self.view.width() - self.coachmarkButton.width())/2, y: self.view.height(), width: self.coachmarkButton.width(), height: self.coachmarkButton.height())
+        }) { (_) in
+            self.isShowingCoachmark = false
+        }
+    }
+    @objc func didTapCoachmark() {
+        self.tableView.setContentOffset(CGPoint.init(x: 0, y: -self.tableView.contentInset.bottom), animated: true)
+        self.hideCoachmark()
     }
     
 }

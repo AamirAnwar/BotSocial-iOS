@@ -135,10 +135,12 @@ class APIService: NSObject {
         guard let user = self.currentUser, let postID = post.id else {return}
         
         self.databaseRef.child("/posts/\(postID)/likes/\(user.uid)").observeSingleEvent(of: .value) { (snapshot) in
+            guard user.uid.isEmpty == false, let authorID = post.authorID else {return}
             let isLiked = snapshot.exists()
+            
             let paths = [
                 "/posts/\(postID)/likes/\(user.uid)",
-                "/user-posts/\(user.uid)/\(postID)/likes/\(user.uid)",
+                "/user-posts/\(authorID)/\(postID)/likes/\(user.uid)",
                 "users/\(user.uid)/likes/\(postID)"
             ]
             if isLiked {

@@ -26,6 +26,7 @@ class BSNotificationsViewController: UIViewController, UIGestureRecognizerDelega
         }
         self.tableView.delegate = self
         self.tableView.dataSource = self
+        self.tableView.tableFooterView = UIView()
         self.tableView.refreshControl = self.refreshControl
         self.tableView.register(BSNotificationTableViewCell.self, forCellReuseIdentifier: kNotifCellReuseID)
         self.navigationController?.interactivePopGestureRecognizer?.delegate = self

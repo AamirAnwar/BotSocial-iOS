@@ -99,6 +99,11 @@ extension BSAccountViewController:UICollectionViewDelegate, UICollectionViewData
 }
 
 extension BSAccountViewController:BSUserProfileCollectionViewCellDelegate {
+    func didTapSettingsButton() {
+        let vc = BSSettingsViewController()
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
     func didTapUserProfileThumb() {
         let vc = BSCameraViewController()
         vc.flowType = .ProfilePicture
