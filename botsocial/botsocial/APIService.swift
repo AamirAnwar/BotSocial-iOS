@@ -13,7 +13,7 @@ class APIService: NSObject {
     static let sharedInstance = APIService()
     fileprivate let storageRef = Storage.storage().reference()
     fileprivate let databaseRef = Database.database().reference()
-    fileprivate var currentUser:User? {
+    var currentUser:User? {
         get {
             return Auth.auth().currentUser
         }
@@ -26,11 +26,19 @@ class APIService: NSObject {
     
     func getUserPosts(completion:@escaping ((_ post:BSPost?) -> Void)) {
         guard let user = self.currentUser else {return}
-        self.databaseRef.child("user-posts").child("\(user.uid)").observe(DataEventType.childAdded, with: { (snapshot) in
-            guard let value = snapshot.value as? [String:AnyObject] else {completion(nil);return}
-            let post = BSPost.initWith(postID: snapshot.key, dict: value)
-            completion(post)
-        })
+        self.databaseRef.child("user-posts").child("\(user.uid)").observeSingleEvent(of: .value) { (snapshot) in
+            if snapshot.exists() == false {
+                completion(nil)
+            }
+            
+            self.databaseRef.child("user-posts").child("\(user.uid)").observe(DataEventType.childAdded, with: { (snapshot) in
+                guard let value = snapshot.value as? [String:AnyObject] else {completion(nil);return}
+                let post = BSPost.initWith(postID: snapshot.key, dict: value)
+                completion(post)
+            })
+
+        }
+        
     }
     
     
@@ -45,11 +53,17 @@ class APIService: NSObject {
     
     func getRecentPosts(completion:@escaping ((_ posts:BSPost?) -> Void)) {
         guard let _ = self.currentUser else {return}
-        self.databaseRef.child("posts").observe(DataEventType.childAdded, with: { (snapshot) in
-            guard let dict = snapshot.value as? [String:AnyObject] else {completion(nil);return}
-            let post = BSPost.initWith(postID: snapshot.key, dict: dict)
-            completion(post)
-        })
+        self.databaseRef.child("posts").observeSingleEvent(of: .value) { (snapshot) in
+            if snapshot.exists() == false {
+                completion(nil)
+            }
+            self.databaseRef.child("posts").observe(DataEventType.childAdded, with: { (snapshot) in
+                guard let dict = snapshot.value as? [String:AnyObject] else {completion(nil);return}
+                let post = BSPost.initWith(postID: snapshot.key, dict: dict)
+                completion(post)
+            })
+
+        }
     }
     
     func getPostWith(postID:String, completion:@escaping ((_ posts:BSPost?) -> Void)) {
@@ -205,13 +219,18 @@ class APIService: NSObject {
     
     func getNotifications(completion:@escaping ((_ notification:BSNotification?) -> Void) ) {
         guard let user = self.currentUser else {completion(nil);return}
-        self.databaseRef.child("users").child("\(user.uid)").child("notifications").observe(.childAdded) { (snapshot) in
-            if let value = snapshot.value as? [String:AnyObject] {
-                let notif = BSNotification.initWith(notifID:snapshot.key, notifDict:value)
-                completion(notif)
-            }
-            else {
+        self.databaseRef.child("users").child("\(user.uid)").child("notifications").observeSingleEvent(of: .value) { (snapshot) in
+            if snapshot.exists() == false{
                 completion(nil)
+            }
+            self.databaseRef.child("users").child("\(user.uid)").child("notifications").observe(.childAdded) { (snapshot) in
+                if let value = snapshot.value as? [String:AnyObject] {
+                    let notif = BSNotification.initWith(notifID:snapshot.key, notifDict:value)
+                    completion(notif)
+                }
+                else {
+                    completion(nil)
+                }
             }
         }
     }

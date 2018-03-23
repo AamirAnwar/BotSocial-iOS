@@ -28,8 +28,8 @@ class BSFeedViewController: UIViewController {
         super.viewDidLoad()
         self.navigationItem.title = "Home"
         self.navigationItem.leftBarButtonItem = UIBarButtonItem.init(image: #imageLiteral(resourceName: "camera_tab_icon"), style: .plain, target: self, action: #selector(didTapCameraButton))
-        self.navigationItem.leftBarButtonItem?.tintColor = UIColor.black
-        self.navigationController?.navigationBar.tintColor = UIColor.black
+        self.navigationItem.leftBarButtonItem?.tintColor = BSColorTextBlack
+        self.navigationController?.navigationBar.tintColor = BSColorTextBlack
         self.view.addSubview(self.tableView)
         self.view.addSubview(self.coachmarkButton)
         self.coachmarkButton.titleLabel?.adjustsFontSizeToFitWidth = true
@@ -66,12 +66,10 @@ class BSFeedViewController: UIViewController {
         isLoadingPosts = true
         APIService.sharedInstance.getRecentPosts { (post) in
             if let post = post {
-                self.isLoadingPosts = false
                 self.posts.insert(post, at: 0)
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                }
             }
+            self.isLoadingPosts = false
+            self.tableView.reloadData()
             
         }
 
@@ -105,7 +103,9 @@ extension BSFeedViewController: UITableViewDelegate, UITableViewDataSource {
         }
         switch indexPath.section {
         case 0:
-            return tableView.dequeueReusableCell(withIdentifier: self.kFeaturedCellReuseID)!
+            let cell = tableView.dequeueReusableCell(withIdentifier: self.kFeaturedCellReuseID) as! BSFeaturedPostTableViewCell
+            cell.featuredPosts = self.posts
+            return cell
         default:
             let currentPostIndex = indexPath.section - 1
             let post = self.posts[currentPostIndex]
@@ -191,7 +191,7 @@ extension BSFeedViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func showCoachmark() {
-        guard isShowingCoachmark == false else {return}
+        guard self.posts.count > 1 && isShowingCoachmark == false else {return}
         UIView.animate(withDuration: 0.3, animations: {
             self.coachmarkButton.frame = CGRect.init(x: (self.view.width() - self.coachmarkButton.width())/2, y: self.view.height() - 44 - kInteritemPadding - self.coachmarkButton.height() - 4, width: self.coachmarkButton.width(), height: self.coachmarkButton.height())
         }) { (_) in

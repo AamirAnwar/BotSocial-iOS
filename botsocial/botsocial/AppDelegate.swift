@@ -49,10 +49,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, FUIAuthDelegate {
     }
     func authUI(_ authUI: FUIAuth, didSignInWith user: User?, error: Error?) {
         // handle user and error as necessary
-        if let user = user {
+        if let _ = user {
             APIService.sharedInstance.updateUserDetails()
             self.resetApp()
         }
+    }
+    
+    func authPickerViewController(forAuthUI authUI: FUIAuth) -> FUIAuthPickerViewController {
+        return BSLoginViewController.init(nibName: nil, bundle: nil, authUI: authUI)
     }
 
     func resetApp() {
@@ -65,8 +69,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, FUIAuthDelegate {
             notifVC.tabBarItem.image = UIImage.init(named: "notification_tab_icon")
             accountVC.tabBarItem.image = UIImage.init(named: "account_tab_icon")
             rootVC.viewControllers = [feedVC, notifVC, accountVC]
-            rootVC.tabBar.tintColor = UIColor.black
-            self.window?.rootViewController = rootVC
+            rootVC.tabBar.tintColor = BSColorTextBlack
+            window.rootViewController = rootVC
         }
     }
     

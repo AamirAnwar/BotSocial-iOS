@@ -15,7 +15,7 @@ class BSCommentInputView: UIView {
     let postButton:UIButton = {
         let button = UIButton.init(type: .system)
         button.setTitle("Post", for: .normal)
-        button.setTitleColor(UIColor.black, for: .normal)
+        button.setTitleColor(BSColorTextBlack, for: .normal)
         return button
     }()
     let userImageView = UIImageView()

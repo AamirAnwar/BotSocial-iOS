@@ -1,35 +1,25 @@
 //
-//  BSFeaturedPostTableViewCell.swift
+//  BSLoginViewController.swift
 //  botsocial
 //
-//  Created by Aamir  on 20/03/18.
+//  Created by Aamir  on 23/03/18.
 //  Copyright © 2018 AamirAnwar. All rights reserved.
 //
 
 import UIKit
+import FirebaseAuthUI
 
-class BSFeaturedPostTableViewCell: UITableViewCell {
+class BSLoginViewController: FUIAuthPickerViewController {
     let kImageCellReuseID = "BSImageCollectionViewCell"
     let titleLabel:UILabel = {
         let label = UILabel()
         label.font = BSFontBigBold
-        label.textColor = BSColorTextBlack
-        label.text = "Featured Posts"
         label.numberOfLines = 0
+        label.textAlignment = .center
+        label.textColor = BSColorTextBlack
+        label.text = "Welcome\n\nSign up or Log in to proceed"
         return label
     }()
-    var featuredPosts:[BSPost] = []  {
-        didSet {
-            if featuredPosts.isEmpty {
-                self.titleLabel.text = "Tap the camera on the top left to create a post!"
-            }
-            else {
-                self.titleLabel.text = "Featured Posts"
-            }
-            self.collectionView.reloadData()
-        }
-    }
-    
     let collectionView:UICollectionView = {
         let layout = UICollectionViewFlowLayout.init()
         layout.minimumInteritemSpacing = 0
@@ -40,48 +30,51 @@ class BSFeaturedPostTableViewCell: UITableViewCell {
         cView.backgroundColor = UIColor.white
         return cView
     }()
-    required init?(coder aDecoder: NSCoder) {
-        fatalError()
-    }
+    var stockImages:[String] = []
     
-    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
+    
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?, authUI: FUIAuth) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil, authUI: authUI)
+        self.view.backgroundColor = UIColor.white
+        for _ in 0..<25 {
+            stockImages += [kTestFeaturedImageURL]
+        }
+        self.navigationItem.title = nil
+        self.navigationItem.leftBarButtonItem = nil
+        self.view.addSubview(self.collectionView)
+        self.view.addSubview(self.titleLabel)
         
-//        for _ in 0..<25 {
-//            featuredPosts += [kTestFeaturedImageURL]
-//        }
-        self.selectionStyle = .none
-        self.contentView.addSubview(self.titleLabel)
-        self.contentView.addSubview(self.collectionView)
         self.titleLabel.snp.makeConstraints { (make) in
             make.leading.equalToSuperview().offset(kSidePadding)
-            make.top.equalToSuperview().offset(kInteritemPadding)
             make.trailing.equalToSuperview().inset(kSidePadding)
+            make.bottom.equalTo(self.collectionView.snp.top).offset(-kInteritemPadding)
         }
-        
         self.collectionView.snp.makeConstraints { (make) in
             make.leading.equalToSuperview()
             make.trailing.equalToSuperview()
-            make.top.equalTo(self.titleLabel.snp.bottom).offset(kInteritemPadding)
+            make.centerY.equalToSuperview()
             make.height.equalTo(258)
-            make.bottom.equalToSuperview().inset(2*kInteritemPadding)
         }
         self.collectionView.delegate = self
         self.collectionView.showsHorizontalScrollIndicator = false
         self.collectionView.dataSource = self
         self.collectionView.register(BSImageCollectionViewCell.self, forCellWithReuseIdentifier: kImageCellReuseID)
+       
     }
-
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError()
+    }
 }
 
 
-extension BSFeaturedPostTableViewCell:UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+extension BSLoginViewController:UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return featuredPosts.count
+        return self.stockImages.count
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -90,26 +83,25 @@ extension BSFeaturedPostTableViewCell:UICollectionViewDelegate, UICollectionView
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kImageCellReuseID, for: indexPath) as! BSImageCollectionViewCell
-        if let urlString = featuredPosts[indexPath.row].imageURL, let url = URL(string:urlString) {
+        let urlString = self.stockImages[indexPath.row]
+        if let url = URL(string:urlString) {
             cell.setImageURL(url)
         }
         if indexPath.row == 1 && cell.isExpanded == false {
-            let cellFrame = collectionView.convert(cell.frame, to: self.contentView)
+            let cellFrame = collectionView.convert(cell.frame, to: self.view)
             let translationX = cellFrame.origin.x / 5
             cell.storyImageView.transform = CGAffineTransform(translationX: translationX, y: 0)
             cell.layer.transform = animateCell(cellFrame: cellFrame)
         }
         cell.expandImages()
         return cell
-        
     }
-
 }
 
 
-extension BSFeaturedPostTableViewCell: UIScrollViewDelegate {
+extension BSLoginViewController: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-//        let offsetY = scrollView.contentOffset.y
+        //        let offsetY = scrollView.contentOffset.y
         if let collectionView = scrollView as? UICollectionView {
             for cell in collectionView.visibleCells as! [BSImageCollectionViewCell] {
                 configure(cell)
@@ -120,7 +112,7 @@ extension BSFeaturedPostTableViewCell: UIScrollViewDelegate {
     func configure(_ cell:BSImageCollectionViewCell) {
         let indexPath = collectionView.indexPath(for: cell)!
         let attributes = collectionView.layoutAttributesForItem(at: indexPath)!
-        let cellFrame = collectionView.convert(attributes.frame, to: self.contentView)
+        let cellFrame = collectionView.convert(attributes.frame, to: self.view)
         
         let translationX = cellFrame.origin.x / 5
         cell.storyImageView.transform = CGAffineTransform(translationX: translationX, y: 0)

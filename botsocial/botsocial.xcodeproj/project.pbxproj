@@ -41,6 +41,9 @@
 		43A5174420629FAC00F49ADF /* BSFilterCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A5174320629FAC00F49ADF /* BSFilterCollectionViewCell.swift */; };
 		43A517462062B7D400F49ADF /* BSShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A517452062B7D400F49ADF /* BSShareViewController.swift */; };
 		43A98C06206122B500739551 /* BSFeaturedPostTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A98C05206122B500739551 /* BSFeaturedPostTableViewCell.swift */; };
+		43ABC92120657DD700229461 /* BSLoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43ABC92020657DD700229461 /* BSLoginViewController.swift */; };
+		43ABC92320658BA100229461 /* BSEmptyStateTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43ABC92220658BA100229461 /* BSEmptyStateTableViewCell.swift */; };
+		43ABC92520658D5300229461 /* BSEmptyStateCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43ABC92420658D5300229461 /* BSEmptyStateCollectionViewCell.swift */; };
 		43B934612064F68E005FB360 /* MobileNet.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 43B934602064F68E005FB360 /* MobileNet.mlmodel */; };
 		43B934632064F953005FB360 /* BSVisionObjectCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B934622064F953005FB360 /* BSVisionObjectCollectionViewCell.swift */; };
 		43B9346520651BAA005FB360 /* BSFonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B9346420651BAA005FB360 /* BSFonts.swift */; };
@@ -116,6 +119,9 @@
 		43A5174320629FAC00F49ADF /* BSFilterCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSFilterCollectionViewCell.swift; sourceTree = "<group>"; };
 		43A517452062B7D400F49ADF /* BSShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSShareViewController.swift; sourceTree = "<group>"; };
 		43A98C05206122B500739551 /* BSFeaturedPostTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSFeaturedPostTableViewCell.swift; sourceTree = "<group>"; };
+		43ABC92020657DD700229461 /* BSLoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSLoginViewController.swift; sourceTree = "<group>"; };
+		43ABC92220658BA100229461 /* BSEmptyStateTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSEmptyStateTableViewCell.swift; sourceTree = "<group>"; };
+		43ABC92420658D5300229461 /* BSEmptyStateCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSEmptyStateCollectionViewCell.swift; sourceTree = "<group>"; };
 		43B934602064F68E005FB360 /* MobileNet.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = MobileNet.mlmodel; sourceTree = "<group>"; };
 		43B934622064F953005FB360 /* BSVisionObjectCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSVisionObjectCollectionViewCell.swift; sourceTree = "<group>"; };
 		43B9346420651BAA005FB360 /* BSFonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSFonts.swift; sourceTree = "<group>"; };
@@ -164,6 +170,8 @@
 		43910A8D203CC917009171CB = {
 			isa = PBXGroup;
 			children = (
+				43ABC92420658D5300229461 /* BSEmptyStateCollectionViewCell.swift */,
+				43ABC92220658BA100229461 /* BSEmptyStateTableViewCell.swift */,
 				43910A98203CC917009171CB /* botsocial */,
 				43910AAF203CC917009171CB /* botsocialTests */,
 				43910ABA203CC918009171CB /* botsocialUITests */,
@@ -192,6 +200,7 @@
 				437A0D1E2063E21300964245 /* BSComment.swift */,
 				43B9346820653B54005FB360 /* BSCommentInputView.swift */,
 				43B9346420651BAA005FB360 /* BSFonts.swift */,
+				43ABC92020657DD700229461 /* BSLoginViewController.swift */,
 				43927C9720603DDE002BE1AC /* BSPhotoCaptureDelegate.swift */,
 				43927C9920605B09002BE1AC /* BSNotificationTableViewCell.swift */,
 				43B9346620651D7A005FB360 /* BSColors.swift */,
@@ -630,6 +639,7 @@
 				430E61AC205F11B200AECF27 /* BSSeparator.swift in Sources */,
 				43A5174220629E3D00F49ADF /* BSFilterView.swift in Sources */,
 				43927C9A20605B09002BE1AC /* BSNotificationTableViewCell.swift in Sources */,
+				43ABC92120657DD700229461 /* BSLoginViewController.swift in Sources */,
 				430E61A0205F0C6100AECF27 /* BSCameraViewController.swift in Sources */,
 				436913CF20631D9B0034F527 /* BSUser.swift in Sources */,
 				43A5174420629FAC00F49ADF /* BSFilterCollectionViewCell.swift in Sources */,
@@ -637,6 +647,7 @@
 				430E61AE205F12B000AECF27 /* BSImageTableViewCell.swift in Sources */,
 				43B934612064F68E005FB360 /* MobileNet.mlmodel in Sources */,
 				43B9346520651BAA005FB360 /* BSFonts.swift in Sources */,
+				43ABC92520658D5300229461 /* BSEmptyStateCollectionViewCell.swift in Sources */,
 				430E619E205F076B00AECF27 /* BSFeedTableViewCell.swift in Sources */,
 				43910A9A203CC917009171CB /* AppDelegate.swift in Sources */,
 				43E17B56206430BD006A75FB /* BSSettingsViewController.swift in Sources */,
@@ -644,6 +655,7 @@
 				437A0D1F2063E21300964245 /* BSComment.swift in Sources */,
 				430E61B2205F220A00AECF27 /* BSPostDetailTableViewCell.swift in Sources */,
 				430E619C205F066B00AECF27 /* BSFeedViewController.swift in Sources */,
+				43ABC92320658BA100229461 /* BSEmptyStateTableViewCell.swift in Sources */,
 				437A0D1D2063DF8B00964245 /* BSPostCommentsViewController.swift in Sources */,
 				43A98C06206122B500739551 /* BSFeaturedPostTableViewCell.swift in Sources */,
 				43B934632064F953005FB360 /* BSVisionObjectCollectionViewCell.swift in Sources */,

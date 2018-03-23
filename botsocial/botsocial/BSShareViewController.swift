@@ -37,14 +37,14 @@ class BSShareViewController: UIViewController, UIGestureRecognizerDelegate {
     let shareButton:UIButton = {
         let button = UIButton.init(type: .system)
         button.setTitle("Share", for: .normal)
-        button.setTitleColor(UIColor.black, for: .normal)
+        button.setTitleColor(BSColorTextBlack, for: .normal)
         return button
     }()
     
     let backButton:UIButton = {
         let button = UIButton.init(type: .system)
         button.setTitle("Back", for: .normal)
-        button.setTitleColor(UIColor.black, for: .normal)
+        button.setTitleColor(BSColorTextBlack, for: .normal)
         return button
     }()
     
@@ -194,9 +194,7 @@ class BSShareViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     func setTextViewPlaceHolder() {
-        self.textView.attributedText = NSMutableAttributedString.init(string: kPlaceholderText, attributes: [.foregroundColor:BSLightGray,
-                                                                                                                           .font:BSFontMediumParagraph
-            ])
+        self.textView.attributedText = NSMutableAttributedString.init(string: kPlaceholderText, attributes: [.foregroundColor:BSLightGray,.font:BSFontMediumParagraph])
     }
     func clearTextViewPlaceHolder() {
         self.textView.attributedText = nil

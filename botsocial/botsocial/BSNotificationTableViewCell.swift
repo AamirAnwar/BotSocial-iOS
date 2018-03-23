@@ -38,6 +38,7 @@ class BSNotificationTableViewCell: UITableViewCell {
         
         self.containerView.addSubview(self.titleLabel)
         self.titleLabel.numberOfLines = 0
+        self.titleLabel.textColor = BSColorTextBlack
         self.titleLabel.font = BSFontMediumParagraph
         self.titleLabel.snp.makeConstraints { (make) in
             make.leading.equalTo(self.userThumbnailImageView.snp.trailing).offset(kInteritemPadding)

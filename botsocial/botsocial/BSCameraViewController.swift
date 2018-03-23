@@ -31,27 +31,27 @@ class BSCameraViewController: UIViewController {
     let cancelButton:UIButton = {
         let button = UIButton.init(type: .system)
         button.setTitle("Cancel", for: .normal)
-        button.setTitleColor(UIColor.black, for: .normal)
+        button.setTitleColor(BSColorTextBlack, for: .normal)
         return button
     }()
     let backButton:UIButton = {
         let button = UIButton.init(type: .system)
         button.setTitle("Back", for: .normal)
-        button.setTitleColor(UIColor.black, for: .normal)
+        button.setTitleColor(BSColorTextBlack, for: .normal)
         return button
     }()
     
     let nextButton:UIButton = {
         let button = UIButton.init(type: .system)
         button.setTitle("Next", for: .normal)
-        button.setTitleColor(UIColor.black, for: .normal)
+        button.setTitleColor(BSColorTextBlack, for: .normal)
         return button
     }()
     
     let saveButton:UIButton = {
         let button = UIButton.init(type: .system)
         button.setTitle("Save", for: .normal)
-        button.setTitleColor(UIColor.black, for: .normal)
+        button.setTitleColor(BSColorTextBlack, for: .normal)
         return button
     }()
     let filterView = BSFilterView()
@@ -101,7 +101,7 @@ class BSCameraViewController: UIViewController {
         }
         
         // Camera view
-        self.cameraView.backgroundColor = UIColor.black
+        self.cameraView.backgroundColor = BSColorTextBlack
         self.cameraView.snp.makeConstraints { (make) in
             make.leading.equalToSuperview()
             make.trailing.equalToSuperview()
@@ -569,8 +569,10 @@ class BSCameraViewController: UIViewController {
         self.showImagePicker()
     }
     @objc func didTapSaveButton() {
+        self.saveButton.isEnabled = false
         if let image = self.capturedImageView.image {
             APIService.sharedInstance.updateUserProfilePicture(image: image, completion: {
+                self.saveButton.isEnabled = true
                 self.dismiss(animated: true)
             })
         }

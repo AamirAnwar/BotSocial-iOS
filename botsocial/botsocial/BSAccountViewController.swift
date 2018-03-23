@@ -14,7 +14,7 @@ class BSAccountViewController: UIViewController, UIGestureRecognizerDelegate {
     var userPosts = [BSPost]()
     var user:BSUser? {
         didSet {
-            self.navigationItem.title = user?.displayName
+            self.navigationItem.title = user?.displayName ?? APIService.sharedInstance.currentUser?.displayName
         }
     }
     let collectionView:UICollectionView = {
@@ -36,21 +36,21 @@ class BSAccountViewController: UIViewController, UIGestureRecognizerDelegate {
         self.isLoading = true
         if let user = self.user {
             APIService.sharedInstance.getPostsWith(userID: user.id, completion: { (post) in
+                self.isLoading = false
                 if let post = post {
-                    self.isLoading = false
                     self.userPosts.insert(post, at: 0)
-                    self.collectionView.reloadData()
                 }
+                self.collectionView.reloadData()
             })
             
         }
         else {
             APIService.sharedInstance.getUserPosts { (post) in
+                self.isLoading = false
                 if let post = post {
-                    self.isLoading = false
                     self.userPosts.insert(post, at: 0)
-                    self.collectionView.reloadData()
                 }
+                self.collectionView.reloadData()
             }
         }
         
@@ -61,6 +61,7 @@ class BSAccountViewController: UIViewController, UIGestureRecognizerDelegate {
         self.collectionView.delegate = self
         self.collectionView.dataSource = self
         self.collectionView.register(BSLoaderCollectionViewCell.self, forCellWithReuseIdentifier: "loader_cell")
+        self.collectionView.register(BSEmptyStateCollectionViewCell.self, forCellWithReuseIdentifier: "empty_state_cell")
         self.collectionView.register(BSUserProfileCollectionViewCell.self, forCellWithReuseIdentifier: kUserProfileCellReuseID)
         self.collectionView.register(BSImageCollectionViewCell.self, forCellWithReuseIdentifier: kImageCellReuseID)
     }
@@ -78,6 +79,7 @@ extension BSAccountViewController:UICollectionViewDelegate, UICollectionViewData
             return 1
         case 1:
             guard self.isLoading == false else {return 1}
+            guard self.userPosts.isEmpty == false else {return 1}
             return userPosts.count
         default:
             return 0
@@ -90,6 +92,7 @@ extension BSAccountViewController:UICollectionViewDelegate, UICollectionViewData
         }
         else {
             guard self.isLoading == false else {return CGSize.init(width: self.view.width(), height: 20)}
+            guard self.userPosts.isEmpty == false else {return CGSize.init(width: self.view.width(), height: 50)}
             return CGSize.init(width: self.view.width()/3, height: 120)
         }
         
@@ -108,6 +111,13 @@ extension BSAccountViewController:UICollectionViewDelegate, UICollectionViewData
             return cell
         case 1:
             guard self.isLoading == false else {return collectionView.dequeueReusableCell(withReuseIdentifier: "loader_cell", for: indexPath)}
+            guard self.userPosts.isEmpty == false else {
+                
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "empty_state_cell", for: indexPath) as! BSEmptyStateCollectionViewCell
+                cell.titleLabel.text = "No posts yet"
+                return cell
+                
+            }
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kImageCellReuseID, for: indexPath) as! BSImageCollectionViewCell
             if let url = URL(string:userPosts[indexPath.row].imageURL) {
                 cell.setImageURL(url)

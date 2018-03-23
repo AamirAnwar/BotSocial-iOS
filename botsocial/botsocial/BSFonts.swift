@@ -43,6 +43,7 @@ import UIKit
 let BSFontBigBold = UIFont(name: "HelveticaNeue-Bold", size: 20)!
 let BSFontMiniBold = UIFont(name: "HelveticaNeue-Medium", size: 12)!
 let BSFontMediumBold = UIFont(name: "HelveticaNeue-Medium", size: 14)!
+let BSFontLargeBold = UIFont(name: "HelveticaNeue-Medium", size: 18)!
 let BSFontMediumParagraph = UIFont(name: "HelveticaNeue", size: 14)!
 
 
