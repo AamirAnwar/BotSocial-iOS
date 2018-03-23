@@ -25,9 +25,20 @@ class BSFeedActionsTableViewCell: UITableViewCell {
         }
     }
     
+    let likeActionButton:UIButton = {
+        let button = UIButton.init(type: .custom)
+        button.setBackgroundImage(#imageLiteral(resourceName: "like_icon_normal"), for: .normal)
+        button.setBackgroundImage(#imageLiteral(resourceName: "like_icon_highlighted"), for: .selected)
+        button.snp.makeConstraints({ (make) in
+            make.size.equalTo(22)
+        })
+        return button
+    }()
+    
     let likeButton:UIButton = {
         let button = BSFeedActionsTableViewCell.standardButton
         button.setTitle("No Likes", for: .normal)
+        button.isUserInteractionEnabled = false
         return button
     }()
     
@@ -44,8 +55,12 @@ class BSFeedActionsTableViewCell: UITableViewCell {
     }()
     
     let saveButton:UIButton = {
-        let button = BSFeedActionsTableViewCell.standardButton
-        button.setTitle("Save", for: .normal)
+        let button = UIButton.init(type: .custom)
+        button.setBackgroundImage(#imageLiteral(resourceName: "save_icon_normal"), for: .normal)
+        button.setBackgroundImage(#imageLiteral(resourceName: "save_icon_highlighted"), for: .selected)
+        button.snp.makeConstraints({ (make) in
+            make.size.equalTo(22)
+        })
         return button
     }()
     var post:BSPost? {
@@ -77,11 +92,12 @@ class BSFeedActionsTableViewCell: UITableViewCell {
 //        self.contentView.addSubview(self.dislikeButton)
         self.contentView.addSubview(self.commentButton)
         self.contentView.addSubview(self.saveButton)
+        self.contentView.addSubview(self.likeActionButton)
         
         self.selectionStyle = .none
         self.likeButton.addTarget(self, action: #selector(didTapLikeButton), for: .touchUpInside)
         self.likeButton.snp.makeConstraints { (make) in
-            make.leading.equalToSuperview().offset(kSidePadding)
+            make.leading.equalTo(self.likeActionButton.snp.trailing).offset(4)
             make.top.equalToSuperview().offset(kInteritemPadding)
             make.bottom.equalToSuperview().inset(kInteritemPadding)
         }
@@ -95,11 +111,17 @@ class BSFeedActionsTableViewCell: UITableViewCell {
             make.leading.equalTo(self.likeButton.snp.trailing).offset(kInteritemPadding)
             make.centerY.equalTo(self.likeButton.snp.centerY)
         }
-        
+        self.saveButton.addTarget(self, action: #selector(saveButtonTapped), for: .touchUpInside)
         self.saveButton.snp.makeConstraints { (make) in
             make.trailing.equalToSuperview().inset(kSidePadding)
             make.centerY.equalTo(self.commentButton.snp.centerY)
             make.leading.greaterThanOrEqualTo(self.commentButton.snp.trailing)
+        }
+        
+        self.likeActionButton.addTarget(self, action: #selector(didTapLikeActionButton), for: .touchUpInside)
+        self.likeActionButton.snp.makeConstraints { (make) in
+            make.leading.equalToSuperview().offset(kSidePadding)
+            make.centerY.equalTo(self.likeButton.snp.centerY)
         }
     }
     
@@ -108,14 +130,35 @@ class BSFeedActionsTableViewCell: UITableViewCell {
         self.delegate?.didTapCommentsButton(forIndexPath: self.indexPath)
     }
     
-    @objc func didTapLikeButton() {
+    @objc func didTapLikeActionButton() {
+        UIView.transition(with: self.likeActionButton, duration: 0.3, options: .curveEaseIn, animations: {
+            self.likeActionButton.isSelected = !self.likeActionButton.isSelected
+        })
         UIView.animate(withDuration: 0.3, animations: {
-            self.likeButton.transform = self.likeButton.transform.scaledBy(x: 1.1, y: 1.1)
+            self.likeActionButton.transform = self.likeActionButton.transform.scaledBy(x: 1.1, y: 1.1)
         }) { (_) in
             UIView.animate(withDuration: 0.8, delay: 0.0, usingSpringWithDamping: 0.4, initialSpringVelocity: 0.5, options: .curveEaseInOut, animations: {
-                self.likeButton.transform = .identity
+                self.likeActionButton.transform = .identity
             })
         }
         self.delegate?.didTapLikeButton(forIndexPath: self.indexPath)
+    }
+    
+    @objc func didTapLikeButton() {
+        
+    }
+    
+    @objc func saveButtonTapped() {
+        UIView.transition(with: self.saveButton, duration: 0.3, options: .curveEaseIn, animations: {
+            self.saveButton.isSelected = !self.saveButton.isSelected
+        })
+        
+        UIView.animate(withDuration: 0.3, animations: {
+            self.saveButton.transform = self.saveButton.transform.scaledBy(x: 1.1, y: 1.1)
+        }) { (_) in
+            UIView.animate(withDuration: 0.8, delay: 0.0, usingSpringWithDamping: 0.4, initialSpringVelocity: 0.5, options: .curveEaseInOut, animations: {
+                self.saveButton.transform = .identity
+            })
+        }
     }
 }
