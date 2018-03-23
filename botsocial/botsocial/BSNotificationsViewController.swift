@@ -44,12 +44,26 @@ class BSNotificationsViewController: UIViewController, UIGestureRecognizerDelega
         self.loadNotifications()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.tabBarItem.badgeValue = nil
+    }
+    
     func loadNotifications() {
         isLoadingNotifications = true
         self.notifications.removeAll()
         APIService.sharedInstance.getNotifications { (notification) in
             if let notif = notification {
                 self.notifications.insert(notif, at: 0)
+                if self.tabBarController?.selectedIndex != 1 {
+                    self.tabBarItem.badgeColor = UIColor.red.withAlphaComponent(0.8)
+                    if let v = self.tabBarItem.badgeValue, let value = Int(v) {
+                        self.tabBarItem.badgeValue = "\(value + 1)"
+                    }
+                    else {
+                        self.tabBarItem.badgeValue = "1"
+                    }
+                }
             }
             self.refreshControl.endRefreshing()
             self.isLoadingNotifications = false

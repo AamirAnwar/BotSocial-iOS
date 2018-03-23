@@ -170,13 +170,10 @@
 		43910A8D203CC917009171CB = {
 			isa = PBXGroup;
 			children = (
-				43ABC92420658D5300229461 /* BSEmptyStateCollectionViewCell.swift */,
-				43ABC92220658BA100229461 /* BSEmptyStateTableViewCell.swift */,
 				43910A98203CC917009171CB /* botsocial */,
 				43910AAF203CC917009171CB /* botsocialTests */,
 				43910ABA203CC918009171CB /* botsocialUITests */,
 				43910A97203CC917009171CB /* Products */,
-				43B9346C206562E7005FB360 /* BSLoaderCollectionViewCell.swift */,
 				AAD362DF12D387AEB430FEB1 /* Pods */,
 				684667AF3C5C9CF8C8181BA9 /* Frameworks */,
 			);
@@ -198,9 +195,11 @@
 				43910A99203CC917009171CB /* AppDelegate.swift */,
 				43910AA2203CC917009171CB /* Assets.xcassets */,
 				437A0D1E2063E21300964245 /* BSComment.swift */,
+				43ABC92220658BA100229461 /* BSEmptyStateTableViewCell.swift */,
 				43B9346820653B54005FB360 /* BSCommentInputView.swift */,
 				43B9346420651BAA005FB360 /* BSFonts.swift */,
 				43ABC92020657DD700229461 /* BSLoginViewController.swift */,
+				43ABC92420658D5300229461 /* BSEmptyStateCollectionViewCell.swift */,
 				43927C9720603DDE002BE1AC /* BSPhotoCaptureDelegate.swift */,
 				43927C9920605B09002BE1AC /* BSNotificationTableViewCell.swift */,
 				43B9346620651D7A005FB360 /* BSColors.swift */,
@@ -234,6 +233,7 @@
 				43E17B5320641EFA006A75FB /* BSNotification.swift */,
 				436913CC20631BDF0034F527 /* BSPost.swift */,
 				436913CE20631D9B0034F527 /* BSUser.swift */,
+				43B9346C206562E7005FB360 /* BSLoaderCollectionViewCell.swift */,
 				437A0D1C2063DF8B00964245 /* BSPostCommentsViewController.swift */,
 				43E17B55206430BD006A75FB /* BSSettingsViewController.swift */,
 				43B9346A206559C6005FB360 /* BSLoaderTableViewCell.swift */,
@@ -840,7 +840,7 @@
 				INFOPLIST_FILE = botsocial/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.aamiranwar.botsocial;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aamiranwar.pictogramapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -857,7 +857,7 @@
 				INFOPLIST_FILE = botsocial/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.aamiranwar.botsocial;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aamiranwar.pictogramapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

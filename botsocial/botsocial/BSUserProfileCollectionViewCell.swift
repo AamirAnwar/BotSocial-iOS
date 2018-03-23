@@ -92,6 +92,7 @@ class BSUserProfileCollectionViewCell: UICollectionViewCell {
     
     func configureWithUser(user:BSUser? = nil) {
         if let user = user {
+            self.changePictureImageView.alpha = 0
             self.usernameLabel.text = user.displayName
             APIService.sharedInstance.getProfilePictureFor(userID: user.id, completion: { (url) in
                 self.userThumbnailImageView.pin_setImage(from: url)
