@@ -13,7 +13,7 @@ class BSSettingsViewController: UIViewController,UIGestureRecognizerDelegate {
     let tableView = UITableView.init(frame: .zero, style: .plain)
     let options = ["Logout"]
     override func viewDidLoad() {
-        super.viewDidLoad()g
+        super.viewDidLoad()
         self.view.backgroundColor = UIColor.white
         self.view.addSubview(self.tableView)
         self.tableView.tableFooterView = UIView()
