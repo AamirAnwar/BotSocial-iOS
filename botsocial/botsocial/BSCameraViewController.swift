@@ -68,6 +68,22 @@ class BSCameraViewController: UIViewController {
     let kVisionCellReuseID = "BSVisionObjectCell"
     var visionObjects:[String] = []
     
+    let loaderOverlayView: UIView = {
+        let view = UIView()
+        view.isHidden = true
+        view.backgroundColor = UIColor.black.withAlphaComponent(0.7)
+        return view
+        
+    }()
+    
+    let loader:UIActivityIndicatorView =  {
+        
+        let view = UIActivityIndicatorView.init()
+        view.activityIndicatorViewStyle = .whiteLarge
+        return view
+    }()
+
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 //        self.imagePickerController.modalPresentationStyle = .currentContext
@@ -89,6 +105,8 @@ class BSCameraViewController: UIViewController {
         self.view.addSubview(self.saveButton)
         self.view.addSubview(self.libPreviewButton)
         self.view.addSubview(self.objectCollectionView)
+        self.capturedImageView.addSubview(self.loaderOverlayView)
+        self.loaderOverlayView.addSubview(self.loader)
         
         self.cameraView.addSubview(self.switchCameraButton)
         
@@ -101,7 +119,7 @@ class BSCameraViewController: UIViewController {
         }
         
         // Camera view
-        self.cameraView.backgroundColor = BSColorTextBlack
+        self.cameraView.backgroundColor = UIColor.black
         self.cameraView.snp.makeConstraints { (make) in
             make.leading.equalToSuperview()
             make.trailing.equalToSuperview()
@@ -205,6 +223,19 @@ class BSCameraViewController: UIViewController {
             make.leading.equalToSuperview()
             make.trailing.equalToSuperview()
             make.height.equalTo(kVisionObjectsListViewHeight)
+        }
+        
+        self.loaderOverlayView.isHidden = true
+        self.loaderOverlayView.snp.makeConstraints { (make) in
+            make.top.equalToSuperview()
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview()
+            make.bottom.equalToSuperview()
+        }
+        
+        self.loader.snp.makeConstraints { (make) in
+            make.center.equalToSuperview()
+            make.size.equalTo(20)
         }
         
     }
@@ -569,16 +600,40 @@ class BSCameraViewController: UIViewController {
         self.showImagePicker()
     }
     @objc func didTapSaveButton() {
+        self.showLoader()
         self.saveButton.isEnabled = false
         if let image = self.capturedImageView.image {
             APIService.sharedInstance.updateUserProfilePicture(image: image, completion: {
+                self.hideLoader()
                 self.saveButton.isEnabled = true
                 self.dismiss(animated: true)
             })
         }
         
     }
+    
+    func showLoader() {
+        guard self.loaderOverlayView.isHidden else {return}
+        self.loaderOverlayView.alpha = 0
+        self.loaderOverlayView.isHidden = false
+        UIView.animate(withDuration: 0.3) {
+            self.loaderOverlayView.alpha = 1.0
+            self.loader.startAnimating()
+        }
+    }
+    
+    func hideLoader() {
+        guard self.loaderOverlayView.isHidden == false else {return}
+        self.loader.stopAnimating()
+        UIView.animate(withDuration: 0.3, animations: {
+            self.loaderOverlayView.alpha = 0
+        }) { (_) in
+            self.loaderOverlayView.isHidden = true
+        }
+        
+    }
 }
+
 
 extension BSCameraViewController:UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {

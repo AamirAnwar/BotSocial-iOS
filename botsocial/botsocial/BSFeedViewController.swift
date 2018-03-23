@@ -23,6 +23,14 @@ class BSFeedViewController: UIViewController {
     let coachmarkButton = UIButton.init(type: .system)
     var isShowingCoachmark = false
     var isLoadingPosts = false
+    var navBarHeight:CGFloat {
+        get {
+            if let navBar = self.navigationController?.navigationBar {
+                return navBar.height()
+            }
+            return 0.0
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -173,6 +181,7 @@ extension BSFeedViewController: UITableViewDelegate, UITableViewDataSource {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let y = scrollView.contentOffset.y
+        print(y)
         if y + scrollView.height() < (scrollView.contentSize.height) {
             hideCoachmark()
         }
@@ -209,7 +218,7 @@ extension BSFeedViewController: UITableViewDelegate, UITableViewDataSource {
         }
     }
     @objc func didTapCoachmark() {
-        self.tableView.setContentOffset(CGPoint.init(x: 0, y: -self.tableView.contentInset.bottom), animated: true)
+        self.tableView.setContentOffset(CGPoint.init(x: 0, y: -(self.navBarHeight + self.tableView.contentInset.bottom + self.tableView.contentInset.top)), animated: true)
         self.hideCoachmark()
     }
     

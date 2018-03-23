@@ -31,7 +31,7 @@ class APIService: NSObject {
                 completion(nil)
             }
             
-            self.databaseRef.child("user-posts").child("\(user.uid)").observe(DataEventType.childAdded, with: { (snapshot) in
+            self.databaseRef.child("user-posts").child("\(user.uid)").queryLimited(toLast: 30).observe(DataEventType.childAdded, with: { (snapshot) in
                 guard let value = snapshot.value as? [String:AnyObject] else {completion(nil);return}
                 let post = BSPost.initWith(postID: snapshot.key, dict: value)
                 completion(post)
@@ -44,7 +44,7 @@ class APIService: NSObject {
     
     func getPostsWith(userID:String, completion:@escaping ((_ post:BSPost?) -> Void)) {
         guard userID.isEmpty == false else {return}
-        self.databaseRef.child("user-posts").child("\(userID)").observe(DataEventType.childAdded, with: { (snapshot) in
+        self.databaseRef.child("user-posts").child("\(userID)").queryLimited(toLast: 30).observe(DataEventType.childAdded, with: { (snapshot) in
             guard let value = snapshot.value as? [String:AnyObject] else {completion(nil);return}
             let post = BSPost.initWith(postID: snapshot.key, dict: value)
             completion(post)
@@ -57,7 +57,7 @@ class APIService: NSObject {
             if snapshot.exists() == false {
                 completion(nil)
             }
-            self.databaseRef.child("posts").observe(DataEventType.childAdded, with: { (snapshot) in
+            self.databaseRef.child("posts").queryLimited(toLast: 30).observe(DataEventType.childAdded, with: { (snapshot) in
                 guard let dict = snapshot.value as? [String:AnyObject] else {completion(nil);return}
                 let post = BSPost.initWith(postID: snapshot.key, dict: dict)
                 completion(post)
@@ -223,7 +223,7 @@ class APIService: NSObject {
             if snapshot.exists() == false{
                 completion(nil)
             }
-            self.databaseRef.child("users").child("\(user.uid)").child("notifications").observe(.childAdded) { (snapshot) in
+            self.databaseRef.child("users").child("\(user.uid)").child("notifications").queryLimited(toLast: 20).observe(.childAdded) { (snapshot) in
                 if let value = snapshot.value as? [String:AnyObject] {
                     let notif = BSNotification.initWith(notifID:snapshot.key, notifDict:value)
                     completion(notif)

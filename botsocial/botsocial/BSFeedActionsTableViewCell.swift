@@ -39,7 +39,6 @@ class BSFeedActionsTableViewCell: UITableViewCell {
     let likeButton:UIButton = {
         let button = BSFeedActionsTableViewCell.standardButton
         button.setTitle("No Likes", for: .normal)
-        button.isUserInteractionEnabled = false
         return button
     }()
     
@@ -150,7 +149,7 @@ class BSFeedActionsTableViewCell: UITableViewCell {
     }
     
     @objc func didTapLikeButton() {
-        
+        self.didTapLikeActionButton()
     }
     
     @objc func saveButtonTapped() {

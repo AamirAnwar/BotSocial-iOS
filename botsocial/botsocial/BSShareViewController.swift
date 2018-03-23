@@ -69,7 +69,7 @@ class BSShareViewController: UIViewController, UIGestureRecognizerDelegate {
         self.view.addSubview(self.shareButton)
         self.view.addSubview(self.backButton)
         self.view.addSubview(self.scrollView)
-        self.view.addSubview(self.loaderOverlayView)
+        self.postImageView.addSubview(self.loaderOverlayView)
         self.loaderOverlayView.addSubview(self.loader)
         
         self.scrollView.addSubview(self.contentView)
@@ -130,9 +130,9 @@ class BSShareViewController: UIViewController, UIGestureRecognizerDelegate {
 //            make.bottom.greaterThanOrEqualToSuperview().inset(2*kInteritemPadding)
         }
 
-        
+        self.loaderOverlayView.isHidden = true
         self.loaderOverlayView.snp.makeConstraints { (make) in
-            make.top.equalToSuperview().offset(self.navigationController != nil ? self.navigationController!.navigationBar.height():0.0)
+            make.top.equalToSuperview()
             make.leading.equalToSuperview()
             make.trailing.equalToSuperview()
             make.bottom.equalToSuperview()

@@ -95,6 +95,7 @@ extension BSNotificationsViewController:UITableViewDelegate, UITableViewDataSour
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
         guard self.notifications.isEmpty == false else {return}
         if let postID = self.notifications[indexPath.row].postID {
             APIService.sharedInstance.getPostWith(postID: postID, completion: { (post) in
