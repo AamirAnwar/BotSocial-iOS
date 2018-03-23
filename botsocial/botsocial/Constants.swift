@@ -15,6 +15,7 @@ let kUserThumbnailImageHeight:CGFloat = 44
 let kSidePadding:CGFloat = 13
 let kInteritemPadding:CGFloat = 8
 let kCornerRadius:CGFloat = 8
+let kVisionObjectsListViewHeight:CGFloat = 60
 let kLibPhotoPreviewSize:CGFloat = 44
 let kNotificationWillShowKeyboard = Notification(name: Notification.Name.UIKeyboardWillShow)
 let kNotificationWillHideKeyboard = Notification(name: Notification.Name.UIKeyboardWillHide)

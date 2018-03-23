@@ -8,6 +8,8 @@
 
 import UIKit
 import AVFoundation
+import CoreML
+import Vision
 
 let kCameraViewHeight:CGFloat = UIScreen.main.bounds.width
 class BSCameraViewController: UIViewController {
@@ -54,6 +56,17 @@ class BSCameraViewController: UIViewController {
     }()
     let filterView = BSFilterView()
     let libPreviewButton:UIButton = UIButton.init(type: .system)
+    let model = MobileNet()
+    let objectCollectionView:UICollectionView = {
+        let layout = UICollectionViewFlowLayout.init()
+        layout.estimatedItemSize = CGSize.init(width: 1.0, height: 1.0)
+        layout.scrollDirection = .horizontal
+        let cv = UICollectionView.init(frame: .zero, collectionViewLayout: layout)
+        return cv
+    }()
+    
+    let kVisionCellReuseID = "BSVisionObjectCell"
+    var visionObjects:[String] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -75,6 +88,7 @@ class BSCameraViewController: UIViewController {
         self.view.addSubview(self.nextButton)
         self.view.addSubview(self.saveButton)
         self.view.addSubview(self.libPreviewButton)
+        self.view.addSubview(self.objectCollectionView)
         
         self.cameraView.addSubview(self.switchCameraButton)
         
@@ -144,7 +158,7 @@ class BSCameraViewController: UIViewController {
         // Filter View
         self.filterView.isHidden = true
         self.filterView.snp.makeConstraints { (make) in
-            make.top.equalTo(self.capturedImageView.snp.bottom).offset(kInteritemPadding)
+            make.top.equalTo(self.objectCollectionView.snp.bottom).offset(0)
             make.bottom.equalToSuperview()
             make.leading.equalToSuperview()
             make.trailing.equalToSuperview()
@@ -176,8 +190,20 @@ class BSCameraViewController: UIViewController {
             if let image = image {
                 self.libPreviewButton.setBackgroundImage(image, for: .normal)
             }
-            
-            
+        }
+        
+        // Vision objects collection view
+        self.objectCollectionView.isHidden = true
+        self.objectCollectionView.delegate = self
+        self.objectCollectionView.showsHorizontalScrollIndicator = false
+        self.objectCollectionView.dataSource = self
+        self.objectCollectionView.backgroundColor = UIColor.white
+        self.objectCollectionView.register(BSVisionObjectCollectionViewCell.self, forCellWithReuseIdentifier: kVisionCellReuseID)
+        self.objectCollectionView.snp.makeConstraints { (make) in
+            make.top.equalTo(self.capturedImageView.snp.bottom)
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview()
+            make.height.equalTo(kVisionObjectsListViewHeight)
         }
         
     }
@@ -374,7 +400,50 @@ class BSCameraViewController: UIViewController {
         self.captureButton.isHidden = true
         self.libPreviewButton.isHidden = true
         self.stopSessionIfNeeded()
+        self.detectObjectsWith(image:image)
     }
+    
+    func detectObjectsWith(image:UIImage) {
+        guard let visionModel = try? VNCoreMLModel(for: model.model) else {
+            return
+        }
+        
+        let request = VNCoreMLRequest(model: visionModel) { request, error in
+            if let observations = request.results as? [VNClassificationObservation] {
+                
+                // The observations appear to be sorted by confidence already, so we
+                // take the top 5 and map them to an array of (String, Double) tuples.
+                let top5 = observations.prefix(through: 4)
+                    .map { ($0.identifier, Double($0.confidence)) }
+                print(top5)
+                let objects = top5.map({ (id,con) -> String in
+                    return id
+                })
+                for item in objects {
+                    
+                    var explodedString = item.components(separatedBy: ",")
+                    let firstObjectExploded = explodedString.first!.components(separatedBy: " ")
+                    explodedString[0] = firstObjectExploded[1]
+                    for i in 1..<explodedString.count {
+                        explodedString[i].remove(at: explodedString[i].startIndex)
+                    }
+                    if explodedString.isEmpty == false {
+                        self.visionObjects += explodedString
+                    }
+                }
+                if self.visionObjects.isEmpty == false {
+                    self.objectCollectionView.isHidden = false
+                    self.objectCollectionView.reloadData()
+                }
+//                self.show(results: top5)
+            }
+        }
+        request.imageCropAndScaleOption = .centerCrop
+        let handler = VNImageRequestHandler(cgImage: image.cgImage!)
+        try? handler.perform([request])
+    }
+    
+    
     
     
     @objc func willShowKeyboard(notification:NSNotification) {
@@ -418,6 +487,8 @@ class BSCameraViewController: UIViewController {
         self.libPreviewButton.isHidden = false
         self.captureButton.isHidden = false
         self.filterView.isHidden = true
+        self.objectCollectionView.isHidden = true
+        self.visionObjects.removeAll()
         self.startSessionIfNeeded()
     }
     
@@ -555,5 +626,23 @@ extension BSCameraViewController:UIImagePickerControllerDelegate,UINavigationCon
             // Done cancel dismiss of image picker.
         })
     }
+}
+
+extension BSCameraViewController:UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout  {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return self.visionObjects.count
+    }
+    
+//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+//        return CGSize.init(width: 130, height: 130)
+//    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kVisionCellReuseID, for: indexPath) as! BSVisionObjectCollectionViewCell
+        cell.titleLabel.text = visionObjects[indexPath.item]
+        return cell
+        
+    }
+    
 }
 
