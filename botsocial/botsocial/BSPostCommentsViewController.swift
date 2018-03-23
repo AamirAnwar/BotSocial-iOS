@@ -8,16 +8,8 @@
 
 import UIKit
 
-class BSPostCommentsViewController: UIViewController, UIGestureRecognizerDelegate {
-    let commentTextView = UITextView()
-    let postButton:UIButton = {
-        let button = UIButton.init(type: .system)
-        button.setTitle("Post", for: .normal)
-        button.setTitleColor(UIColor.black, for: .normal)
-        return button
-    }()
+class BSPostCommentsViewController: UIViewController, UIGestureRecognizerDelegate, BSCommentInputViewDelegate {
     let tableView = UITableView.init(frame: .zero, style: .plain)
-    let userImageView = UIImageView()
     let kNotifCellReuseID = "BSNotificationTableViewCell"
     var tabBarHeight:CGFloat {
         get {
@@ -38,61 +30,36 @@ class BSPostCommentsViewController: UIViewController, UIGestureRecognizerDelegat
             }
         }
     }
-    
+    let commentView = BSCommentInputView()
     var comments:[BSComment] = []
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.addSubview(self.tableView)
-        self.view.addSubview(self.commentTextView)
-        self.view.addSubview(self.userImageView)
-        self.view.addSubview(self.postButton)
+        self.view.addSubview(self.commentView)
         self.view.backgroundColor = UIColor.white
         NotificationCenter.default.addObserver(self, selector: #selector(willShowKeyboard(notification:)), name: kNotificationWillShowKeyboard.name, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(willHideKeyboard), name: kNotificationWillHideKeyboard.name, object: nil)
         
-        
+        self.navigationItem.title = "Comments"
         self.tableView.snp.makeConstraints { (make) in
             make.top.equalToSuperview()
             make.leading.equalToSuperview()
             make.trailing.equalToSuperview()
-            make.bottom.equalTo(self.commentTextView.snp.top).inset(kInteritemPadding)
+            make.bottom.equalTo(self.commentView.snp.top).inset(kInteritemPadding)
+        }
+        
+        self.commentView.delegate = self
+        self.commentView.snp.makeConstraints { (make) in
+            make.bottom.equalToSuperview().inset(tabBarHeight)
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview()
         }
         self.tableView.delegate = self
         self.tableView.dataSource = self
         self.tableView.tableFooterView = UIView()
+        self.tableView.separatorStyle = .none
         self.tableView.register(BSNotificationTableViewCell.self, forCellReuseIdentifier: kNotifCellReuseID)
         self.navigationController?.interactivePopGestureRecognizer?.delegate = self
-        
-        //        self.commentTextView.backgroundColor = UIColor.red
-        self.commentTextView.snp.makeConstraints { (make) in
-            make.trailing.equalTo(self.postButton.snp.leading).offset(-8)
-            make.leading.equalTo(self.userImageView.snp.trailing).offset(8)
-            make.bottom.equalToSuperview().inset(kInteritemPadding + self.tabBarHeight)
-            make.height.equalTo(50)
-        }
-        
-        self.userImageView.layer.cornerRadius = 22
-        APIService.sharedInstance.getUserProfileImageURL { (url) in
-            if let url = url {
-                self.userImageView.pin_setImage(from: url)
-            }
-        }
-        //        self.userImageView.pin_setImage(from: URL(string:kTestImageURL)!)
-        self.userImageView.contentMode = .scaleAspectFill
-        self.userImageView.clipsToBounds = true
-        self.userImageView.snp.makeConstraints { (make) in
-            make.leading.equalToSuperview().offset(kSidePadding)
-            make.top.equalTo(self.commentTextView.snp.top)
-            make.size.equalTo(44)
-        }
-        
-        self.postButton.addTarget(self, action: #selector(didTapPostButton), for: .touchUpInside)
-        self.postButton.snp.makeConstraints { (make) in
-            make.trailing.equalToSuperview().inset(kSidePadding)
-            make.centerY.equalTo(self.userImageView.snp.centerY)
-            //            make.bottom.equalToSuperview().inset(kInteritemPadding + self.tabBarHeight)
-        }
-        
     }
     
     
@@ -105,39 +72,40 @@ class BSPostCommentsViewController: UIViewController, UIGestureRecognizerDelegat
             if let tabbar = self.tabBarController?.tabBar {
                 tabBarHeight = tabbar.height()
             }
-            self.tableView.contentInset = UIEdgeInsets.init(top: 0, left: 0, bottom: keyboardHeight - tabBarHeight, right: 0)
-            self.userImageView.transform = userImageView.transform.translatedBy(x: 0, y: -keyboardHeight + tabBarHeight)
-            self.commentTextView.transform = commentTextView.transform.translatedBy(x: 0, y: -keyboardHeight + tabBarHeight)
-            self.postButton.transform = self.postButton.transform.translatedBy(x: 0, y: -keyboardHeight + tabBarHeight)
+            UIView.animate(withDuration: 0.3, animations: {
+                self.tableView.contentInset = UIEdgeInsets.init(top: 0, left: 0, bottom: keyboardHeight - tabBarHeight, right: 0)
+                self.commentView.transform = self.commentView.transform.translatedBy(x: 0, y: -keyboardHeight + tabBarHeight)
+            })
+            
         }
     }
     
     @objc func willHideKeyboard() {
         guard self.view.window != nil else {return}
-        UIView.animate(withDuration: 1, animations: {
+        UIView.animate(withDuration: 0.3, animations: {
             self.tableView.contentInset = .zero
-            self.userImageView.transform = .identity
-            self.commentTextView.transform = .identity
-            self.postButton.transform = .identity
+            self.commentView.transform = .identity
         })
     }
     
     @objc func didTapPostButton() {
-        //        post comment
-        if let post = self.post, let commentText = self.commentTextView.text {
+        if let post = self.post, let commentText = self.commentView.commentTextView.text {
             APIService.sharedInstance.commentOnPostWith(post: post, comment: commentText) {
-                self.commentTextView.text = ""
-                self.commentTextView.resignFirstResponder()
+                self.commentView.commentTextView.text = ""
+                self.commentView.commentTextView.resignFirstResponder()
             }
         }
     }
+    
+    
+    
     
 }
 
 extension BSPostCommentsViewController:UITableViewDelegate, UITableViewDataSource {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if self.commentTextView.isFirstResponder {
-            self.commentTextView.resignFirstResponder()
+        if self.commentView.commentTextView.isFirstResponder {
+            self.commentView.commentTextView.resignFirstResponder()
         }
     }
     
@@ -150,7 +118,7 @@ extension BSPostCommentsViewController:UITableViewDelegate, UITableViewDataSourc
         let comment = comments[indexPath.row]
         
         if let authorName = comment.authorName, let commentText = comment.text {
-            cell.configureWith(title: "\(authorName) \(commentText)")
+            cell.configureWith(authorName:authorName,title: commentText)
             APIService.sharedInstance.getProfilePictureFor(userID: comment.authorID, completion: { (url) in
                 cell.userThumbnailImageView.pin_setImage(from: url)
             })

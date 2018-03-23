@@ -17,7 +17,11 @@ class BSVisionObjectCollectionViewCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.contentView.addSubview(self.titleLabel)
-        self.titleLabel.textColor = UIColor.black
+        self.contentView.layer.cornerRadius = kCornerRadius
+        self.contentView.backgroundColor = UIColor.white
+        
+        self.titleLabel.textColor = BSColorTextBlack
+        self.titleLabel.font = BSFontMediumBold
         let padding:CGFloat = 4
         self.titleLabel.snp.makeConstraints { (make) in
             make.leading.equalToSuperview().offset(padding)
@@ -25,5 +29,10 @@ class BSVisionObjectCollectionViewCell: UICollectionViewCell {
             make.top.equalToSuperview().offset(padding)
             make.bottom.equalToSuperview().inset(padding)
         }
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+//        BSCommons.addShadowTo(view: self.contentView)
     }
 }

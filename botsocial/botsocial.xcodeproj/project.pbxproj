@@ -43,6 +43,11 @@
 		43A98C06206122B500739551 /* BSFeaturedPostTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A98C05206122B500739551 /* BSFeaturedPostTableViewCell.swift */; };
 		43B934612064F68E005FB360 /* MobileNet.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 43B934602064F68E005FB360 /* MobileNet.mlmodel */; };
 		43B934632064F953005FB360 /* BSVisionObjectCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B934622064F953005FB360 /* BSVisionObjectCollectionViewCell.swift */; };
+		43B9346520651BAA005FB360 /* BSFonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B9346420651BAA005FB360 /* BSFonts.swift */; };
+		43B9346720651D7A005FB360 /* BSColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B9346620651D7A005FB360 /* BSColors.swift */; };
+		43B9346920653B55005FB360 /* BSCommentInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B9346820653B54005FB360 /* BSCommentInputView.swift */; };
+		43B9346B206559C6005FB360 /* BSLoaderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B9346A206559C6005FB360 /* BSLoaderTableViewCell.swift */; };
+		43B9346D206562E7005FB360 /* BSLoaderCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B9346C206562E7005FB360 /* BSLoaderCollectionViewCell.swift */; };
 		43E17B5420641EFB006A75FB /* BSNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43E17B5320641EFA006A75FB /* BSNotification.swift */; };
 		43E17B56206430BD006A75FB /* BSSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43E17B55206430BD006A75FB /* BSSettingsViewController.swift */; };
 		6696C21C6D06CDDC0C9C3975 /* Pods_botsocial.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E6D73461FF8EA10B5F94BD03 /* Pods_botsocial.framework */; };
@@ -113,6 +118,11 @@
 		43A98C05206122B500739551 /* BSFeaturedPostTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSFeaturedPostTableViewCell.swift; sourceTree = "<group>"; };
 		43B934602064F68E005FB360 /* MobileNet.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = MobileNet.mlmodel; sourceTree = "<group>"; };
 		43B934622064F953005FB360 /* BSVisionObjectCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSVisionObjectCollectionViewCell.swift; sourceTree = "<group>"; };
+		43B9346420651BAA005FB360 /* BSFonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSFonts.swift; sourceTree = "<group>"; };
+		43B9346620651D7A005FB360 /* BSColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSColors.swift; sourceTree = "<group>"; };
+		43B9346820653B54005FB360 /* BSCommentInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BSCommentInputView.swift; path = "/Users/Hazmat/Documents/iOSProjects/BotSocial-iOS/botsocial/botsocial/BSCommentInputView.swift"; sourceTree = "<absolute>"; };
+		43B9346A206559C6005FB360 /* BSLoaderTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSLoaderTableViewCell.swift; sourceTree = "<group>"; };
+		43B9346C206562E7005FB360 /* BSLoaderCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSLoaderCollectionViewCell.swift; sourceTree = "<group>"; };
 		43E17B5320641EFA006A75FB /* BSNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSNotification.swift; sourceTree = "<group>"; };
 		43E17B55206430BD006A75FB /* BSSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSSettingsViewController.swift; sourceTree = "<group>"; };
 		4718A2820C609AF2A7866FA5 /* Pods_botsocialTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_botsocialTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -154,11 +164,11 @@
 		43910A8D203CC917009171CB = {
 			isa = PBXGroup;
 			children = (
-				437A0D1E2063E21300964245 /* BSComment.swift */,
 				43910A98203CC917009171CB /* botsocial */,
 				43910AAF203CC917009171CB /* botsocialTests */,
 				43910ABA203CC918009171CB /* botsocialUITests */,
 				43910A97203CC917009171CB /* Products */,
+				43B9346C206562E7005FB360 /* BSLoaderCollectionViewCell.swift */,
 				AAD362DF12D387AEB430FEB1 /* Pods */,
 				684667AF3C5C9CF8C8181BA9 /* Frameworks */,
 			);
@@ -179,8 +189,12 @@
 			children = (
 				43910A99203CC917009171CB /* AppDelegate.swift */,
 				43910AA2203CC917009171CB /* Assets.xcassets */,
+				437A0D1E2063E21300964245 /* BSComment.swift */,
+				43B9346820653B54005FB360 /* BSCommentInputView.swift */,
+				43B9346420651BAA005FB360 /* BSFonts.swift */,
 				43927C9720603DDE002BE1AC /* BSPhotoCaptureDelegate.swift */,
 				43927C9920605B09002BE1AC /* BSNotificationTableViewCell.swift */,
+				43B9346620651D7A005FB360 /* BSColors.swift */,
 				43927C9B20606D20002BE1AC /* BSUserProfileCollectionViewCell.swift */,
 				437590CA2060E8B800A7AAEA /* GoogleService-Info.plist */,
 				437590C6206073ED00A7AAEA /* BSImageCollectionViewCell.swift */,
@@ -213,6 +227,7 @@
 				436913CE20631D9B0034F527 /* BSUser.swift */,
 				437A0D1C2063DF8B00964245 /* BSPostCommentsViewController.swift */,
 				43E17B55206430BD006A75FB /* BSSettingsViewController.swift */,
+				43B9346A206559C6005FB360 /* BSLoaderTableViewCell.swift */,
 			);
 			path = botsocial;
 			sourceTree = "<group>";
@@ -621,6 +636,7 @@
 				437590C7206073ED00A7AAEA /* BSImageCollectionViewCell.swift in Sources */,
 				430E61AE205F12B000AECF27 /* BSImageTableViewCell.swift in Sources */,
 				43B934612064F68E005FB360 /* MobileNet.mlmodel in Sources */,
+				43B9346520651BAA005FB360 /* BSFonts.swift in Sources */,
 				430E619E205F076B00AECF27 /* BSFeedTableViewCell.swift in Sources */,
 				43910A9A203CC917009171CB /* AppDelegate.swift in Sources */,
 				43E17B56206430BD006A75FB /* BSSettingsViewController.swift in Sources */,
@@ -633,15 +649,19 @@
 				43B934632064F953005FB360 /* BSVisionObjectCollectionViewCell.swift in Sources */,
 				437590C92060DED600A7AAEA /* BSPostViewController.swift in Sources */,
 				436913CB206309FC0034F527 /* BSFunctions.swift in Sources */,
+				43B9346920653B55005FB360 /* BSCommentInputView.swift in Sources */,
 				430E61A2205F0C6D00AECF27 /* BSNotificationsViewController.swift in Sources */,
 				430E61B0205F1BAB00AECF27 /* BSFeedActionsTableViewCell.swift in Sources */,
 				43927C9C20606D20002BE1AC /* BSUserProfileCollectionViewCell.swift in Sources */,
+				43B9346720651D7A005FB360 /* BSColors.swift in Sources */,
 				430E61B4205F255B00AECF27 /* BSAddCommentTableViewCell.swift in Sources */,
 				430E61A8205F104600AECF27 /* Constants.swift in Sources */,
+				43B9346B206559C6005FB360 /* BSLoaderTableViewCell.swift in Sources */,
 				43E17B5420641EFB006A75FB /* BSNotification.swift in Sources */,
 				436913CD20631BDF0034F527 /* BSPost.swift in Sources */,
 				43927C9820603DDE002BE1AC /* BSPhotoCaptureDelegate.swift in Sources */,
 				430E61A4205F0C7700AECF27 /* BSAccountViewController.swift in Sources */,
+				43B9346D206562E7005FB360 /* BSLoaderCollectionViewCell.swift in Sources */,
 				43A517462062B7D400F49ADF /* BSShareViewController.swift in Sources */,
 				436913C92062EA730034F527 /* APIService.swift in Sources */,
 				430E61A6205F0FB700AECF27 /* BSUserSnippetTableViewCell.swift in Sources */,

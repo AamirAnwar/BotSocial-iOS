@@ -159,7 +159,7 @@ class BSCameraViewController: UIViewController {
         self.filterView.isHidden = true
         self.filterView.snp.makeConstraints { (make) in
             make.top.equalTo(self.objectCollectionView.snp.bottom).offset(0)
-            make.bottom.equalToSuperview()
+            make.bottom.lessThanOrEqualToSuperview()
             make.leading.equalToSuperview()
             make.trailing.equalToSuperview()
         }
@@ -197,10 +197,11 @@ class BSCameraViewController: UIViewController {
         self.objectCollectionView.delegate = self
         self.objectCollectionView.showsHorizontalScrollIndicator = false
         self.objectCollectionView.dataSource = self
+        self.objectCollectionView.contentInset = UIEdgeInsets.init(top: 0, left: kSidePadding, bottom: 0, right: kSidePadding)
         self.objectCollectionView.backgroundColor = UIColor.white
         self.objectCollectionView.register(BSVisionObjectCollectionViewCell.self, forCellWithReuseIdentifier: kVisionCellReuseID)
         self.objectCollectionView.snp.makeConstraints { (make) in
-            make.top.equalTo(self.capturedImageView.snp.bottom)
+            make.top.equalTo(self.capturedImageView.snp.bottom).offset(kInteritemPadding)
             make.leading.equalToSuperview()
             make.trailing.equalToSuperview()
             make.height.equalTo(kVisionObjectsListViewHeight)

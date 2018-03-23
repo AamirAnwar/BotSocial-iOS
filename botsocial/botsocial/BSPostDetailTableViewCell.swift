@@ -28,7 +28,9 @@ class BSPostDetailTableViewCell: UITableViewCell {
     var post:BSPost? {
         didSet {
             if let post = post, let authorName = post.authorName {
-                postTitleLabel.text = "\(authorName) \(post.caption ?? "")"
+                let string = NSMutableAttributedString.init(string: "\(authorName)", attributes: [.font:BSFontMediumBold])
+                string.append(NSAttributedString.init(string: " \(post.caption ?? "")", attributes: [.font:BSFontMediumParagraph]))
+                postTitleLabel.attributedText = string
             }
             
         }
@@ -36,6 +38,7 @@ class BSPostDetailTableViewCell: UITableViewCell {
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        self.selectionStyle = .none
         self.contentView.addSubview(self.postTitleLabel)
         self.contentView.addSubview(self.postDateLabel)
         self.postTitleLabel.snp.makeConstraints { (make) in
@@ -48,8 +51,9 @@ class BSPostDetailTableViewCell: UITableViewCell {
         self.postDateLabel.snp.makeConstraints { (make) in
             make.leading.equalTo(self.postTitleLabel.snp.leading)
             make.trailing.equalTo(self.postTitleLabel.snp.trailing)
-            make.top.equalTo(self.postTitleLabel.snp.bottom).offset(kInteritemPadding)
-            make.bottom.equalToSuperview().inset(kInteritemPadding)
+            make.top.equalTo(self.postTitleLabel.snp.bottom).offset(0)
+            make.bottom.equalToSuperview().inset(2*kInteritemPadding)
         }
     }
 }
+

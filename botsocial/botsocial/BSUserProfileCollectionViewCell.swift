@@ -61,7 +61,8 @@ class BSUserProfileCollectionViewCell: UICollectionViewCell {
             make.top.greaterThanOrEqualToSuperview().offset(kInteritemPadding)
             
         }
-        
+        self.usernameLabel.textColor = BSColorTextBlack
+        self.usernameLabel.font = BSFontMediumBold
         self.usernameLabel.snp.makeConstraints { (make) in
             make.leading.equalTo(self.userThumbnailImageView.snp.leading)
             make.top.equalTo(self.userThumbnailImageView.snp.bottom).offset(8)

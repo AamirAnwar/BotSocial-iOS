@@ -12,6 +12,16 @@ import FirebaseAuthUI
 import FirebaseGoogleAuthUI
 
 enum BSCommons {
+    static func addShadowTo(view:UIView) {
+        let shadowPath = UIBezierPath(rect: view.bounds)
+        view.layer.masksToBounds = false
+        view.layer.shadowColor = UIColor.black.withAlphaComponent(0.6).cgColor
+        view.layer.shadowOffset = CGSize(width: 0, height: 4)
+        view.layer.shadowOpacity = 0.2
+        view.layer.shadowRadius = 6
+        view.layer.shadowPath = shadowPath.cgPath
+    }
+    
     static func getLatestPhotoFromLibrary(completion:@escaping(_ image:UIImage?)->Void) {
         let fetchOptions = PHFetchOptions()
         fetchOptions.sortDescriptors = [NSSortDescriptor.init(key: "creationDate", ascending: true)]
@@ -41,6 +51,14 @@ enum BSCommons {
         }
     }
 }
+
+//protocol UIViewControllerLoadingState {
+//    var loaderOverlayView:UIView {get}
+//    var loader:UIActivityIndicatorView {get}
+//    func showLoader()
+//    func hideLoader()
+//}
+//
 
 
 

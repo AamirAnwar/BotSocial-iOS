@@ -13,10 +13,11 @@ class BSSettingsViewController: UIViewController,UIGestureRecognizerDelegate {
     let tableView = UITableView.init(frame: .zero, style: .plain)
     let options = ["Logout"]
     override func viewDidLoad() {
-        super.viewDidLoad()
+        super.viewDidLoad()g
         self.view.backgroundColor = UIColor.white
         self.view.addSubview(self.tableView)
         self.tableView.tableFooterView = UIView()
+        self.tableView.separatorStyle = .none
         self.tableView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview()
         }
@@ -36,6 +37,8 @@ extension BSSettingsViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell")!
         cell.textLabel?.text = options[indexPath.row]
+        cell.textLabel?.font = BSFontMediumParagraph
+        cell.textLabel?.textColor = BSColorTextBlack
         return cell
     }
     

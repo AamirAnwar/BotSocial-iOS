@@ -12,7 +12,11 @@ class BSAccountViewController: UIViewController, UIGestureRecognizerDelegate {
     let kUserProfileCellReuseID = "BSUserProfileCollectionViewCell"
     let kImageCellReuseID = "BSImageCollectionViewCell"
     var userPosts = [BSPost]()
-    var user:BSUser?
+    var user:BSUser? {
+        didSet {
+            self.navigationItem.title = user?.displayName
+        }
+    }
     let collectionView:UICollectionView = {
         let layout = UICollectionViewFlowLayout.init()
         layout.minimumInteritemSpacing = 0
@@ -21,15 +25,19 @@ class BSAccountViewController: UIViewController, UIGestureRecognizerDelegate {
         cView.backgroundColor = UIColor.white
         return cView
     }()
+    var isLoading = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 //        for _ in 0..<30 {
 //            userImages += [kTestImageURL]
 //        }
         self.navigationController?.interactivePopGestureRecognizer?.delegate = self
+        self.isLoading = true
         if let user = self.user {
             APIService.sharedInstance.getPostsWith(userID: user.id, completion: { (post) in
                 if let post = post {
+                    self.isLoading = false
                     self.userPosts.insert(post, at: 0)
                     self.collectionView.reloadData()
                 }
@@ -39,6 +47,7 @@ class BSAccountViewController: UIViewController, UIGestureRecognizerDelegate {
         else {
             APIService.sharedInstance.getUserPosts { (post) in
                 if let post = post {
+                    self.isLoading = false
                     self.userPosts.insert(post, at: 0)
                     self.collectionView.reloadData()
                 }
@@ -51,6 +60,7 @@ class BSAccountViewController: UIViewController, UIGestureRecognizerDelegate {
         }
         self.collectionView.delegate = self
         self.collectionView.dataSource = self
+        self.collectionView.register(BSLoaderCollectionViewCell.self, forCellWithReuseIdentifier: "loader_cell")
         self.collectionView.register(BSUserProfileCollectionViewCell.self, forCellWithReuseIdentifier: kUserProfileCellReuseID)
         self.collectionView.register(BSImageCollectionViewCell.self, forCellWithReuseIdentifier: kImageCellReuseID)
     }
@@ -62,10 +72,13 @@ extension BSAccountViewController:UICollectionViewDelegate, UICollectionViewData
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        
         switch section {
         case 0:
             return 1
-        case 1: return userPosts.count
+        case 1:
+            guard self.isLoading == false else {return 1}
+            return userPosts.count
         default:
             return 0
         }
@@ -76,12 +89,14 @@ extension BSAccountViewController:UICollectionViewDelegate, UICollectionViewData
             return CGSize.init(width: self.view.width(), height: 150)
         }
         else {
+            guard self.isLoading == false else {return CGSize.init(width: self.view.width(), height: 20)}
             return CGSize.init(width: self.view.width()/3, height: 120)
         }
         
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
         switch indexPath.section {
         case 0:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kUserProfileCellReuseID, for: indexPath) as! BSUserProfileCollectionViewCell
@@ -92,6 +107,7 @@ extension BSAccountViewController:UICollectionViewDelegate, UICollectionViewData
             }
             return cell
         case 1:
+            guard self.isLoading == false else {return collectionView.dequeueReusableCell(withReuseIdentifier: "loader_cell", for: indexPath)}
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kImageCellReuseID, for: indexPath) as! BSImageCollectionViewCell
             if let url = URL(string:userPosts[indexPath.row].imageURL) {
                 cell.setImageURL(url)
@@ -106,6 +122,7 @@ extension BSAccountViewController:UICollectionViewDelegate, UICollectionViewData
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if indexPath.section == 1 {
+            guard self.userPosts.isEmpty == false else {return}
             let vc = BSPostViewController()
             vc.post = userPosts[indexPath.row]
             self.navigationController?.pushViewController(vc, animated: true)

@@ -20,6 +20,8 @@ class BSUserSnippetTableViewCell: UITableViewCell {
     }()
     let usernameLabel:UILabel = {
         let label = UILabel()
+        label.font = BSFontMediumBold
+        label.textColor = BSColorTextBlack
         return label
     }()
     
@@ -37,11 +39,11 @@ class BSUserSnippetTableViewCell: UITableViewCell {
             make.leading.equalToSuperview().offset(kSidePadding)
             make.top.equalToSuperview().offset(kInteritemPadding)
             make.bottom.equalToSuperview().inset(kInteritemPadding)
-            make.height.equalTo(kUserThumbnailImageHeight)
-            make.width.equalTo(kUserThumbnailImageHeight)
+            make.height.equalTo(kUserThumbnailImageSize)
+            make.width.equalTo(kUserThumbnailImageSize)
         }
 //        self.userImageView.pin_setImage(from: URL(string:kTestImageURL)!)
-        self.userImageView.layer.cornerRadius =  round(kUserThumbnailImageHeight/2)
+        self.userImageView.layer.cornerRadius =  round(kUserThumbnailImageSize/2)
         self.usernameLabel.snp.makeConstraints { (make) in
             make.centerY.equalTo(self.userImageView.snp.centerY)
             make.trailing.lessThanOrEqualToSuperview().inset(kSidePadding)

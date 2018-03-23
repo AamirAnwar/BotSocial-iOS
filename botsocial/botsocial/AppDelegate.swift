@@ -45,7 +45,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, FUIAuthDelegate {
     
     func getNotificationsPage() -> UIViewController {
         let navVC = UINavigationController.init(rootViewController: BSNotificationsViewController())
-        navVC.isNavigationBarHidden = true
         return navVC
     }
     func authUI(_ authUI: FUIAuth, didSignInWith user: User?, error: Error?) {

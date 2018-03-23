@@ -154,6 +154,14 @@ class APIService: NSObject {
         }
     }
     
+    func isPostLiked(post:BSPost, completion:@escaping ((_ isLiked:Bool) -> Void) ) {
+        guard let user = self.currentUser, let postID = post.id else {return}
+        self.databaseRef.child("/posts/\(postID)/likes/\(user.uid)").observeSingleEvent(of: .value) { (snapshot) in
+            guard user.uid.isEmpty == false, let authorID = post.authorID else {completion(false);return}
+            completion(snapshot.exists())
+        }
+    }
+    
     func likePost(post:BSPost) {
         guard let user = self.currentUser, let postID = post.id else {return}
         
@@ -182,7 +190,8 @@ class APIService: NSObject {
                 self.databaseRef.updateChildValues(childUpdates, withCompletionBlock: { (error, ref) in
                     if let username = user.displayName, let postAuthorID = post.authorID {
                         let notification = [
-                            "text":"\(username) just liked your post",
+                            "author_name": username,
+                            "text":"liked your post",
                             "user_id": user.uid,
                             "post_id": postID
                         ]

@@ -9,16 +9,17 @@
 import Foundation
 import UIKit
 
-let kCoachmarkButtonWidth:CGFloat = 120
-let kCoachmarkButtonHeight:CGFloat = 30
-let kUserThumbnailImageHeight:CGFloat = 44
+let kCoachmarkButtonWidth:CGFloat = 100
+let kCoachmarkButtonHeight:CGFloat = 20
+let kUserThumbnailImageSize:CGFloat = 33
 let kSidePadding:CGFloat = 13
 let kInteritemPadding:CGFloat = 8
 let kCornerRadius:CGFloat = 8
-let kVisionObjectsListViewHeight:CGFloat = 60
+let kVisionObjectsListViewHeight:CGFloat = 30
 let kLibPhotoPreviewSize:CGFloat = 44
 let kNotificationWillShowKeyboard = Notification(name: Notification.Name.UIKeyboardWillShow)
 let kNotificationWillHideKeyboard = Notification(name: Notification.Name.UIKeyboardWillHide)
+let kCommentPlaceholderText = "Post a comment..."
 
 //let kTestImageURL = "https://avatars3.githubusercontent.com/u/12379620?s=460&v=4"
 var kTestImageURL:String {

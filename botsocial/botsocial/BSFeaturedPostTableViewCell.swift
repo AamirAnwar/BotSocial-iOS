@@ -10,6 +10,13 @@ import UIKit
 
 class BSFeaturedPostTableViewCell: UITableViewCell {
     let kImageCellReuseID = "BSImageCollectionViewCell"
+    let titleLabel:UILabel = {
+        let label = UILabel()
+        label.font = BSFontBigBold
+        label.textColor = BSColorTextBlack
+        label.text = "Featured Posts"
+        return label
+    }()
     var featuredPosts:[BSPost] = []
     let collectionView:UICollectionView = {
         let layout = UICollectionViewFlowLayout.init()
@@ -40,11 +47,20 @@ class BSFeaturedPostTableViewCell: UITableViewCell {
             }
             
         }
-        
+        self.contentView.addSubview(self.titleLabel)
         self.contentView.addSubview(self.collectionView)
+        self.titleLabel.snp.makeConstraints { (make) in
+            make.leading.equalToSuperview().offset(kSidePadding)
+            make.top.equalToSuperview().offset(kInteritemPadding)
+            make.trailing.equalToSuperview().inset(kSidePadding)
+        }
+        
         self.collectionView.snp.makeConstraints { (make) in
-            make.edges.equalToSuperview()
-            make.height.equalTo(380)
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview()
+            make.top.equalTo(self.titleLabel.snp.bottom).offset(kInteritemPadding)
+            make.height.equalTo(258)
+            make.bottom.equalToSuperview().inset(2*kInteritemPadding)
         }
         self.collectionView.delegate = self
         self.collectionView.showsHorizontalScrollIndicator = false

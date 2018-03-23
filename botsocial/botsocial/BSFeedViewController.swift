@@ -22,10 +22,11 @@ class BSFeedViewController: UIViewController {
     let kFeedCommentInfoCellReuseID = "BSAddCommentTableViewCell"
     let coachmarkButton = UIButton.init(type: .system)
     var isShowingCoachmark = false
+    var isLoadingPosts = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        self.navigationItem.title = "Home"
         self.navigationItem.leftBarButtonItem = UIBarButtonItem.init(image: #imageLiteral(resourceName: "camera_tab_icon"), style: .plain, target: self, action: #selector(didTapCameraButton))
         self.navigationItem.leftBarButtonItem?.tintColor = UIColor.black
         self.navigationController?.navigationBar.tintColor = UIColor.black
@@ -36,15 +37,22 @@ class BSFeedViewController: UIViewController {
         self.coachmarkButton.setTitle("Back to top", for: .normal)
         self.coachmarkButton.layer.cornerRadius = kCoachmarkButtonHeight/2
         self.coachmarkButton.backgroundColor = UIColor.white
-        self.coachmarkButton.layer.borderWidth = 1
-        self.coachmarkButton.layer.borderColor = UIColor.black.cgColor
-        self.coachmarkButton.setTitleColor(UIColor.black, for: .normal)
+//        self.coachmarkButton.layer.borderWidth = 1
+//        self.coachmarkButton.layer.borderColor = BSColorTextBlack.withAlphaComponent(0.5).cgColor
+        self.coachmarkButton.titleLabel?.font = BSFontMiniBold
+        self.coachmarkButton.setTitleColor(BSColorTextBlack, for: .normal)
         self.coachmarkButton.addTarget(self, action: #selector(didTapCoachmark), for: .touchUpInside)
+//        if let label = self.coachmarkButton.titleLabel {
+        BSCommons.addShadowTo(view:self.coachmarkButton)
+//        }
+        
         
         self.tableView.contentInset = UIEdgeInsets.init(top: 0, left: 0, bottom: kCoachmarkButtonHeight, right: 0)
         self.tableView.delegate = self
         self.tableView.dataSource = self
+        self.tableView.separatorStyle = .none
         self.tableView.delaysContentTouches = false
+        self.tableView.register(BSLoaderTableViewCell.self, forCellReuseIdentifier: "loader_cell")
         self.tableView.register(BSFeaturedPostTableViewCell.self, forCellReuseIdentifier: self.kFeaturedCellReuseID)
         self.tableView.register(BSFeedTableViewCell.self, forCellReuseIdentifier: self.kFeedCellReuseIdentifier)
         self.tableView.register(BSUserSnippetTableViewCell.self, forCellReuseIdentifier: kFeedUserSnippetCellReuseID)
@@ -55,9 +63,10 @@ class BSFeedViewController: UIViewController {
         self.tableView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview()
         }
-        
+        isLoadingPosts = true
         APIService.sharedInstance.getRecentPosts { (post) in
             if let post = post {
+                self.isLoadingPosts = false
                 self.posts.insert(post, at: 0)
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
@@ -65,9 +74,7 @@ class BSFeedViewController: UIViewController {
             }
             
         }
-//        for _ in 0..<20 {
-//            postImages += [kTestLargeImageURL]
-//        }
+
     }
     
     @objc func didTapCameraButton() {
@@ -78,21 +85,24 @@ class BSFeedViewController: UIViewController {
 
 extension BSFeedViewController: UITableViewDelegate, UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
+        guard self.isLoadingPosts == false else {return 1}
         return 1 + self.posts.count
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        guard self.isLoadingPosts == false else {return 1}
         switch section {
         case 0:
             return 1
         default:
             return 4
         }
-        
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
+        guard self.isLoadingPosts == false else {
+            return tableView.dequeueReusableCell(withIdentifier: "loader_cell")!
+        }
         switch indexPath.section {
         case 0:
             return tableView.dequeueReusableCell(withIdentifier: self.kFeaturedCellReuseID)!
@@ -116,6 +126,7 @@ extension BSFeedViewController: UITableViewDelegate, UITableViewDataSource {
             case 1:
                 let cell = tableView.dequeueReusableCell(withIdentifier: kFeedImageCellReuseID) as! BSImageTableViewCell
                 cell.setImageURL(post.imageURL ?? "")
+                cell.delegate = self
                 return cell
             case 2:
                 let cell = tableView.dequeueReusableCell(withIdentifier: kFeedActionsCellReuseID) as! BSFeedActionsTableViewCell
@@ -136,6 +147,9 @@ extension BSFeedViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard self.posts.count > 0 else {
+            return
+        }
         tableView.deselectRow(at: indexPath, animated: true)
         guard indexPath.section > 0 else {return}
         let postIndex = indexPath.section - 1
@@ -159,6 +173,14 @@ extension BSFeedViewController: UITableViewDelegate, UITableViewDataSource {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let y = scrollView.contentOffset.y
+        if y + scrollView.height() < (scrollView.contentSize.height) {
+            hideCoachmark()
+        }
+        
+    }
+    
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        let y = scrollView.contentOffset.y
         if y + scrollView.height() >= (scrollView.contentSize.height) {
             // Show coachmark
             showCoachmark()
@@ -171,7 +193,7 @@ extension BSFeedViewController: UITableViewDelegate, UITableViewDataSource {
     func showCoachmark() {
         guard isShowingCoachmark == false else {return}
         UIView.animate(withDuration: 0.3, animations: {
-            self.coachmarkButton.frame = CGRect.init(x: (self.view.width() - self.coachmarkButton.width())/2, y: self.view.height() - 44 - kInteritemPadding - self.coachmarkButton.height(), width: self.coachmarkButton.width(), height: self.coachmarkButton.height())
+            self.coachmarkButton.frame = CGRect.init(x: (self.view.width() - self.coachmarkButton.width())/2, y: self.view.height() - 44 - kInteritemPadding - self.coachmarkButton.height() - 4, width: self.coachmarkButton.width(), height: self.coachmarkButton.height())
         }) { (_) in
             self.isShowingCoachmark = true
         }
@@ -191,6 +213,12 @@ extension BSFeedViewController: UITableViewDelegate, UITableViewDataSource {
         self.hideCoachmark()
     }
     
+}
+
+extension BSFeedViewController:BSImageTableViewCellDelegate {
+    func didUpdateCellHeight() {
+//        self.tableView.reloadData()
+    }
 }
 
 

@@ -17,6 +17,7 @@ class BSNotificationsViewController: UIViewController, UIGestureRecognizerDelega
         control.tintColor = UIColor.black
         return control
     }()
+    var isLoadingNotifications = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,11 +25,14 @@ class BSNotificationsViewController: UIViewController, UIGestureRecognizerDelega
         self.tableView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview()
         }
+        self.navigationItem.title = "Notifications"
         self.tableView.delegate = self
+        self.tableView.separatorStyle = .none
         self.tableView.dataSource = self
         self.tableView.tableFooterView = UIView()
         self.tableView.refreshControl = self.refreshControl
         self.tableView.register(BSNotificationTableViewCell.self, forCellReuseIdentifier: kNotifCellReuseID)
+        self.tableView.register(BSLoaderTableViewCell.self, forCellReuseIdentifier: "loader_cell")
         self.navigationController?.interactivePopGestureRecognizer?.delegate = self
         self.refreshControl.addTarget(self, action: #selector(didPromptRefresh), for: UIControlEvents.valueChanged)
         self.loadNotifications()
@@ -39,8 +43,10 @@ class BSNotificationsViewController: UIViewController, UIGestureRecognizerDelega
     }
     
     func loadNotifications() {
+        isLoadingNotifications = true
         self.notifications.removeAll()
         APIService.sharedInstance.getNotifications { (notification) in
+            self.isLoadingNotifications = false
             self.refreshControl.endRefreshing()
             if let notif = notification {
                 self.notifications.insert(notif, at: 0)
@@ -52,14 +58,19 @@ class BSNotificationsViewController: UIViewController, UIGestureRecognizerDelega
 
 extension BSNotificationsViewController:UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        guard self.isLoadingNotifications == false else {return 1}
         return self.notifications.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard self.isLoadingNotifications == false else {
+            return tableView.dequeueReusableCell(withIdentifier: "loader_cell")!
+        }
         let cell =  tableView.dequeueReusableCell(withIdentifier: kNotifCellReuseID) as! BSNotificationTableViewCell
         let notification = self.notifications[indexPath.row]
         if let text = notification.text {
-            cell.configureWith(title: text, imageURL: URL(string:kTestImageURL)!)
+            
+            cell.configureWith(authorName:notification.authorName, title: text, imageURL: URL(string:kTestImageURL)!)
         }
         if let authorID = notification.userID, authorID.isEmpty == false {
             APIService.sharedInstance.getProfilePictureFor(userID: authorID, completion: { (url) in

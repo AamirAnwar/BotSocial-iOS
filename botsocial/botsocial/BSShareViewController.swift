@@ -11,6 +11,21 @@ import Firebase
 
 let kPlaceholderText = "Write a caption..."
 class BSShareViewController: UIViewController, UIGestureRecognizerDelegate {
+    let loaderOverlayView: UIView = {
+            let view = UIView()
+            view.isHidden = true
+            view.backgroundColor = UIColor.black.withAlphaComponent(0.7)
+            return view
+        
+    }()
+    
+    let loader:UIActivityIndicatorView =  {
+        
+            let view = UIActivityIndicatorView.init()
+            view.activityIndicatorViewStyle = .whiteLarge
+            return view
+        }()
+
     var postImage:UIImage? {
         didSet {
             self.postImageView.image = postImage
@@ -34,6 +49,16 @@ class BSShareViewController: UIViewController, UIGestureRecognizerDelegate {
     }()
     
     let contentView = UIView()
+    var isUploading = false {
+        didSet {
+            if isUploading {
+                self.showLoader()
+            }
+            else {
+                self.hideLoader()
+            }
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,9 +69,14 @@ class BSShareViewController: UIViewController, UIGestureRecognizerDelegate {
         self.view.addSubview(self.shareButton)
         self.view.addSubview(self.backButton)
         self.view.addSubview(self.scrollView)
+        self.view.addSubview(self.loaderOverlayView)
+        self.loaderOverlayView.addSubview(self.loader)
+        
         self.scrollView.addSubview(self.contentView)
         self.contentView.addSubview(self.postImageView)
         self.contentView.addSubview(self.textView)
+        
+        
         
         self.view.backgroundColor = UIColor.white
         self.navigationController?.interactivePopGestureRecognizer?
@@ -81,7 +111,7 @@ class BSShareViewController: UIViewController, UIGestureRecognizerDelegate {
         }
         
         self.textView.delegate = self
-        self.textView.text = kPlaceholderText
+        self.setTextViewPlaceHolder()
         self.textView.snp.makeConstraints { (make) in
             make.leading.equalToSuperview().offset(kSidePadding)
             make.height.equalTo(100)
@@ -99,6 +129,20 @@ class BSShareViewController: UIViewController, UIGestureRecognizerDelegate {
             make.height.equalTo(300)
 //            make.bottom.greaterThanOrEqualToSuperview().inset(2*kInteritemPadding)
         }
+
+        
+        self.loaderOverlayView.snp.makeConstraints { (make) in
+            make.top.equalToSuperview().offset(self.navigationController != nil ? self.navigationController!.navigationBar.height():0.0)
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview()
+            make.bottom.equalToSuperview()
+            
+        }
+        
+        self.loader.snp.makeConstraints { (make) in
+            make.center.equalToSuperview()
+            make.size.equalTo(20)
+        }
         
     }
     @objc func didTapBackButton() {
@@ -106,12 +150,17 @@ class BSShareViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     @objc func didTapShareButton() {
+        guard self.isUploading == false else {return}
         if let image = self.postImage {
+            self.isUploading = true
+            self.shareButton.isEnabled = false
             var caption = ""
             if  self.textView.text.isEmpty == false && self.textView.text != kPlaceholderText {
                 caption = self.textView.text
             }
             APIService.sharedInstance.createPost(caption: caption, image: image) {
+                self.isUploading = false
+                self.shareButton.isEnabled = true
                 self.presentingViewController?.dismiss(animated: true)
             }
         }
@@ -130,25 +179,65 @@ class BSShareViewController: UIViewController, UIGestureRecognizerDelegate {
                 tabBarHeight = tabbar.height()
             }
             self.scrollView.contentInset = UIEdgeInsets.init(top: 0, left: 0, bottom: keyboardHeight - tabBarHeight, right: 0)
-            
+            self.loaderOverlayView.snp.updateConstraints({ (make) in
+                make.bottom.equalToSuperview().inset(keyboardHeight - tabBarHeight)
+            })
         }
     }
     
     @objc func willHideKeyboard() {
         guard self.view.window != nil else {return}
         self.scrollView.contentInset = .zero
+        self.loaderOverlayView.snp.updateConstraints({ (make) in
+            make.bottom.equalToSuperview()
+        })
+    }
+    
+    func setTextViewPlaceHolder() {
+        self.textView.attributedText = NSMutableAttributedString.init(string: kPlaceholderText, attributes: [.foregroundColor:BSLightGray,
+                                                                                                                           .font:BSFontMediumParagraph
+            ])
+    }
+    func clearTextViewPlaceHolder() {
+        self.textView.attributedText = nil
+        self.textView.font = BSFontMediumParagraph
+        self.textView.textColor = BSColorTextBlack
+    }
+    
+    
+    func showLoader() {
+        guard self.loaderOverlayView.isHidden else {return}
+        self.loaderOverlayView.alpha = 0
+        self.loaderOverlayView.isHidden = false
+        UIView.animate(withDuration: 0.3) {
+            self.loaderOverlayView.alpha = 1.0
+            self.loader.startAnimating()
+        }
+    }
+    
+    func hideLoader() {
+        guard self.loaderOverlayView.isHidden == false else {return}
+        self.loader.stopAnimating()
+        UIView.animate(withDuration: 0.3, animations: {
+            self.loaderOverlayView.alpha = 0
+        }) { (_) in
+            self.loaderOverlayView.isHidden = true
+        }
+        
     }
 }
 
 extension BSShareViewController:UITextViewDelegate {
-    func textViewDidBeginEditing(_ textView: UITextView) {
-        if textView.text == kPlaceholderText {
-            textView.text = ""
-        }
-    }
     func textViewDidEndEditing(_ textView: UITextView) {
         if textView.text.isEmpty {
-            textView.text = kPlaceholderText
+            self.setTextViewPlaceHolder()
+        }
+    }
+    
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        if textView.attributedText != nil {
+            self.clearTextViewPlaceHolder()
+            textView.text = ""
         }
     }
 }

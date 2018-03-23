@@ -18,8 +18,9 @@ class BSFeedActionsTableViewCell: UITableViewCell {
     static var standardButton:UIButton {
         get {
             let button = UIButton.init(type: .system)
+            button.titleLabel?.font = BSFontMediumBold
             button.layer.cornerRadius = kCornerRadius
-            button.setTitleColor(UIColor.black, for: .normal)
+            button.setTitleColor(BSColorTextBlack, for: .normal)
             button.contentEdgeInsets = UIEdgeInsets.init(top: 4, left: 4, bottom: 4, right: 4)
             return button
         }
@@ -76,6 +77,10 @@ class BSFeedActionsTableViewCell: UITableViewCell {
                     self.commentButton.setTitle("\(commentCount) \(pluralCorrection)", for: .normal)
                 })
                 
+                APIService.sharedInstance.isPostLiked(post: post, completion: { (isLiked) in
+                    self.likeActionButton.isSelected = isLiked
+                })
+                
             }
         }
     }
@@ -99,7 +104,7 @@ class BSFeedActionsTableViewCell: UITableViewCell {
         self.likeButton.snp.makeConstraints { (make) in
             make.leading.equalTo(self.likeActionButton.snp.trailing).offset(4)
             make.top.equalToSuperview().offset(kInteritemPadding)
-            make.bottom.equalToSuperview().inset(kInteritemPadding)
+            make.bottom.equalToSuperview().inset(0)
         }
         // Disable Dislikes
         //        self.dislikeButton.snp.makeConstraints { (make) in

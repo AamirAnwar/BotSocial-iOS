@@ -67,9 +67,11 @@ class BSFilterView: UIView {
         super.init(frame: frame)
         self.addSubview(self.filterCollectionView)
         self.filterCollectionView.backgroundColor = UIColor.white
+        self.filterCollectionView.showsHorizontalScrollIndicator = false
         self.filterCollectionView.register(BSFilterCollectionViewCell.self, forCellWithReuseIdentifier: kFilterCellReuseID)
         self.filterCollectionView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview()
+            make.height.equalTo(140)
         }
         self.filterCollectionView.delegate = self
         self.filterCollectionView.dataSource = self
@@ -113,7 +115,7 @@ extension BSFilterView:UICollectionViewDelegate, UICollectionViewDataSource, UIC
         // update font of selected cell
         if let selectedCell = self.filterCollectionView.cellForItem(at: IndexPath(row: filterIndex, section: 0)) {
                         let cell = selectedCell as! BSFilterCollectionViewCell
-                        cell.nameLabel.font = UIFont.boldSystemFont(ofSize: 14)
+                        cell.nameLabel.font = BSFontMediumBold
         }
         
         for i in 0...filterNameList.count - 1 {
@@ -121,7 +123,7 @@ extension BSFilterView:UICollectionViewDelegate, UICollectionViewDataSource, UIC
                 // update nonselected cell font
                 if let unselectedCell = self.filterCollectionView.cellForItem(at: IndexPath(row: i, section: 0)) {
                     if let cell = unselectedCell as? BSFilterCollectionViewCell {
-                        cell.nameLabel.font = UIFont.systemFont(ofSize: 14.0, weight: UIFont.Weight.thin)
+                        cell.nameLabel.font = BSFontMediumParagraph
                     }
                 }
             }

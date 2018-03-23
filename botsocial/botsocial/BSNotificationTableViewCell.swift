@@ -17,7 +17,6 @@ class BSNotificationTableViewCell: UITableViewCell {
             make.size.equalTo(44)
         })
         imageView.layer.cornerRadius = 22
-//        imageView.pin_setImage(from: URL(string:kTestImageURL)!)
         return imageView
     }()
     
@@ -38,15 +37,10 @@ class BSNotificationTableViewCell: UITableViewCell {
         }
         
         self.containerView.addSubview(self.titleLabel)
-        if arc4random() % 2 == 0 {
-            self.titleLabel.text = "aamiranwarr liked your post. 40m"
-        }
-        else {
-            self.titleLabel.text = "aamiranwarr commented on your post \" This has got to be the best app ever made\" 40m"
-        }
         self.titleLabel.numberOfLines = 0
+        self.titleLabel.font = BSFontMediumParagraph
         self.titleLabel.snp.makeConstraints { (make) in
-            make.leading.equalTo(self.userThumbnailImageView.snp.trailing).offset(4)
+            make.leading.equalTo(self.userThumbnailImageView.snp.trailing).offset(kInteritemPadding)
             make.trailing.equalToSuperview().inset(kSidePadding)
             make.centerY.equalTo(self.userThumbnailImageView.snp.centerY)
             make.top.equalToSuperview().offset(kInteritemPadding).priority(100)
@@ -67,8 +61,10 @@ class BSNotificationTableViewCell: UITableViewCell {
         }
     }
     
-    func configureWith(title:String, imageURL:URL? = nil) {
-        self.titleLabel.text = title
+    func configureWith(authorName:String, title:String, imageURL:URL? = nil) {
+        let string = NSMutableAttributedString.init(string: "\(authorName)", attributes: [.font:BSFontMediumBold])
+        string.append(NSAttributedString.init(string: " \(title)", attributes: [.font:BSFontMediumParagraph]))
+        self.titleLabel.attributedText = string
         self.userThumbnailImageView.pin_setImage(from: imageURL)
     }
  
