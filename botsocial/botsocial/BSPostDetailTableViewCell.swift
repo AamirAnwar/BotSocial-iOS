@@ -11,13 +11,12 @@ import UIKit
 class BSPostDetailTableViewCell: UITableViewCell {
     let postTitleLabel:UILabel = {
         let label = UILabel.init()
-//        label.text = "aamiranwar this is my first post"
+        label.numberOfLines = 4
         return label
     }()
     
     let postDateLabel:UILabel = {
         let label = UILabel()
-//        label.text = "1 day ago"
         return label
     }()
  

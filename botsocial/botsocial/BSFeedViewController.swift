@@ -75,6 +75,20 @@ class BSFeedViewController: UIViewController {
         APIService.sharedInstance.getRecentPosts { (post) in
             if let post = post {
                 self.posts.insert(post, at: 0)
+                
+                // If in between the list then show coachmark
+                if let indexPaths = self.tableView.indexPathsForVisibleRows {
+                    var min = Int.max
+                    for path in indexPaths {
+                        if path.section < min {
+                            min = path.section
+                        }
+                    }
+                    if min > 2 {
+                        self.showCoachmark(withTitle: kCoachmarkTitleNewPost)
+                    }
+                    
+                }
             }
             self.isLoadingPosts = false
             self.tableView.reloadData()
@@ -192,15 +206,16 @@ extension BSFeedViewController: UITableViewDelegate, UITableViewDataSource {
         let y = scrollView.contentOffset.y
         if y + scrollView.height() >= (scrollView.contentSize.height) {
             // Show coachmark
-            showCoachmark()
+            showCoachmark(withTitle: kCoachmarkTitleScrollUp)
         }
         else {
             hideCoachmark()
         }
     }
     
-    func showCoachmark() {
+    func showCoachmark(withTitle title:String) {
         guard self.posts.count > 1 && isShowingCoachmark == false else {return}
+        self.coachmarkButton.setTitle(title, for: .normal)
         UIView.animate(withDuration: 0.3, animations: {
             self.coachmarkButton.frame = CGRect.init(x: (self.view.width() - self.coachmarkButton.width())/2, y: self.view.height() - 44 - kInteritemPadding - self.coachmarkButton.height() - 4, width: self.coachmarkButton.width(), height: self.coachmarkButton.height())
         }) { (_) in
@@ -218,7 +233,8 @@ extension BSFeedViewController: UITableViewDelegate, UITableViewDataSource {
         }
     }
     @objc func didTapCoachmark() {
-        self.tableView.setContentOffset(CGPoint.init(x: 0, y: -(self.navBarHeight + self.tableView.contentInset.bottom + self.tableView.contentInset.top)), animated: true)
+//        self.tableView.setContentOffset(CGPoint.init(x: 0, y: -(self.navBarHeight + self.tableView.contentInset.bottom + self.tableView.contentInset.top)), animated: true)
+        self.tableView.scrollRectToVisible(CGRect.init(x: 0, y: 0, width: 1, height: 1), animated: true)
         self.hideCoachmark()
     }
     

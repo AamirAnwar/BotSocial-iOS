@@ -147,5 +147,9 @@ extension BSFeaturedPostTableViewCell: UIScrollViewDelegate {
         
         return CATransform3DConcat(rotation, scale)
     }
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        self.collectionView.collectionViewLayout.invalidateLayout()
+    }
 }
 
