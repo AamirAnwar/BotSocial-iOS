@@ -20,7 +20,7 @@ class BSImageTableViewCell: UITableViewCell {
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         self.contentView.addSubview(self.storyImageView)
-        let image = #imageLiteral(resourceName: "placeholder_image")
+        
         self.storyImageView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview()
             make.height.equalTo(400)
@@ -28,14 +28,18 @@ class BSImageTableViewCell: UITableViewCell {
         self.selectionStyle = .none
         self.storyImageView.contentMode = .scaleAspectFill
         self.storyImageView.clipsToBounds = true
-        self.storyImageView.image = image
+        self.storyImageView.image = #imageLiteral(resourceName: "placeholder_image")
         //self.storyImageView.backgroundColor = UIColor.gray.withAlphaComponent(0.1)
         self.contentView.clipsToBounds = true
         
     }
     
     public func setImageURL(_ urlString:String) {
-        self.storyImageView.pin_setImage(from: URL(string:urlString)) { (result) in
+        guard let url = URL(string:urlString) else {
+            self.storyImageView.image = #imageLiteral(resourceName: "placeholder_image")
+            return
+        }
+        self.storyImageView.pin_setImage(from: url) { (result) in
 //            if let image = result.image {
                 // TODO
 //                let width = UIScreen.main.bounds.width

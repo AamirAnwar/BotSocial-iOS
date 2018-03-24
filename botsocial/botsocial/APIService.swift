@@ -209,7 +209,7 @@ class APIService: NSObject {
                             "user_id": user.uid,
                             "post_id": postID
                         ]
-                        let newNotificationChild = self.databaseRef.child("users").child("\(postAuthorID)").child("notifications").child("\(user.uid)_\(postID)_like")
+                        let newNotificationChild = self.databaseRef.child("users").child("\(postAuthorID)").child("notifications").childByAutoId()
                         newNotificationChild.setValue(notification)
                     }
                 })
@@ -217,19 +217,20 @@ class APIService: NSObject {
         }
     }
     
-    func getNotifications(completion:@escaping ((_ notification:BSNotification?) -> Void) ) {
-        guard let user = self.currentUser else {completion(nil);return}
+    func getNotifications(completion:@escaping ((_ notification:BSNotification?, _ handle:UInt) -> Void) ) {
+        guard let user = self.currentUser else {completion(nil, 0);return}
         self.databaseRef.child("users").child("\(user.uid)").child("notifications").observeSingleEvent(of: .value) { (snapshot) in
             if snapshot.exists() == false{
-                completion(nil)
+                completion(nil, 0)
             }
-            self.databaseRef.child("users").child("\(user.uid)").child("notifications").queryLimited(toLast: 20).observe(.childAdded) { (snapshot) in
+            var handleRef:UInt = 0
+            handleRef = self.databaseRef.child("users").child("\(user.uid)").child("notifications").queryLimited(toLast: 50).observe(.childAdded) { (snapshot) in
                 if let value = snapshot.value as? [String:AnyObject] {
                     let notif = BSNotification.initWith(notifID:snapshot.key, notifDict:value)
-                    completion(notif)
+                    completion(notif, handleRef)
                 }
                 else {
-                    completion(nil)
+                    completion(nil, 0)
                 }
             }
         }
@@ -277,5 +278,11 @@ class APIService: NSObject {
                 completion(comment)
         })
         
+    }
+    
+    func cancelHandle(_ handle:UInt?) {
+        if let handle = handle {
+            self.databaseRef.removeObserver(withHandle: handle)
+        }
     }
 }

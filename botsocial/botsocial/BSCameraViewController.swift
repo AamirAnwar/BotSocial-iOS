@@ -144,7 +144,7 @@ class BSCameraViewController: UIViewController {
         self.backButton.isHidden = true
         self.backButton.snp.makeConstraints { (make) in
             make.leading.equalToSuperview().offset(kSidePadding)
-            make.top.equalToSuperview().offset(2*kInteritemPadding)
+            make.top.equalToSuperview().offset(2*kInteritemPadding + self.view.safeAreaInsets.top)
         }
         
         // Next button
@@ -152,7 +152,7 @@ class BSCameraViewController: UIViewController {
         self.nextButton.isHidden = true
         self.nextButton.snp.makeConstraints { (make) in
             make.trailing.equalToSuperview().inset(kSidePadding)
-            make.top.equalToSuperview().offset(2*kInteritemPadding)
+            make.top.equalTo(self.backButton.snp.top)
         }
         
         //Save button
@@ -204,9 +204,14 @@ class BSCameraViewController: UIViewController {
             make.size.equalTo(kLibPhotoPreviewSize)
         }
         self.libPreviewButton.addTarget(self, action: #selector(didTapLibPreviewThumb(_:)), for: .touchUpInside)
+        self.libPreviewButton.layer.borderColor = BSLightGray.cgColor
+        self.libPreviewButton.layer.borderWidth = 1
         BSCommons.getLatestPhotoFromLibrary { (image) in
             if let image = image {
                 self.libPreviewButton.setBackgroundImage(image, for: .normal)
+            }
+            else {
+                self.libPreviewButton.setBackgroundImage(#imageLiteral(resourceName: "placeholder_image"), for: .normal)
             }
         }
         

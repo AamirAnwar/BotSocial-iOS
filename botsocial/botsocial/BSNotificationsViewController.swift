@@ -18,7 +18,8 @@ class BSNotificationsViewController: UIViewController, UIGestureRecognizerDelega
         return control
     }()
     var isLoadingNotifications = false
-    
+    var handleRef:UInt?
+    var notificationSet:Set<String> = Set<String>()
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.addSubview(self.tableView)
@@ -46,30 +47,39 @@ class BSNotificationsViewController: UIViewController, UIGestureRecognizerDelega
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.tabBarItem.badgeValue = nil
+        self.navigationController?.tabBarItem.badgeValue = nil
+        APIService.sharedInstance.cancelHandle(self.handleRef)
     }
     
     func loadNotifications() {
         isLoadingNotifications = true
+        notificationSet = Set<String>()
         self.notifications.removeAll()
-        APIService.sharedInstance.getNotifications { (notification) in
-            if let notif = notification {
+        APIService.sharedInstance.getNotifications { (notification, handle) in
+            self.handleRef = handle
+            if let notif = notification, self.notificationSet.contains(notif.id) == false {
                 self.notifications.insert(notif, at: 0)
-                if self.tabBarController?.selectedIndex != 1 {
-                    self.tabBarItem.badgeColor = UIColor.red.withAlphaComponent(0.8)
-                    if let v = self.tabBarItem.badgeValue, let value = Int(v) {
-                        self.tabBarItem.badgeValue = "\(value + 1)"
-                    }
-                    else {
-                        self.tabBarItem.badgeValue = "1"
-                    }
-                }
+                self.notificationSet.insert(notif.id)
+                self.incrementUnreadBadge()
+             
             }
             self.refreshControl.endRefreshing()
             self.isLoadingNotifications = false
             self.tableView.reloadData()
             
             
+        }
+    }
+    
+    func incrementUnreadBadge() {
+        if self.tabBarController?.selectedIndex != 1 {
+            self.tabBarItem.badgeColor = UIColor.red.withAlphaComponent(0.8)
+            if let v = self.navigationController?.tabBarItem.badgeValue, let value = Int(v) {
+                self.navigationController?.tabBarItem.badgeValue = "\(value + 1)"
+            }
+            else {
+                self.navigationController?.tabBarItem.badgeValue = "1"
+            }
         }
     }
 }
@@ -94,8 +104,7 @@ extension BSNotificationsViewController:UITableViewDelegate, UITableViewDataSour
         let cell =  tableView.dequeueReusableCell(withIdentifier: kNotifCellReuseID) as! BSNotificationTableViewCell
         let notification = self.notifications[indexPath.row]
         if let text = notification.text {
-            
-            cell.configureWith(authorName:notification.authorName, title: text, imageURL: URL(string:kTestImageURL)!)
+            cell.configureWith(authorName:notification.authorName, title: text)
         }
         if let authorID = notification.userID, authorID.isEmpty == false {
             APIService.sharedInstance.getProfilePictureFor(userID: authorID, completion: { (url) in

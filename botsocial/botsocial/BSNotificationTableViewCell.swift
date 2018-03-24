@@ -66,7 +66,18 @@ class BSNotificationTableViewCell: UITableViewCell {
         let string = NSMutableAttributedString.init(string: "\(authorName)", attributes: [.font:BSFontMediumBold])
         string.append(NSAttributedString.init(string: " \(title)", attributes: [.font:BSFontMediumParagraph]))
         self.titleLabel.attributedText = string
-        self.userThumbnailImageView.pin_setImage(from: imageURL)
+        if let url = imageURL {
+            self.userThumbnailImageView.pin_setImage(from: url)
+        }
+        else {
+            self.userThumbnailImageView.image = #imageLiteral(resourceName: "placeholder_image")
+        }
+        
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        self.userThumbnailImageView.image = #imageLiteral(resourceName: "placeholder_image")
     }
  
 }
