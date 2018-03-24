@@ -20,6 +20,8 @@ class BSUserSnippetTableViewCell: UITableViewCell {
     }()
     let usernameLabel:UILabel = {
         let label = UILabel()
+        label.font = BSFontMediumBold
+        label.textColor = BSColorTextBlack
         return label
     }()
     
@@ -32,17 +34,16 @@ class BSUserSnippetTableViewCell: UITableViewCell {
         self.contentView.addSubview(self.userImageView)
         self.contentView.addSubview(self.usernameLabel)
         
-        self.usernameLabel.text = "aamiranwar"
         self.userImageView.backgroundColor = UIColor.gray.withAlphaComponent(0.1)
         self.userImageView.snp.makeConstraints { (make) in
             make.leading.equalToSuperview().offset(kSidePadding)
             make.top.equalToSuperview().offset(kInteritemPadding)
             make.bottom.equalToSuperview().inset(kInteritemPadding)
-            make.height.equalTo(kUserThumbnailImageHeight)
-            make.width.equalTo(kUserThumbnailImageHeight)
+            make.height.equalTo(kUserThumbnailImageSize)
+            make.width.equalTo(kUserThumbnailImageSize)
         }
-        self.userImageView.pin_setImage(from: URL(string:kTestImageURL)!)
-        self.userImageView.layer.cornerRadius =  round(kUserThumbnailImageHeight/2)
+//        self.userImageView.pin_setImage(from: URL(string:kTestImageURL)!)
+        self.userImageView.layer.cornerRadius =  round(kUserThumbnailImageSize/2)
         self.usernameLabel.snp.makeConstraints { (make) in
             make.centerY.equalTo(self.userImageView.snp.centerY)
             make.trailing.lessThanOrEqualToSuperview().inset(kSidePadding)
@@ -53,7 +54,9 @@ class BSUserSnippetTableViewCell: UITableViewCell {
         
     }
     
-    
+    func setImageURL(_ url:URL?) {
+        self.userImageView.pin_setImage(from:url)
+    }
     
     
 

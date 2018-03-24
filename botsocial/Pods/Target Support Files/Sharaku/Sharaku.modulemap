@@ -1,0 +1,6 @@
+framework module Sharaku {
+  umbrella header "Sharaku-umbrella.h"
+
+  export *
+  module * { export * }
+}

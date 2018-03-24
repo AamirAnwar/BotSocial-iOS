@@ -8,11 +8,15 @@
 
 import UIKit
 
-class BSAccountViewController: UIViewController {
-    let tableView = UITableView.init(frame: .zero, style: .plain)
-    let kUserProfileCellReuseID = "BSUserProfileTableViewCell"
+class BSAccountViewController: UIViewController, UIGestureRecognizerDelegate {
+    let kUserProfileCellReuseID = "BSUserProfileCollectionViewCell"
     let kImageCellReuseID = "BSImageCollectionViewCell"
-    var userImages = [String]()
+    var userPosts = [BSPost]()
+    var user:BSUser? {
+        didSet {
+            self.navigationItem.title = user?.displayName ?? APIService.sharedInstance.currentUser?.displayName
+        }
+    }
     let collectionView:UICollectionView = {
         let layout = UICollectionViewFlowLayout.init()
         layout.minimumInteritemSpacing = 0
@@ -21,17 +25,43 @@ class BSAccountViewController: UIViewController {
         cView.backgroundColor = UIColor.white
         return cView
     }()
+    var isLoading = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        for _ in 0..<30 {
-            userImages += [kTestImageURL]
+//        for _ in 0..<30 {
+//            userImages += [kTestImageURL]
+//        }
+        self.navigationController?.interactivePopGestureRecognizer?.delegate = self
+        self.isLoading = true
+        if let user = self.user {
+            APIService.sharedInstance.getPostsWith(userID: user.id, completion: { (post) in
+                self.isLoading = false
+                if let post = post {
+                    self.userPosts.insert(post, at: 0)
+                }
+                self.collectionView.reloadData()
+            })
+            
         }
+        else {
+            APIService.sharedInstance.getUserPosts { (post) in
+                self.isLoading = false
+                if let post = post {
+                    self.userPosts.insert(post, at: 0)
+                }
+                self.collectionView.reloadData()
+            }
+        }
+        
         self.view.addSubview(self.collectionView)
         self.collectionView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview()
         }
         self.collectionView.delegate = self
         self.collectionView.dataSource = self
+        self.collectionView.register(BSLoaderCollectionViewCell.self, forCellWithReuseIdentifier: "loader_cell")
+        self.collectionView.register(BSEmptyStateCollectionViewCell.self, forCellWithReuseIdentifier: "empty_state_cell")
         self.collectionView.register(BSUserProfileCollectionViewCell.self, forCellWithReuseIdentifier: kUserProfileCellReuseID)
         self.collectionView.register(BSImageCollectionViewCell.self, forCellWithReuseIdentifier: kImageCellReuseID)
     }
@@ -43,10 +73,14 @@ extension BSAccountViewController:UICollectionViewDelegate, UICollectionViewData
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        
         switch section {
         case 0:
             return 1
-        case 1: return userImages.count
+        case 1:
+            guard self.isLoading == false else {return 1}
+            guard self.userPosts.isEmpty == false else {return 1}
+            return userPosts.count
         default:
             return 0
         }
@@ -57,18 +91,37 @@ extension BSAccountViewController:UICollectionViewDelegate, UICollectionViewData
             return CGSize.init(width: self.view.width(), height: 150)
         }
         else {
+            guard self.isLoading == false else {return CGSize.init(width: self.view.width(), height: 20)}
+            guard self.userPosts.isEmpty == false else {return CGSize.init(width: self.view.width(), height: 50)}
             return CGSize.init(width: self.view.width()/3, height: 120)
         }
         
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
         switch indexPath.section {
         case 0:
-            return collectionView.dequeueReusableCell(withReuseIdentifier: kUserProfileCellReuseID, for: indexPath)
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kUserProfileCellReuseID, for: indexPath) as! BSUserProfileCollectionViewCell
+            cell.delegate = self
+            cell.configureWithUser(user: self.user)
+            if let _ = self.user {
+                cell.settingsButton.isHidden = true
+            }
+            return cell
         case 1:
+            guard self.isLoading == false else {return collectionView.dequeueReusableCell(withReuseIdentifier: "loader_cell", for: indexPath)}
+            guard self.userPosts.isEmpty == false else {
+                
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "empty_state_cell", for: indexPath) as! BSEmptyStateCollectionViewCell
+                cell.titleLabel.text = "No posts yet"
+                return cell
+                
+            }
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kImageCellReuseID, for: indexPath) as! BSImageCollectionViewCell
-            cell.setImageURL(URL(string:userImages[indexPath.row])!)
+            if let url = URL(string:userPosts[indexPath.row].imageURL) {
+                cell.setImageURL(url)
+            }
             return cell
         default:
             print("Something's wrong")
@@ -79,10 +132,26 @@ extension BSAccountViewController:UICollectionViewDelegate, UICollectionViewData
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if indexPath.section == 1 {
+            guard self.userPosts.isEmpty == false else {return}
             let vc = BSPostViewController()
-            vc.setImageURLString(userImages[indexPath.row])
+            vc.post = userPosts[indexPath.row]
             self.navigationController?.pushViewController(vc, animated: true)
         }
+    }
+}
+
+extension BSAccountViewController:BSUserProfileCollectionViewCellDelegate {
+    func didTapSettingsButton() {
+        let vc = BSSettingsViewController()
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    func didTapUserProfileThumb() {
+        guard self.user == nil else {return}
+        let vc = BSCameraViewController()
+        vc.flowType = .ProfilePicture
+        let navVC = UINavigationController.init(rootViewController: vc)
+        self.present(navVC, animated: true)
     }
 }
 

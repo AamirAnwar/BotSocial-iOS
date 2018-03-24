@@ -8,9 +8,12 @@
 
 import UIKit
 import Firebase
+import FirebaseAuthUI
+
+
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, FUIAuthDelegate {
 
     var window: UIWindow?
 
@@ -21,19 +24,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window = UIWindow.init()
         self.window?.makeKeyAndVisible()
         self.window?.backgroundColor = UIColor.white
-        let rootVC = UITabBarController.init()
-        let feedVC = BSFeedViewController()
-        let accountVC = getAccountPage()
-        let cameraVC = BSCameraViewController()
-        let notifVC = getNotificationsPage()
-        cameraVC.tabBarItem.image = UIImage.init(named: "camera_tab_icon")
-        notifVC.tabBarItem.image = UIImage.init(named: "notification_tab_icon")
-        accountVC.tabBarItem.image = UIImage.init(named: "account_tab_icon")
+        self.resetApp()
+        if Auth.auth().currentUser == nil {
+            BSCommons.showLoginPage(delegate: self)
+        }
         
-        rootVC.viewControllers = [feedVC, cameraVC, notifVC, accountVC]
-        rootVC.tabBar.tintColor = UIColor.black
-        self.window?.rootViewController = rootVC
         return true
+    }
+    
+    func getFeedPage() -> UIViewController {
+        let navVC = UINavigationController.init(rootViewController: BSFeedViewController())
+        return navVC
     }
     
     func getAccountPage() -> UIViewController {
@@ -44,10 +45,45 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func getNotificationsPage() -> UIViewController {
         let navVC = UINavigationController.init(rootViewController: BSNotificationsViewController())
-        navVC.isNavigationBarHidden = true
         return navVC
     }
+    func authUI(_ authUI: FUIAuth, didSignInWith user: User?, error: Error?) {
+        // handle user and error as necessary
+        if let _ = user {
+            APIService.sharedInstance.updateUserDetails()
+            self.resetApp()
+        }
+    }
     
+    func authPickerViewController(forAuthUI authUI: FUIAuth) -> FUIAuthPickerViewController {
+        return BSLoginViewController.init(nibName: nil, bundle: nil, authUI: authUI)
+    }
+
+    func resetApp() {
+        if let window = self.window {
+            let rootVC = UITabBarController.init()
+            let feedVC = getFeedPage()
+            let accountVC = getAccountPage()
+            let notifVC = getNotificationsPage()
+            feedVC.tabBarItem.image = UIImage.init(named: "feed_tab_icon")
+            notifVC.tabBarItem.image = UIImage.init(named: "notification_tab_icon")
+            accountVC.tabBarItem.image = UIImage.init(named: "account_tab_icon")
+            rootVC.viewControllers = [feedVC, notifVC, accountVC]
+            rootVC.tabBar.tintColor = BSColorTextBlack
+            window.rootViewController = rootVC
+        }
+    }
+    
+    func application(_ app: UIApplication, open url: URL,
+                     options: [UIApplicationOpenURLOptionsKey : Any]) -> Bool {
+        let sourceApplication = options[UIApplicationOpenURLOptionsKey.sourceApplication] as! String?
+        if FUIAuth.defaultAuthUI()?.handleOpen(url, sourceApplication: sourceApplication) ?? false {
+            return true
+        }
+        // other URL handling goes here.
+        return false
+    }
+
     
 
     func applicationWillResignActive(_ application: UIApplication) {

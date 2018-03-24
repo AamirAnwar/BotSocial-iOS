@@ -10,7 +10,26 @@ import UIKit
 
 class BSFeaturedPostTableViewCell: UITableViewCell {
     let kImageCellReuseID = "BSImageCollectionViewCell"
-    var featuredImages:[String] = []
+    let titleLabel:UILabel = {
+        let label = UILabel()
+        label.font = BSFontBigBold
+        label.textColor = BSColorTextBlack
+        label.text = "Featured Posts"
+        label.numberOfLines = 0
+        return label
+    }()
+    var featuredPosts:[BSPost] = []  {
+        didSet {
+            if featuredPosts.isEmpty {
+                self.titleLabel.text = "Tap the camera on the top left to create a post!"
+            }
+            else {
+                self.titleLabel.text = "Featured Posts"
+            }
+            self.collectionView.reloadData()
+        }
+    }
+    
     let collectionView:UICollectionView = {
         let layout = UICollectionViewFlowLayout.init()
         layout.minimumInteritemSpacing = 0
@@ -28,14 +47,24 @@ class BSFeaturedPostTableViewCell: UITableViewCell {
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
-        for _ in 0..<25 {
-            featuredImages += [kTestFeaturedImageURL]
+//        for _ in 0..<25 {
+//            featuredPosts += [kTestFeaturedImageURL]
+//        }
+        self.selectionStyle = .none
+        self.contentView.addSubview(self.titleLabel)
+        self.contentView.addSubview(self.collectionView)
+        self.titleLabel.snp.makeConstraints { (make) in
+            make.leading.equalToSuperview().offset(kSidePadding)
+            make.top.equalToSuperview().offset(kInteritemPadding)
+            make.trailing.equalToSuperview().inset(kSidePadding)
         }
         
-        self.contentView.addSubview(self.collectionView)
         self.collectionView.snp.makeConstraints { (make) in
-            make.edges.equalToSuperview()
-            make.height.equalTo(380)
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview()
+            make.top.equalTo(self.titleLabel.snp.bottom).offset(kInteritemPadding)
+            make.height.equalTo(258)
+            make.bottom.equalToSuperview().inset(2*kInteritemPadding)
         }
         self.collectionView.delegate = self
         self.collectionView.showsHorizontalScrollIndicator = false
@@ -52,7 +81,7 @@ extension BSFeaturedPostTableViewCell:UICollectionViewDelegate, UICollectionView
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return featuredImages.count
+        return featuredPosts.count
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -61,7 +90,15 @@ extension BSFeaturedPostTableViewCell:UICollectionViewDelegate, UICollectionView
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kImageCellReuseID, for: indexPath) as! BSImageCollectionViewCell
-        cell.setImageURL(URL(string:featuredImages[indexPath.row])!)
+        if let urlString = featuredPosts[indexPath.row].imageURL, let url = URL(string:urlString) {
+            cell.setImageURL(url)
+        }
+        if indexPath.row == 1 && cell.isExpanded == false {
+            let cellFrame = collectionView.convert(cell.frame, to: self.contentView)
+            let translationX = cellFrame.origin.x / 5
+            cell.storyImageView.transform = CGAffineTransform(translationX: translationX, y: 0)
+            cell.layer.transform = animateCell(cellFrame: cellFrame)
+        }
         cell.expandImages()
         return cell
         
@@ -75,15 +112,19 @@ extension BSFeaturedPostTableViewCell: UIScrollViewDelegate {
 //        let offsetY = scrollView.contentOffset.y
         if let collectionView = scrollView as? UICollectionView {
             for cell in collectionView.visibleCells as! [BSImageCollectionViewCell] {
-                let indexPath = collectionView.indexPath(for: cell)!
-                let attributes = collectionView.layoutAttributesForItem(at: indexPath)!
-                let cellFrame = collectionView.convert(attributes.frame, to: self.contentView)
-                
-                let translationX = cellFrame.origin.x / 5
-                cell.storyImageView.transform = CGAffineTransform(translationX: translationX, y: 0)
-                cell.layer.transform = animateCell(cellFrame: cellFrame)
+                configure(cell)
             }
         }
+    }
+    
+    func configure(_ cell:BSImageCollectionViewCell) {
+        let indexPath = collectionView.indexPath(for: cell)!
+        let attributes = collectionView.layoutAttributesForItem(at: indexPath)!
+        let cellFrame = collectionView.convert(attributes.frame, to: self.contentView)
+        
+        let translationX = cellFrame.origin.x / 5
+        cell.storyImageView.transform = CGAffineTransform(translationX: translationX, y: 0)
+        cell.layer.transform = animateCell(cellFrame: cellFrame)
     }
     
     func animateCell(cellFrame: CGRect) -> CATransform3D {
@@ -105,6 +146,10 @@ extension BSFeaturedPostTableViewCell: UIScrollViewDelegate {
         let scale = CATransform3DScale(CATransform3DIdentity, scaleFromX, scaleFromX, 1)
         
         return CATransform3DConcat(rotation, scale)
+    }
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        self.collectionView.collectionViewLayout.invalidateLayout()
     }
 }
 

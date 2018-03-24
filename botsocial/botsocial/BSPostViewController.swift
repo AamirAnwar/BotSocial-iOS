@@ -14,12 +14,19 @@ class BSPostViewController: UITableViewController, UIGestureRecognizerDelegate {
     let kFeedActionsCellReuseID = "BSFeedActionsTableViewCell"
     let kFeedPostInfoCellReuseID = "BSPostDetailTableViewCell"
     let kFeedCommentInfoCellReuseID = "BSAddCommentTableViewCell"
-    var imageURLString:String?
+    var post:BSPost? {
+        didSet {
+            self.tableView.reloadData()
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         self.tableView.delegate = self
         self.tableView.dataSource = self
+        self.tableView.tableFooterView = UIView()
+        self.tableView.separatorStyle = .none
         self.tableView.register(BSUserSnippetTableViewCell.self, forCellReuseIdentifier: kFeedUserSnippetCellReuseID)
         self.tableView.register(BSImageTableViewCell.self, forCellReuseIdentifier: kFeedImageCellReuseID)
         self.tableView.register(BSFeedActionsTableViewCell.self, forCellReuseIdentifier: kFeedActionsCellReuseID)
@@ -29,33 +36,74 @@ class BSPostViewController: UITableViewController, UIGestureRecognizerDelegate {
         self.navigationController?.interactivePopGestureRecognizer?.delegate = self
     }
     
-    func setImageURLString(_ urlString:String) {
-        self.imageURLString = urlString
-    }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 5
+        return 4
         
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         switch indexPath.row {
         case 0:
-            return tableView.dequeueReusableCell(withIdentifier: kFeedUserSnippetCellReuseID)!
+            let cell = tableView.dequeueReusableCell(withIdentifier: kFeedUserSnippetCellReuseID) as! BSUserSnippetTableViewCell
+            if let post = self.post {
+                cell.usernameLabel.text = self.post?.authorName
+                APIService.sharedInstance.getProfilePictureFor(userID: post.authorID, completion: { (url) in
+                    cell.setImageURL(url)
+                })
+            }
+            return cell
         case 1:
             let cell = tableView.dequeueReusableCell(withIdentifier: kFeedImageCellReuseID) as! BSImageTableViewCell
-            cell.setImageURL(self.imageURLString ?? "")
+            if let post = self.post, let imageURLString = post.imageURL {
+                cell.setImageURL(imageURLString)
+            }
             return cell
         case 2:
-            return tableView.dequeueReusableCell(withIdentifier: kFeedActionsCellReuseID)!
+            let cell = tableView.dequeueReusableCell(withIdentifier: kFeedActionsCellReuseID) as! BSFeedActionsTableViewCell
+            cell.post = self.post
+            cell.delegate = self
+            return cell
         case 3:
-            return tableView.dequeueReusableCell(withIdentifier: kFeedPostInfoCellReuseID)!
+            let cell = tableView.dequeueReusableCell(withIdentifier: kFeedPostInfoCellReuseID) as! BSPostDetailTableViewCell
+            cell.post = self.post
+            return cell
         case 4:
             return tableView.dequeueReusableCell(withIdentifier: kFeedCommentInfoCellReuseID)!
         default:
             return UITableViewCell()
         }
+    }
     
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        if indexPath.row == 0 {
+            if let authorID = self.post?.authorID {
+                APIService.sharedInstance.getUserWith(userID: authorID, completion: { (user) in
+                    let vc = BSAccountViewController()
+                    vc.user = user
+                    self.navigationController?.pushViewController(vc, animated: true)
+                })
+            }
+        }
+    }
+    
+}
+
+extension BSPostViewController:BSFeedActionsTableViewCellDelegate {
+    func didTapLikeButton(forIndexPath indexPath: IndexPath?) {
+        if  let post = self.post {
+            APIService.sharedInstance.likePost(post:post)
+        }
+    }
+    
+    func didTapCommentsButton(forIndexPath indexPath: IndexPath?) {
+        if let post = self.post {
+            let vc = BSPostCommentsViewController()
+            vc.post = post
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+        
     }
 }
 
