@@ -195,7 +195,6 @@ extension BSFeedViewController: UITableViewDelegate, UITableViewDataSource {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let y = scrollView.contentOffset.y
-        print(y)
         if y + scrollView.height() < (scrollView.contentSize.height) {
             hideCoachmark()
         }
