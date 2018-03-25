@@ -95,7 +95,7 @@ class BSSavedPostsViewController: UIViewController, UITableViewDataSource, UITab
             return cell
         case 1:
             let cell = tableView.dequeueReusableCell(withIdentifier: kFeedImageCellReuseID) as! BSImageTableViewCell
-//            cell.delegate = self
+            //            cell.delegate = self
             if let imageURL = post.imageURL {
                 cell.setImageURL(imageURL)
             }
@@ -110,6 +110,8 @@ class BSSavedPostsViewController: UIViewController, UITableViewDataSource, UITab
             post.caption = savedPost.caption
             cell.post = post
             cell.indexPath = IndexPath.init(row: indexPath.row, section: currentPostIndex)
+            cell.saveButton.isSelected = true
+            cell.delegate = self
             return cell
         case 3:
             let cell = tableView.dequeueReusableCell(withIdentifier: kFeedPostInfoCellReuseID) as! BSPostDetailTableViewCell
@@ -153,5 +155,74 @@ class BSSavedPostsViewController: UIViewController, UITableViewDataSource, UITab
         }
         
     }
-
+    
+}
+extension BSSavedPostsViewController:BSFeedActionsTableViewCellDelegate {
+    func didTapLikeButton(forIndexPath indexPath: IndexPath?) {
+        
+    }
+    
+    func didTapCommentsButton(forIndexPath indexPath: IndexPath?) {
+        
+    }
+    
+    func didTapSavePostButton(forIndexPath indexPath: IndexPath?) {
+        let alertController = UIAlertController.init(title: "Delete post", message: "Delete this post?", preferredStyle: .actionSheet)
+        let deleteAction = UIAlertAction.init(title: "Delete", style: .destructive) { (action) in
+            if let indexPath = indexPath {
+                let post = self.posts[indexPath.section]
+                // delete post
+                self.deletePost(postID: post.id!)
+                self.posts.remove(at: indexPath.section)
+                
+                self.tableView.beginUpdates()
+                self.tableView.deleteSections(IndexSet.init(integer: indexPath.section), with: .automatic)
+                self.tableView.endUpdates()
+                
+            }
+        }
+        
+        let cancelAction = UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil)
+        alertController.addAction(deleteAction)
+        alertController.addAction(cancelAction)
+        self.present(alertController, animated: true)
+    }
+    func deletePost(postID:String) {
+        guard let currentUser = APIService.sharedInstance.currentUser  else {return }
+        
+        do {
+            let userFetch:NSFetchRequest<UserObject> = UserObject.fetchRequest()
+            userFetch.predicate = NSPredicate.init(format:"%K == %@", #keyPath(UserObject.id), currentUser.uid)
+            
+            let results = try managedContext.fetch(userFetch)
+            if results.count > 0 {
+                guard let currentUserObject = results.first else {
+                    return
+                }
+                if let savedPosts = currentUserObject.posts as? NSMutableOrderedSet {
+                    var postToDelete:PostObject? = nil
+                    for post in savedPosts {
+                        if let post = post as? PostObject {
+                            if post.id == postID {
+                                postToDelete = post
+                            }
+                        }
+                    }
+                    if let post = postToDelete {
+                        savedPosts.remove(post)
+                    }
+                    currentUserObject.posts = savedPosts
+                    
+                }
+                try managedContext.save()
+                
+            }
+        }
+        catch let error as NSError {
+            print("Fetch error \(error)")
+        }
+        
+    }
+    
+    
 }

@@ -173,6 +173,8 @@ extension BSFeedViewController: UITableViewDelegate, UITableViewDataSource {
                 cell.delegate = self
                 cell.post = post
                 cell.indexPath = IndexPath.init(row: indexPath.row, section: currentPostIndex)
+                cell.saveButton.isSelected = false
+                self.postIsSaved(postID: post.id, saveButton: cell.saveButton)
                 return cell
             case 3:
                 let cell = tableView.dequeueReusableCell(withIdentifier: kFeedPostInfoCellReuseID) as! BSPostDetailTableViewCell
@@ -280,6 +282,32 @@ extension BSFeedViewController:BSFeedActionsTableViewCellDelegate {
             vc.post = post
             self.navigationController?.pushViewController(vc, animated: true)
         }
+    }
+    
+    func postIsSaved(postID:String, saveButton:UIButton){
+        guard let currentUser = APIService.sharedInstance.currentUser else {return}
+        let postsFetch:NSFetchRequest<PostObject> = PostObject.fetchRequest()
+        postsFetch.predicate = NSPredicate.init(format:"%K == %@", #keyPath(PostObject.user.id), currentUser.uid)
+        let asyncFetch:NSAsynchronousFetchRequest<PostObject> = NSAsynchronousFetchRequest<PostObject>.init(fetchRequest: postsFetch) {[unowned self] (result) in
+            if let finalResult = result.finalResult {
+                
+                for post in finalResult {
+                    if post.id == postID {
+                        saveButton.isSelected = true
+                    }
+                }
+            }
+        }
+        
+        do {
+         try managedContext.execute(asyncFetch)
+        }
+        catch let error as NSError {
+            print("Fetch Error! \(error)")
+            return
+        }
+        return
+        
     }
     
     func didTapSavePostButton(forIndexPath indexPath: IndexPath?) {
