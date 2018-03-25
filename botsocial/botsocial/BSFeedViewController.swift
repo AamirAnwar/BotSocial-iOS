@@ -38,6 +38,11 @@ class BSFeedViewController: UIViewController {
         self.navigationItem.leftBarButtonItem = UIBarButtonItem.init(image: #imageLiteral(resourceName: "camera_tab_icon"), style: .plain, target: self, action: #selector(didTapCameraButton))
         self.navigationItem.leftBarButtonItem?.tintColor = BSColorTextBlack
         self.navigationController?.navigationBar.tintColor = BSColorTextBlack
+        
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(image: #imageLiteral(resourceName: "chat_icon"), style: .plain, target: self, action: #selector(didTapChatButton))
+        self.navigationItem.rightBarButtonItem?.tintColor = BSColorTextBlack
+        
+        
         self.view.addSubview(self.tableView)
         self.view.addSubview(self.coachmarkButton)
         self.coachmarkButton.titleLabel?.adjustsFontSizeToFitWidth = true
@@ -45,14 +50,11 @@ class BSFeedViewController: UIViewController {
         self.coachmarkButton.setTitle("Back to top", for: .normal)
         self.coachmarkButton.layer.cornerRadius = kCoachmarkButtonHeight/2
         self.coachmarkButton.backgroundColor = UIColor.white
-//        self.coachmarkButton.layer.borderWidth = 1
-//        self.coachmarkButton.layer.borderColor = BSColorTextBlack.withAlphaComponent(0.5).cgColor
         self.coachmarkButton.titleLabel?.font = BSFontMiniBold
         self.coachmarkButton.setTitleColor(BSColorTextBlack, for: .normal)
         self.coachmarkButton.addTarget(self, action: #selector(didTapCoachmark), for: .touchUpInside)
-//        if let label = self.coachmarkButton.titleLabel {
         BSCommons.addShadowTo(view:self.coachmarkButton)
-//        }
+
         
         
         self.tableView.contentInset = UIEdgeInsets.init(top: 0, left: 0, bottom: kCoachmarkButtonHeight, right: 0)
@@ -101,6 +103,14 @@ class BSFeedViewController: UIViewController {
         let navVC = UINavigationController.init(rootViewController: BSCameraViewController())
         self.present(navVC, animated: true)
     }
+    
+    @objc func didTapChatButton() {
+        
+        // TODO Show a list of chats here and NOT messages
+        guard let user = APIService.sharedInstance.currentUser else {
+            return
+        }
+    }
 }
 
 extension BSFeedViewController: UITableViewDelegate, UITableViewDataSource {
@@ -136,18 +146,14 @@ extension BSFeedViewController: UITableViewDelegate, UITableViewDataSource {
                 let cell = tableView.dequeueReusableCell(withIdentifier: kFeedUserSnippetCellReuseID) as! BSUserSnippetTableViewCell
                 cell.usernameLabel.text = post.authorName
                 if let authorID = post.authorID {
-                    APIService.sharedInstance.getProfilePictureFor(userID: authorID, completion: {[weak cell] (url) in
-                        if let strongCell = cell {
-                            if let url = url {
-                                strongCell.setImageURL(url)
-                            }
-                        }
+                    APIService.sharedInstance.getProfilePictureFor(userID: authorID, completion: {(url) in
+                        cell.setImageURL(url)
                     })
                 }
                 return cell
             case 1:
                 let cell = tableView.dequeueReusableCell(withIdentifier: kFeedImageCellReuseID) as! BSImageTableViewCell
-                cell.setImageURL(post.imageURL ?? "")
+                cell.setImageURL(post.imageURL)
                 cell.delegate = self
                 return cell
             case 2:

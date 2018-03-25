@@ -179,9 +179,6 @@ class BSShareViewController: UIViewController, UIGestureRecognizerDelegate {
                 tabBarHeight = tabbar.height()
             }
             self.scrollView.contentInset = UIEdgeInsets.init(top: 0, left: 0, bottom: keyboardHeight - tabBarHeight, right: 0)
-            self.loaderOverlayView.snp.updateConstraints({ (make) in
-                make.bottom.equalToSuperview().inset(keyboardHeight - tabBarHeight)
-            })
         }
     }
     

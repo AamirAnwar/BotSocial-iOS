@@ -42,7 +42,6 @@ class BSUserSnippetTableViewCell: UITableViewCell {
             make.height.equalTo(kUserThumbnailImageSize)
             make.width.equalTo(kUserThumbnailImageSize)
         }
-//        self.userImageView.pin_setImage(from: URL(string:kTestImageURL)!)
         self.userImageView.layer.cornerRadius =  round(kUserThumbnailImageSize/2)
         self.usernameLabel.snp.makeConstraints { (make) in
             make.centerY.equalTo(self.userImageView.snp.centerY)
@@ -55,7 +54,13 @@ class BSUserSnippetTableViewCell: UITableViewCell {
     }
     
     func setImageURL(_ url:URL?) {
-        self.userImageView.pin_setImage(from:url)
+        if let url = url {
+            self.userImageView.pin_setImage(from:url)
+        }
+        else {
+            self.userImageView.image = #imageLiteral(resourceName: "placeholder_image")
+        }
+        
     }
     
     

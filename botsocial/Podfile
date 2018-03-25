@@ -12,6 +12,7 @@ target 'botsocial' do
    pod 'Firebase/Storage'
    pod 'FirebaseUI'
    pod "Sharaku"
+   pod 'JSQMessagesViewController'
   target 'botsocialTests' do
     inherit! :search_paths
     # Pods for testing
