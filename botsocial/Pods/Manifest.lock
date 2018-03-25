@@ -130,6 +130,9 @@ PODS:
   - GTMSessionFetcher/Core (1.1.14)
   - GTMSessionFetcher/Full (1.1.14):
     - GTMSessionFetcher/Core (= 1.1.14)
+  - JSQMessagesViewController (7.3.5):
+    - JSQSystemSoundPlayer (~> 2.0.1)
+  - JSQSystemSoundPlayer (2.0.1)
   - leveldb-library (1.20)
   - nanopb (0.3.8):
     - nanopb/decode (= 0.3.8)
@@ -169,6 +172,7 @@ DEPENDENCIES:
   - Firebase/Core
   - Firebase/Storage
   - FirebaseUI
+  - JSQMessagesViewController
   - PINRemoteImage (= 3.0.0-beta.13)
   - Sharaku
   - SnapKit (~> 4.0.0)
@@ -196,6 +200,8 @@ SPEC CHECKSUMS:
   gRPC-RxLibrary: a41a4652d220f230ba1c0491a94ce2ee04c6180a
   GTMOAuth2: c77fe325e4acd453837e72d91e3b5f13116857b2
   GTMSessionFetcher: 390ea358e5a0d0133153806f744662dad933d06b
+  JSQMessagesViewController: 6587f56aedbcb150a8ba1d968e1ef58b1bc758b7
+  JSQSystemSoundPlayer: c5850e77a4363ffd374cd851154b9af93264ed8d
   leveldb-library: 08cba283675b7ed2d99629a4bc5fd052cd2bb6a5
   nanopb: 5601e6bca2dbf1ed831b519092ec110f66982ca3
   PINCache: d195fdba255283f7e9900a55e3cced377f431f9b
@@ -208,6 +214,6 @@ SPEC CHECKSUMS:
   TwitterCore: 644d59e75abccb26cf0a9050d2c4dea0e5412241
   TwitterKit: a2e60ddcedbf54091eac6f27685ca7a87681e1d7
 
-PODFILE CHECKSUM: e3351582427180c893d134fd81fe3baa8d10ed97
+PODFILE CHECKSUM: eca1e4f4c0a1fa6905a62fbc392e01f2f1c9a374
 
 COCOAPODS: 1.4.0

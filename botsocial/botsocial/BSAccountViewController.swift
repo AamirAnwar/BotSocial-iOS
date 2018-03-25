@@ -15,6 +15,13 @@ class BSAccountViewController: UIViewController, UIGestureRecognizerDelegate {
     var user:BSUser? {
         didSet {
             self.navigationItem.title = user?.displayName ?? APIService.sharedInstance.currentUser?.displayName
+            if let user = user,let currentUser = APIService.sharedInstance.currentUser, currentUser.uid != user.id {
+                self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(image: #imageLiteral(resourceName: "chat_icon"), style: .plain, target: self, action: #selector(didTapChatButton))
+                self.navigationItem.rightBarButtonItem?.tintColor = BSColorTextBlack
+            }
+            else {
+                self.navigationItem.rightBarButtonItem = nil
+            }
         }
     }
     let collectionView:UICollectionView = {
@@ -29,9 +36,6 @@ class BSAccountViewController: UIViewController, UIGestureRecognizerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-//        for _ in 0..<30 {
-//            userImages += [kTestImageURL]
-//        }
         self.navigationController?.interactivePopGestureRecognizer?.delegate = self
         self.isLoading = true
         if let user = self.user {
@@ -137,6 +141,19 @@ extension BSAccountViewController:UICollectionViewDelegate, UICollectionViewData
             vc.post = userPosts[indexPath.row]
             self.navigationController?.pushViewController(vc, animated: true)
         }
+    }
+    
+    @objc func didTapChatButton() {
+        guard let user = APIService.sharedInstance.currentUser, let receiver = self.user else {
+            return
+        }
+        let vc = BSChatViewController()
+        vc.receiver = receiver
+        vc.senderId = user.uid
+        vc.navigationItem.title = receiver.displayName
+        vc.hidesBottomBarWhenPushed = true
+        vc.senderDisplayName = user.displayName ?? "Messages"
+        self.navigationController?.pushViewController(vc, animated: true)
     }
 }
 

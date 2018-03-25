@@ -13,6 +13,7 @@ class APIService: NSObject {
     static let sharedInstance = APIService()
     fileprivate let storageRef = Storage.storage().reference()
     fileprivate let databaseRef = Database.database().reference()
+    
     var currentUser:User? {
         get {
             return Auth.auth().currentUser
@@ -95,8 +96,8 @@ class APIService: NSObject {
         })
     }
     
-    func updateUserDetails() {
-        guard let user = self.currentUser, let name = user.displayName else {return}
+    func updateUserDetails(user:User) {
+        guard let name = user.displayName else {return}
         self.databaseRef.child("users").child(user.uid).updateChildValues(["display_name":name])
     }
     
@@ -137,6 +138,15 @@ class APIService: NSObject {
         }
     }
     
+    func deletePost(post:BSPost, completion:@escaping (() -> Void)) {
+        guard let user = self.currentUser, let postID = post.id, user.uid == post.authorID else {return}
+        let postUpdatePaths = ["/posts/\(postID)":NSNull(),
+                               "/user-posts/\(user.uid)/\(postID)/":NSNull()]
+        self.databaseRef.updateChildValues(postUpdatePaths) { (err, ref) in
+            completion()
+        }
+    }
+    
     
     func createPost(caption:String? = String(), image:UIImage, completion:@escaping (() -> Void)) {
         guard let user = self.currentUser else {return}
@@ -171,7 +181,6 @@ class APIService: NSObject {
     func isPostLiked(post:BSPost, completion:@escaping ((_ isLiked:Bool) -> Void) ) {
         guard let user = self.currentUser, let postID = post.id else {return}
         self.databaseRef.child("/posts/\(postID)/likes/\(user.uid)").observeSingleEvent(of: .value) { (snapshot) in
-            guard user.uid.isEmpty == false, let authorID = post.authorID else {completion(false);return}
             completion(snapshot.exists())
         }
     }
@@ -265,8 +274,19 @@ class APIService: NSObject {
         let childUpdates:[String:Any] = ["/comments/\(commentKey)/": commentPayload,
                                             "/posts/\(postID)/comments/\(commentKey)/":commentPayload,
                                             "/user-posts/\(post.authorID)/\(postID)/comments/\(commentKey)/":commentPayload]
-        self.databaseRef.updateChildValues(childUpdates)
-        completion()
+        self.databaseRef.updateChildValues(childUpdates, withCompletionBlock: { (error, ref) in
+            completion()
+            if let username = user.displayName, let postAuthorID = post.authorID {
+                let notification = [
+                    "author_name": username,
+                    "text":"commented on your post: \(comment)",
+                    "user_id": user.uid,
+                    "post_id": postID
+                ]
+                let newNotificationChild = self.databaseRef.child("users").child("\(postAuthorID)").child("notifications").childByAutoId()
+                newNotificationChild.setValue(notification)
+            }
+        })
         
     }
     
@@ -285,4 +305,228 @@ class APIService: NSObject {
             self.databaseRef.removeObserver(withHandle: handle)
         }
     }
+    
+    func sendMessageTo(receiver:BSUser, message:String ,completion:@escaping ((_ message:BSMessage?) -> Void)) {
+        
+        guard let user = self.currentUser,let receiverID = receiver.id, receiverID.isEmpty == false && message.isEmpty == false, let senderName = user.displayName else {
+            completion(nil)
+            return
+        }
+        self.openChannel(sender: user, receiver: receiver) { (chatID) in
+            self.uploadMessage(receiverID: receiverID,
+                               message: message,
+                               userID: user.uid,
+                               senderName: senderName,
+                               chatID: chatID,
+                               completion: completion)
+        }
+    }
+    
+    private func openChannel(sender:User,
+                             receiver:BSUser,
+                             completion:@escaping (_ chatID:String) -> Void) {
+        
+        guard let receiverID = receiver.id else {completion("");return}
+        let senderID = sender.uid
+        let senderRef = self.databaseRef.child("user_chats").child(senderID).child(receiverID)
+        // Check Sender
+        senderRef.observeSingleEvent(of: .value) { (snapshot) in
+            if snapshot.exists() {
+                let senderChatKey = snapshot.key
+                // Check the receiver as well
+                let receiverRef = self.databaseRef.child("user_chats").child(receiverID).child(senderID)
+                receiverRef.observeSingleEvent(of: .value) { (snapshot) in
+                    if snapshot.exists() {
+                        // Good to go! Get the chat ID from either one of them
+                        if let value = snapshot.value as? [String:AnyObject] {
+                            if let chatID = value.keys.first {
+                                completion(chatID)
+                            }
+                        }
+                        
+                    }
+                    else {
+                        // Create entry on receivers side
+                        // Get chat key from the sender and give it to the receiver
+                        if let value = snapshot.value as? [String:AnyObject] {
+                            if let chatID = value.keys.first {
+                                // Got the Chat ID!
+                                let chatMetadata:[String:Dictionary<String,String>] = ["receiver":[
+                                    // TODO FIX THIS
+                                    kProfilePictureURLKey:receiver.profilePictureURL,
+                                    kDisplayNameKey:sender.displayName!
+                                    ]]
+                                receiverRef.child(chatID).setValue(chatMetadata, withCompletionBlock: { (error, ref) in
+                                    // Sender and Receiver both have keys now!
+                                    // Good to go!
+                                    completion(snapshot.key)
+                                })
+                            }
+                        }
+                    }
+                }
+            }
+            else {
+                // Sender doesn't have a key to his name
+                
+                // Check Receiver for key
+                let receiverRef = self.databaseRef.child("user_chats").child(receiverID).child(senderID)
+                receiverRef.observeSingleEvent(of: .value) { (snapshot) in
+                    if snapshot.exists() {
+                        // If a key exists with the receiver then give it to the sender
+                        let chatMetadata:[String:Dictionary<String,String>] = ["receiver":[
+                            kProfilePictureURLKey:receiver.profilePictureURL,
+                            kDisplayNameKey:receiver.displayName
+                            ]]
+                        
+                        // Get chat key from receiver
+                        if let value = snapshot.value as? [String:AnyObject] {
+                            if let chatID = value.keys.first {
+                                // Got the Chat ID!
+                                senderRef.child(chatID).setValue(chatMetadata, withCompletionBlock: { (error, ref) in
+                                    // Sender and Receiver both have keys now!
+                                    // Good to go!
+                                    completion(snapshot.key)
+                                })
+                            }
+                        }
+                        
+                    }
+                    else {
+                        // Neither the sender nor the receiver have keys
+                        let newChatkey = senderRef.childByAutoId().key
+                        
+                        let senderMetadata:[String:Dictionary<String,String>] = ["receiver":[
+                            kProfilePictureURLKey:receiver.profilePictureURL,
+                            kDisplayNameKey:sender.displayName!
+                            ]]
+                        
+                        let receiverMetadata:[String:Dictionary<String,String>] = ["receiver":[
+                            kProfilePictureURLKey:receiver.profilePictureURL,
+                            kDisplayNameKey:receiver.displayName
+                            ]]
+                        
+                        let childUpdates = ["/user_chats/\(senderID)/\(receiverID)/\(newChatkey)": receiverMetadata,
+                                            "/user_chats/\(receiverID)/\(senderID)/\(newChatkey)": senderMetadata]
+                        self.databaseRef.updateChildValues(childUpdates, withCompletionBlock: { (error, ref) in
+                            completion(newChatkey)
+                        })
+                    }
+                }
+                
+            }
+        }
+        
+    }
+    
+    private func uploadMessage(receiverID:String, message:String, userID:String, senderName:String, chatID:String, completion:@escaping ((_ message:BSMessage?) -> Void)) {
+        let message:[String:String] = ["text":message,
+                                       "sender_id":userID,
+                                       "chat_id":chatID,
+                                       "sender_name":senderName]
+        let ref = self.databaseRef.child("chats").child(chatID).child("messages").childByAutoId()
+        ref.setValue(message) { (error, ref) in
+            if error == nil {
+                completion(BSMessage.initWith(id: ref.key, dict: message as [String:AnyObject]))
+            }
+            else {
+                completion(nil)
+            }
+        }
+    }
+    
+    func getMessagesWith(senderID:String, receiverID:String, completion:@escaping ( (_ message:BSMessage?) -> Void)) {
+        self.databaseRef.child("user_chats").child(senderID).child(receiverID).observeSingleEvent(of: .value) { (snapshot) in
+            if snapshot.exists() {
+                if let value = snapshot.value as? [String:AnyObject] {
+                    if let chatID = value.keys.first {
+                        self.databaseRef.child("chats").child(chatID).child("messages").queryLimited(toLast: 25).observe(.childAdded, with: { (snapshot) in
+                            if let value = snapshot.value as? [String:AnyObject] {
+                                let message = BSMessage.initWith(id: snapshot.key, dict: value)
+                                completion(message)
+                            }
+                        })
+                    }
+                }
+            }
+            else {
+                self.databaseRef.child("user_chats").child(receiverID).child(senderID).observeSingleEvent(of: .value) { (snapshot) in
+                    if snapshot.exists() {
+                        if let value = snapshot.value as? [String:AnyObject] {
+                            if let chatID = value.keys.first {
+                                self.databaseRef.child("chats").child(chatID).child("messages").queryLimited(toLast: 25).observe(.childAdded, with: { (snapshot) in
+                                    if let value = snapshot.value as? [String:AnyObject] {
+                                        let message = BSMessage.initWith(id: snapshot.key, dict: value)
+                                        completion(message)
+                                    }
+                                })
+                                
+                            }
+                            
+                        }
+                    }
+                    else {
+                        completion(nil)
+                    }
+                }
+                
+            }
+        }
+    }
+    
+    func isUserTyping(senderID:String, receiverID:String, completion:@escaping ( (_ ref:DatabaseReference?) -> Void)) {
+        guard let _ = self.currentUser else {completion(nil);return}
+        self.databaseRef.child("user_chats").child(senderID).child(receiverID).observeSingleEvent(of: .value) { (snapshot) in
+            if snapshot.exists() {
+                let ref = self.databaseRef.child("chats").child(snapshot.key).child("typing_indicator").child(receiverID)
+                ref.onDisconnectRemoveValue()
+                completion(self.databaseRef.child("chats").child(snapshot.key).child("typing_indicator"))
+            }
+            else {
+                self.databaseRef.child("user_chats").child(receiverID).child(senderID).observeSingleEvent(of: .value) { (snapshot) in
+                    if snapshot.exists() {
+                        let ref = self.databaseRef.child("chats").child(snapshot.key).child("typing_indicator").child(receiverID)
+                        ref.onDisconnectRemoveValue()
+                        completion(self.databaseRef.child("chats").child(snapshot.key).child("typing_indicator"))
+                    }
+                    else {
+                        completion(nil)
+                    }
+                }
+                
+            }
+        }
+        
+    }
+    
+    func getUserChats(completion:@escaping (_ chat:BSChatInstance?) -> Void) {
+        guard let currentUser = self.currentUser else {return}
+        self.databaseRef.child("user_chats").child(currentUser.uid).observeSingleEvent(of: .value) { (snapshot) in
+            if snapshot.exists() {
+                self.databaseRef.child("user_chats").child(currentUser.uid).observe(.childAdded) { (snapshot) in
+                    var chat:BSChatInstance? = nil
+                    if let value = snapshot.value as? [String:AnyObject] {
+                        print("Checking chats for ID \(currentUser.uid)")
+                        print(value)
+                        let receiverID = snapshot.key
+                        if let chatID = value.keys.first {
+                            if let chatInfoDict = value[chatID] as? [String:AnyObject]{
+                                if let receiverInfo = chatInfoDict["receiver"] as? [String:AnyObject] {
+                                    chat =  BSChatInstance.initWith(senderID: currentUser.uid, receiverID:receiverID,receverInfo: receiverInfo)
+                                }
+                                
+                            }
+                        }
+                        
+                    }
+                    completion(chat)
+                }
+            }
+            else {
+                completion(nil)
+            }
+        }
+
+    }
+    
 }

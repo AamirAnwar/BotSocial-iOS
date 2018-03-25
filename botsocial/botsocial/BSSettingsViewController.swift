@@ -11,7 +11,7 @@ import Firebase
 
 class BSSettingsViewController: UIViewController,UIGestureRecognizerDelegate {
     let tableView = UITableView.init(frame: .zero, style: .plain)
-    let options = ["Log Out"]
+    let options = ["Saved posts","Log Out"]
     let headerLabel = UILabel()
     let customNavBar = UIView()
     let titleLabel = UILabel()
@@ -90,9 +90,12 @@ extension BSSettingsViewController: UITableViewDelegate, UITableViewDataSource {
         tableView.deselectRow(at: indexPath, animated: true)
         switch indexPath.row {
         case 0:
+            self.navigationController?.pushViewController(BSSavedPostsViewController(), animated: true)
+            
+        case 1:
             self.showLogoutAlert()
         default:
-            print()
+            break
         }
     }
     func showLogoutAlert() {
