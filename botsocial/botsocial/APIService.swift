@@ -96,8 +96,8 @@ class APIService: NSObject {
         })
     }
     
-    func updateUserDetails() {
-        guard let user = self.currentUser, let name = user.displayName else {return}
+    func updateUserDetails(user:User) {
+        guard let name = user.displayName else {return}
         self.databaseRef.child("users").child(user.uid).updateChildValues(["display_name":name])
     }
     

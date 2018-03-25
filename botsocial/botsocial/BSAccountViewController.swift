@@ -14,15 +14,14 @@ class BSAccountViewController: UIViewController, UIGestureRecognizerDelegate {
     var userPosts = [BSPost]()
     var user:BSUser? {
         didSet {
-            if user != nil {
+            self.navigationItem.title = user?.displayName ?? APIService.sharedInstance.currentUser?.displayName
+            if let user = user,let currentUser = APIService.sharedInstance.currentUser, currentUser.uid != user.id {
                 self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(image: #imageLiteral(resourceName: "chat_icon"), style: .plain, target: self, action: #selector(didTapChatButton))
                 self.navigationItem.rightBarButtonItem?.tintColor = BSColorTextBlack
             }
             else {
                 self.navigationItem.rightBarButtonItem = nil
             }
-            
-            self.navigationItem.title = user?.displayName ?? APIService.sharedInstance.currentUser?.displayName
         }
     }
     let collectionView:UICollectionView = {
