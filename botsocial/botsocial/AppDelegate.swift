@@ -9,14 +9,14 @@
 import UIKit
 import Firebase
 import FirebaseAuthUI
-
+import CoreData
 
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, FUIAuthDelegate {
 
     var window: UIWindow?
-
+    lazy var coreDataStack = CoreDataStack.init(modelName: "Pictogram")
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
@@ -33,7 +33,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, FUIAuthDelegate {
     }
     
     func getFeedPage() -> UIViewController {
-        let navVC = UINavigationController.init(rootViewController: BSFeedViewController())
+        let vc = BSFeedViewController()
+        vc.managedContext = coreDataStack.managedContext
+        let navVC = UINavigationController.init(rootViewController: vc)
         return navVC
     }
     
@@ -51,6 +53,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate, FUIAuthDelegate {
         // handle user and error as necessary
         if let user = user {
             APIService.sharedInstance.updateUserDetails(user: user)
+            do {
+                let entityDesc = NSEntityDescription.entity(forEntityName: "UserObject", in: coreDataStack.managedContext)!
+                let savedUser = UserObject.init(entity: entityDesc, insertInto: coreDataStack.managedContext)
+                savedUser.id = user.uid
+                savedUser.displayName = user.displayName
+                try coreDataStack.managedContext.save()
+                
+            }
+            catch let error as NSError {
+                print("Error! \(error)")
+            }
+            
+            
             self.resetApp()
         }
     }
@@ -94,6 +109,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, FUIAuthDelegate {
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        coreDataStack.saveContext()
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
@@ -106,6 +122,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, FUIAuthDelegate {
 
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+        coreDataStack.saveContext()
     }
 
 

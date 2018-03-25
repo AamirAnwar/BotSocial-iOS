@@ -91,6 +91,10 @@ class BSPostViewController: UITableViewController, UIGestureRecognizerDelegate {
 }
 
 extension BSPostViewController:BSFeedActionsTableViewCellDelegate {
+    func didTapSavePostButton(forIndexPath indexPath: IndexPath?) {
+        
+    }
+    
     func didTapLikeButton(forIndexPath indexPath: IndexPath?) {
         if  let post = self.post {
             APIService.sharedInstance.likePost(post:post)

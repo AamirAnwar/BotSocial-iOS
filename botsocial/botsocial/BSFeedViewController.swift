@@ -8,6 +8,7 @@
 
 import UIKit
 import SnapKit
+import CoreData
 
 class BSFeedViewController: UIViewController {
 
@@ -31,6 +32,7 @@ class BSFeedViewController: UIViewController {
             return 0.0
         }
     }
+    var managedContext:NSManagedObjectContext!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -277,6 +279,43 @@ extension BSFeedViewController:BSFeedActionsTableViewCellDelegate {
             let vc = BSPostCommentsViewController()
             vc.post = post
             self.navigationController?.pushViewController(vc, animated: true)
+        }
+    }
+    
+    func didTapSavePostButton(forIndexPath indexPath: IndexPath?) {
+        guard let currentUser = APIService.sharedInstance.currentUser  else {return }
+        if let indexPath = indexPath {
+            let post = self.posts[indexPath.section]
+            do {
+                let userFetch:NSFetchRequest<UserObject> = UserObject.fetchRequest()
+                userFetch.predicate = NSPredicate.init(format:"%K == %@", #keyPath(UserObject.id), currentUser.uid)
+                
+                let results = try managedContext.fetch(userFetch)
+                if results.count > 0 {
+                    guard let currentUserObject = results.first else {
+                        return
+                    }
+                    if let savedPosts = currentUserObject.posts as? NSMutableOrderedSet {
+                        let entityDesc = NSEntityDescription.entity(forEntityName: "PostObject", in: managedContext)!
+                        let savedPost = PostObject.init(entity: entityDesc, insertInto: managedContext)
+                        savedPost.id = post.id
+                        savedPost.imageURL = post.imageURL
+                        savedPost.authorName = post.authorName
+                        savedPost.caption = post.caption
+                        savedPost.authorID = post.authorID
+                        savedPost.user = currentUserObject
+                        savedPosts.add(savedPost)
+                        
+                        currentUserObject.posts = savedPosts
+                    }
+                    
+                 try managedContext.save()
+                }
+            }
+            catch let error as NSError {
+                print("Fetch error \(error)")
+            }
+            
         }
     }
 }
