@@ -144,6 +144,9 @@ class BSChatViewController: JSQMessagesViewController {
     override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
         self.inputToolbar.contentView.textView.text = ""
         APIService.sharedInstance.sendMessageTo(receiver: receiver, message: text) { (message) in
+            if self.messages.isEmpty {
+                self.observeMessages()
+            }
             JSQSystemSoundPlayer.jsq_playMessageSentSound() // 4
             self.finishSendingMessage() // 5
         }
