@@ -105,11 +105,9 @@ class BSFeedViewController: UIViewController {
     }
     
     @objc func didTapChatButton() {
-        
-        // TODO Show a list of chats here and NOT messages
-        guard let user = APIService.sharedInstance.currentUser else {
-            return
-        }
+        guard let _ = APIService.sharedInstance.currentUser else {return}
+        let vc = BSChatListViewController()
+        self.navigationController?.pushViewController(vc, animated: true)
     }
 }
 

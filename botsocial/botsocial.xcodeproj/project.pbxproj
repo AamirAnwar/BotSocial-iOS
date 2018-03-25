@@ -40,6 +40,8 @@
 		43927C9820603DDE002BE1AC /* BSPhotoCaptureDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43927C9720603DDE002BE1AC /* BSPhotoCaptureDelegate.swift */; };
 		43927C9A20605B09002BE1AC /* BSNotificationTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43927C9920605B09002BE1AC /* BSNotificationTableViewCell.swift */; };
 		43927C9C20606D20002BE1AC /* BSUserProfileCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43927C9B20606D20002BE1AC /* BSUserProfileCollectionViewCell.swift */; };
+		4395390B2067B5680035C93D /* BSChatInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4395390A2067B5680035C93D /* BSChatInstance.swift */; };
+		4395390D2067D19A0035C93D /* BSChatListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4395390C2067D19A0035C93D /* BSChatListViewController.swift */; };
 		43A5174220629E3D00F49ADF /* BSFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A5174120629E3D00F49ADF /* BSFilterView.swift */; };
 		43A5174420629FAC00F49ADF /* BSFilterCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A5174320629FAC00F49ADF /* BSFilterCollectionViewCell.swift */; };
 		43A517462062B7D400F49ADF /* BSShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A517452062B7D400F49ADF /* BSShareViewController.swift */; };
@@ -121,6 +123,8 @@
 		43927C9720603DDE002BE1AC /* BSPhotoCaptureDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSPhotoCaptureDelegate.swift; sourceTree = "<group>"; };
 		43927C9920605B09002BE1AC /* BSNotificationTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSNotificationTableViewCell.swift; sourceTree = "<group>"; };
 		43927C9B20606D20002BE1AC /* BSUserProfileCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSUserProfileCollectionViewCell.swift; sourceTree = "<group>"; };
+		4395390A2067B5680035C93D /* BSChatInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSChatInstance.swift; sourceTree = "<group>"; };
+		4395390C2067D19A0035C93D /* BSChatListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSChatListViewController.swift; sourceTree = "<group>"; };
 		43A5174120629E3D00F49ADF /* BSFilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSFilterView.swift; sourceTree = "<group>"; };
 		43A5174320629FAC00F49ADF /* BSFilterCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSFilterCollectionViewCell.swift; sourceTree = "<group>"; };
 		43A517452062B7D400F49ADF /* BSShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSShareViewController.swift; sourceTree = "<group>"; };
@@ -176,6 +180,7 @@
 		43910A8D203CC917009171CB = {
 			isa = PBXGroup;
 			children = (
+				4395390A2067B5680035C93D /* BSChatInstance.swift */,
 				437A779E2066F7CE0077B908 /* BSMessage.swift */,
 				43910A98203CC917009171CB /* botsocial */,
 				43910AAF203CC917009171CB /* botsocialTests */,
@@ -246,6 +251,7 @@
 				43E17B55206430BD006A75FB /* BSSettingsViewController.swift */,
 				43B9346A206559C6005FB360 /* BSLoaderTableViewCell.swift */,
 				437A77A0206712560077B908 /* BSAvatarImageDataSource.swift */,
+				4395390C2067D19A0035C93D /* BSChatListViewController.swift */,
 			);
 			path = botsocial;
 			sourceTree = "<group>";
@@ -657,12 +663,14 @@
 				436913CF20631D9B0034F527 /* BSUser.swift in Sources */,
 				437A779F2066F7CE0077B908 /* BSMessage.swift in Sources */,
 				43A5174420629FAC00F49ADF /* BSFilterCollectionViewCell.swift in Sources */,
+				4395390B2067B5680035C93D /* BSChatInstance.swift in Sources */,
 				437590C7206073ED00A7AAEA /* BSImageCollectionViewCell.swift in Sources */,
 				430E61AE205F12B000AECF27 /* BSImageTableViewCell.swift in Sources */,
 				43B934612064F68E005FB360 /* MobileNet.mlmodel in Sources */,
 				43B9346520651BAA005FB360 /* BSFonts.swift in Sources */,
 				43ABC92520658D5300229461 /* BSEmptyStateCollectionViewCell.swift in Sources */,
 				430E619E205F076B00AECF27 /* BSFeedTableViewCell.swift in Sources */,
+				4395390D2067D19A0035C93D /* BSChatListViewController.swift in Sources */,
 				43910A9A203CC917009171CB /* AppDelegate.swift in Sources */,
 				43E17B56206430BD006A75FB /* BSSettingsViewController.swift in Sources */,
 				430E61AA205F117900AECF27 /* CustomUIKitExtensions.swift in Sources */,

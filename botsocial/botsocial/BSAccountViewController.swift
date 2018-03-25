@@ -148,7 +148,7 @@ extension BSAccountViewController:UICollectionViewDelegate, UICollectionViewData
             return
         }
         let vc = BSChatViewController()
-        vc.receiverID = receiver.id
+        vc.receiver = receiver
         vc.senderId = user.uid
         vc.navigationItem.title = receiver.displayName
         vc.hidesBottomBarWhenPushed = true

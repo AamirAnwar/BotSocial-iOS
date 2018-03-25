@@ -12,7 +12,12 @@ import Firebase
 //import JSQSystemSoundPlayer
 
 class BSChatViewController: JSQMessagesViewController {
-    public var receiverID:String!
+    public var receiver:BSUser!
+    var receiverID:String! {
+        get {
+            return self.receiver.id
+        }
+    }
     var messages:[JSQMessage] = []
     lazy var outgoingBubbleImageView: JSQMessagesBubbleImage = self.setupOutgoingBubble()
     lazy var incomingBubbleImageView: JSQMessagesBubbleImage = self.setupIncomingBubble()
@@ -138,7 +143,7 @@ class BSChatViewController: JSQMessagesViewController {
     
     override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
         self.inputToolbar.contentView.textView.text = ""
-        APIService.sharedInstance.sendMessageTo(receiverID: receiverID, message: text) { (message) in
+        APIService.sharedInstance.sendMessageTo(receiver: receiver, message: text) { (message) in
             JSQSystemSoundPlayer.jsq_playMessageSentSound() // 4
             self.finishSendingMessage() // 5
         }

@@ -286,51 +286,131 @@ class APIService: NSObject {
         }
     }
     
-    func sendMessageTo(receiverID:String, message:String ,completion:@escaping ((_ message:BSMessage?) -> Void)) {
+    func sendMessageTo(receiver:BSUser, message:String ,completion:@escaping ((_ message:BSMessage?) -> Void)) {
         
-        func uploadMessage(receiverID:String, message:String, userID:String, senderName:String, chatID:String, completion:@escaping ((_ message:BSMessage?) -> Void)) {
-            let message:[String:String] = ["text":message,
-                                           "sender_id":userID,
-                                           "chat_id":chatID,
-                                           "sender_name":senderName]
-            let ref = self.databaseRef.child("chats").child(chatID).child("messages").childByAutoId()
-            ref.setValue(message) { (error, ref) in
-                if error == nil {
-                    completion(BSMessage.initWith(id: ref.key, dict: message as [String:AnyObject]))
-                }
-                else {
-                    completion(nil)
-                }
-            }
-        }
-        
-        guard let user = self.currentUser, receiverID.isEmpty == false && message.isEmpty == false, let senderName = user.displayName else {
+        guard let user = self.currentUser,let receiverID = receiver.id, receiverID.isEmpty == false && message.isEmpty == false, let senderName = user.displayName else {
             completion(nil)
             return
         }
-        let chatRef = self.databaseRef.child("user_chats").child(user.uid).child(receiverID)
-        chatRef.observeSingleEvent(of: .value) { (snapshot) in
-            var chatID:String!
+        self.openChannel(sender: user, receiver: receiver) { (chatID) in
+            self.uploadMessage(receiverID: receiverID,
+                               message: message,
+                               userID: user.uid,
+                               senderName: senderName,
+                               chatID: chatID,
+                               completion: completion)
+        }
+    }
+    
+    private func openChannel(sender:User,
+                             receiver:BSUser,
+                             completion:@escaping (_ chatID:String) -> Void) {
+        
+        guard let receiverID = receiver.id else {completion("");return}
+        let senderID = sender.uid
+        let senderRef = self.databaseRef.child("user_chats").child(senderID).child(receiverID)
+        // Check Sender
+        senderRef.observeSingleEvent(of: .value) { (snapshot) in
             if snapshot.exists() {
-                chatID = snapshot.key
-                uploadMessage(receiverID: receiverID, message: message, userID: user.uid, senderName: senderName, chatID: chatID, completion: completion)
-            }
-            else {
-                let chatRef = self.databaseRef.child("user_chats").child(receiverID).child(user.uid)
-                chatRef.observeSingleEvent(of: .value) { (snapshot) in
+                let senderChatKey = snapshot.key
+                // Check the receiver as well
+                let receiverRef = self.databaseRef.child("user_chats").child(receiverID).child(senderID)
+                receiverRef.observeSingleEvent(of: .value) { (snapshot) in
                     if snapshot.exists() {
-                        chatID = snapshot.key
-                        uploadMessage(receiverID: receiverID, message: message, userID: user.uid, senderName: senderName, chatID: chatID, completion: completion)
+                        // Good to go! Get the chat ID from either one of them
+                        if let value = snapshot.value as? [String:AnyObject] {
+                            if let chatID = value.keys.first {
+                                completion(chatID)
+                            }
+                        }
+                        
                     }
                     else {
-                        chatRef.childByAutoId().setValue(true, withCompletionBlock: { (error, ref) in
-                            chatID = ref.key
-                            uploadMessage(receiverID: receiverID, message: message, userID: user.uid, senderName: senderName, chatID: chatID, completion: completion)
-                            
+                        // Create entry on receivers side
+                        // Get chat key from the sender and give it to the receiver
+                        if let value = snapshot.value as? [String:AnyObject] {
+                            if let chatID = value.keys.first {
+                                // Got the Chat ID!
+                                let chatMetadata:[String:Dictionary<String,String>] = ["receiver":[
+                                    // TODO FIX THIS
+                                    kProfilePictureURLKey:receiver.profilePictureURL,
+                                    kDisplayNameKey:sender.displayName!
+                                    ]]
+                                receiverRef.child(chatID).setValue(chatMetadata, withCompletionBlock: { (error, ref) in
+                                    // Sender and Receiver both have keys now!
+                                    // Good to go!
+                                    completion(snapshot.key)
+                                })
+                            }
+                        }
+                    }
+                }
+            }
+            else {
+                // Sender doesn't have a key to his name
+                
+                // Check Receiver for key
+                let receiverRef = self.databaseRef.child("user_chats").child(receiverID).child(senderID)
+                receiverRef.observeSingleEvent(of: .value) { (snapshot) in
+                    if snapshot.exists() {
+                        // If a key exists with the receiver then give it to the sender
+                        let chatMetadata:[String:Dictionary<String,String>] = ["receiver":[
+                            kProfilePictureURLKey:receiver.profilePictureURL,
+                            kDisplayNameKey:receiver.displayName
+                            ]]
+                        
+                        // Get chat key from receiver
+                        if let value = snapshot.value as? [String:AnyObject] {
+                            if let chatID = value.keys.first {
+                                // Got the Chat ID!
+                                senderRef.child(chatID).setValue(chatMetadata, withCompletionBlock: { (error, ref) in
+                                    // Sender and Receiver both have keys now!
+                                    // Good to go!
+                                    completion(snapshot.key)
+                                })
+                            }
+                        }
+                        
+                    }
+                    else {
+                        // Neither the sender nor the receiver have keys
+                        let newChatkey = senderRef.childByAutoId().key
+                        
+                        let senderMetadata:[String:Dictionary<String,String>] = ["receiver":[
+                            kProfilePictureURLKey:receiver.profilePictureURL,
+                            kDisplayNameKey:sender.displayName!
+                            ]]
+                        
+                        let receiverMetadata:[String:Dictionary<String,String>] = ["receiver":[
+                            kProfilePictureURLKey:receiver.profilePictureURL,
+                            kDisplayNameKey:receiver.displayName
+                            ]]
+                        
+                        let childUpdates = ["/user_chats/\(senderID)/\(receiverID)/\(newChatkey)": receiverMetadata,
+                                            "/user_chats/\(receiverID)/\(senderID)/\(newChatkey)": senderMetadata]
+                        self.databaseRef.updateChildValues(childUpdates, withCompletionBlock: { (error, ref) in
+                            completion(newChatkey)
                         })
                     }
                 }
-               
+                
+            }
+        }
+        
+    }
+    
+    private func uploadMessage(receiverID:String, message:String, userID:String, senderName:String, chatID:String, completion:@escaping ((_ message:BSMessage?) -> Void)) {
+        let message:[String:String] = ["text":message,
+                                       "sender_id":userID,
+                                       "chat_id":chatID,
+                                       "sender_name":senderName]
+        let ref = self.databaseRef.child("chats").child(chatID).child("messages").childByAutoId()
+        ref.setValue(message) { (error, ref) in
+            if error == nil {
+                completion(BSMessage.initWith(id: ref.key, dict: message as [String:AnyObject]))
+            }
+            else {
+                completion(nil)
             }
         }
     }
@@ -338,22 +418,32 @@ class APIService: NSObject {
     func getMessagesWith(senderID:String, receiverID:String, completion:@escaping ( (_ message:BSMessage?) -> Void)) {
         self.databaseRef.child("user_chats").child(senderID).child(receiverID).observeSingleEvent(of: .value) { (snapshot) in
             if snapshot.exists() {
-                self.databaseRef.child("chats").child(snapshot.key).child("messages").queryLimited(toLast: 25).observe(.childAdded, with: { (snapshot) in
-                    if let value = snapshot.value as? [String:AnyObject] {
-                        let message = BSMessage.initWith(id: snapshot.key, dict: value)
-                        completion(message)
-                    }
-                })
-            }
-            else {
-                self.databaseRef.child("user_chats").child(receiverID).child(senderID).observeSingleEvent(of: .value) { (snapshot) in
-                    if snapshot.exists() {
-                        self.databaseRef.child("chats").child(snapshot.key).child("messages").queryLimited(toLast: 25).observe(.childAdded, with: { (snapshot) in
+                if let value = snapshot.value as? [String:AnyObject] {
+                    if let chatID = value.keys.first {
+                        self.databaseRef.child("chats").child(chatID).child("messages").queryLimited(toLast: 25).observe(.childAdded, with: { (snapshot) in
                             if let value = snapshot.value as? [String:AnyObject] {
                                 let message = BSMessage.initWith(id: snapshot.key, dict: value)
                                 completion(message)
                             }
                         })
+                    }
+                }
+            }
+            else {
+                self.databaseRef.child("user_chats").child(receiverID).child(senderID).observeSingleEvent(of: .value) { (snapshot) in
+                    if snapshot.exists() {
+                        if let value = snapshot.value as? [String:AnyObject] {
+                            if let chatID = value.keys.first {
+                                self.databaseRef.child("chats").child(chatID).child("messages").queryLimited(toLast: 25).observe(.childAdded, with: { (snapshot) in
+                                    if let value = snapshot.value as? [String:AnyObject] {
+                                        let message = BSMessage.initWith(id: snapshot.key, dict: value)
+                                        completion(message)
+                                    }
+                                })
+                                
+                            }
+                            
+                        }
                     }
                     else {
                         completion(nil)
@@ -365,7 +455,7 @@ class APIService: NSObject {
     }
     
     func isUserTyping(senderID:String, receiverID:String, completion:@escaping ( (_ ref:DatabaseReference?) -> Void)) {
-        guard let user = self.currentUser else {completion(nil);return}
+        guard let _ = self.currentUser else {completion(nil);return}
         self.databaseRef.child("user_chats").child(senderID).child(receiverID).observeSingleEvent(of: .value) { (snapshot) in
             if snapshot.exists() {
                 let ref = self.databaseRef.child("chats").child(snapshot.key).child("typing_indicator").child(receiverID)
@@ -389,23 +479,34 @@ class APIService: NSObject {
         
     }
     
-    func updateIsUserTyping(senderID:String,receiverID:String,isTyping:Bool) {
-        guard let user = self.currentUser else {return}
-        self.databaseRef.child("typing_indicator").child(user.uid).setValue(isTyping)
-        self.databaseRef.child("user_chats").child(senderID).child(receiverID).observeSingleEvent(of: .value) { (snapshot) in
+    func getUserChats(completion:@escaping (_ chat:BSChatInstance?) -> Void) {
+        guard let currentUser = self.currentUser else {return}
+        self.databaseRef.child("user_chats").child(currentUser.uid).observeSingleEvent(of: .value) { (snapshot) in
             if snapshot.exists() {
-                let ref = self.databaseRef.child("chats").child(snapshot.key).child("typing_indicator").child(receiverID)
-                ref.setValue(isTyping)
-            }
-            else {
-                self.databaseRef.child("user_chats").child(receiverID).child(senderID).observeSingleEvent(of: .value) { (snapshot) in
-                    if snapshot.exists() {
-                        let ref = self.databaseRef.child("chats").child(snapshot.key).child("typing_indicator").child(receiverID)
-                        ref.setValue(isTyping)
+                self.databaseRef.child("user_chats").child(currentUser.uid).observe(.childAdded) { (snapshot) in
+                    var chat:BSChatInstance? = nil
+                    if let value = snapshot.value as? [String:AnyObject] {
+                        print("Checking chats for ID \(currentUser.uid)")
+                        print(value)
+                        let receiverID = snapshot.key
+                        if let chatID = value.keys.first {
+                            if let chatInfoDict = value[chatID] as? [String:AnyObject]{
+                                if let receiverInfo = chatInfoDict["receiver"] as? [String:AnyObject] {
+                                    chat =  BSChatInstance.initWith(senderID: currentUser.uid, receiverID:receiverID,receverInfo: receiverInfo)
+                                }
+                                
+                            }
+                        }
+                        
                     }
+                    completion(chat)
                 }
             }
+            else {
+                completion(nil)
+            }
         }
+
     }
     
 }
