@@ -10,8 +10,12 @@ import UIKit
 import SnapKit
 import PINRemoteImage
 
+protocol BSUserSnippetTableViewCellDelegate {
+    func moreButtonTapped(sender:UITableViewCell)
+}
+
 class BSUserSnippetTableViewCell: UITableViewCell {
-    
+    var delegate:BSUserSnippetTableViewCellDelegate?
     let userImageView:UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
@@ -25,6 +29,12 @@ class BSUserSnippetTableViewCell: UITableViewCell {
         return label
     }()
     
+    let moreButton:UIButton = {
+       let button = UIButton.init(type: .system)
+        button.setBackgroundImage(#imageLiteral(resourceName: "more_icon"), for: .normal)
+        return button
+    }()
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError()
     }
@@ -33,7 +43,10 @@ class BSUserSnippetTableViewCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         self.contentView.addSubview(self.userImageView)
         self.contentView.addSubview(self.usernameLabel)
+        self.contentView.addSubview(self.moreButton)
         
+        self.moreButton.addTarget(self, action: #selector(moreButtonTapped), for: .touchUpInside)
+        self.moreButton.isHidden = true
         self.userImageView.backgroundColor = UIColor.gray.withAlphaComponent(0.1)
         self.userImageView.snp.makeConstraints { (make) in
             make.leading.equalToSuperview().offset(kSidePadding)
@@ -45,10 +58,16 @@ class BSUserSnippetTableViewCell: UITableViewCell {
         self.userImageView.layer.cornerRadius =  round(kUserThumbnailImageSize/2)
         self.usernameLabel.snp.makeConstraints { (make) in
             make.centerY.equalTo(self.userImageView.snp.centerY)
-            make.trailing.lessThanOrEqualToSuperview().inset(kSidePadding)
+            make.trailing.lessThanOrEqualTo(self.moreButton).inset(kSidePadding)
             make.leading.equalTo(self.userImageView.snp.trailing).offset(kInteritemPadding)
             make.top.greaterThanOrEqualToSuperview()
             make.bottom.greaterThanOrEqualToSuperview()
+        }
+        
+        self.moreButton.snp.makeConstraints { (make) in
+            make.trailing.equalToSuperview().inset(kSidePadding)
+            make.centerY.equalTo(self.usernameLabel)
+            make.size.equalTo(13)
         }
         
     }
@@ -63,6 +82,8 @@ class BSUserSnippetTableViewCell: UITableViewCell {
         
     }
     
-    
+    @objc func moreButtonTapped() {
+        self.delegate?.moreButtonTapped(sender: self)
+    }
 
 }

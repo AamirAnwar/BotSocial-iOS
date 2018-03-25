@@ -138,6 +138,15 @@ class APIService: NSObject {
         }
     }
     
+    func deletePost(post:BSPost, completion:@escaping (() -> Void)) {
+        guard let user = self.currentUser, let postID = post.id, user.uid == post.authorID else {return}
+        let postUpdatePaths = ["/posts/\(postID)":NSNull(),
+                               "/user-posts/\(user.uid)/\(postID)/":NSNull()]
+        self.databaseRef.updateChildValues(postUpdatePaths) { (err, ref) in
+            completion()
+        }
+    }
+    
     
     func createPost(caption:String? = String(), image:UIImage, completion:@escaping (() -> Void)) {
         guard let user = self.currentUser else {return}
@@ -265,8 +274,19 @@ class APIService: NSObject {
         let childUpdates:[String:Any] = ["/comments/\(commentKey)/": commentPayload,
                                             "/posts/\(postID)/comments/\(commentKey)/":commentPayload,
                                             "/user-posts/\(post.authorID)/\(postID)/comments/\(commentKey)/":commentPayload]
-        self.databaseRef.updateChildValues(childUpdates)
-        completion()
+        self.databaseRef.updateChildValues(childUpdates, withCompletionBlock: { (error, ref) in
+            completion()
+            if let username = user.displayName, let postAuthorID = post.authorID {
+                let notification = [
+                    "author_name": username,
+                    "text":"commented on your post: \(comment)",
+                    "user_id": user.uid,
+                    "post_id": postID
+                ]
+                let newNotificationChild = self.databaseRef.child("users").child("\(postAuthorID)").child("notifications").childByAutoId()
+                newNotificationChild.setValue(notification)
+            }
+        })
         
     }
     

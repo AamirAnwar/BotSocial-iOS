@@ -142,12 +142,24 @@ extension BSFeedViewController: UITableViewDelegate, UITableViewDataSource {
             switch indexPath.row {
             case 0:
                 let cell = tableView.dequeueReusableCell(withIdentifier: kFeedUserSnippetCellReuseID) as! BSUserSnippetTableViewCell
+                cell.delegate = self
                 cell.usernameLabel.text = post.authorName
+                cell.moreButton.isHidden = true
                 if let authorID = post.authorID {
                     APIService.sharedInstance.getProfilePictureFor(userID: authorID, completion: {(url) in
                         cell.setImageURL(url)
                     })
+                    
+                    if let currentUser = APIService.sharedInstance.currentUser {
+                        if currentUser.uid == authorID {
+                            cell.moreButton.isHidden = false
+                        }
+                        else {
+                            cell.moreButton.isHidden = true
+                        }
+                    }
                 }
+                
                 return cell
             case 1:
                 let cell = tableView.dequeueReusableCell(withIdentifier: kFeedImageCellReuseID) as! BSImageTableViewCell
@@ -266,6 +278,27 @@ extension BSFeedViewController:BSFeedActionsTableViewCellDelegate {
             vc.post = post
             self.navigationController?.pushViewController(vc, animated: true)
         }
+    }
+}
+
+extension BSFeedViewController:BSUserSnippetTableViewCellDelegate {
+    func moreButtonTapped(sender:UITableViewCell) {
+        let alertController = UIAlertController.init(title: "Delete post", message: "Delete this post?", preferredStyle: .actionSheet)
+        let deleteAction = UIAlertAction.init(title: "Delete", style: .destructive) { (action) in
+            if let indexPath = self.tableView.indexPath(for: sender) {
+                let post = self.posts[indexPath.section - 1]
+                APIService.sharedInstance.deletePost(post: post, completion: {
+                    self.tableView.reloadData()
+                })
+            }
+        }
+        
+        let cancelAction = UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil)
+        alertController.addAction(deleteAction)
+        alertController.addAction(cancelAction)
+        self.present(alertController, animated: true)
+        
+        
     }
 }
 
