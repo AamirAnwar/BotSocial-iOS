@@ -53,8 +53,15 @@ class BSBaseViewController: UIViewController {
     }
     
     func configureCoachmarkButton() {
-        self.coachmark = BSCoachmarkView.getCoachmark(title: "Back to top", withDelegate: self)
-        self.view.addSubview(self.coachmark!)
+        if self.shouldShowCoachmark {
+            self.coachmark = BSCoachmarkView.getCoachmark(title: "Back to top", withDelegate: self)
+            self.view.addSubview(self.coachmark!)
+        }
+        else {
+            self.coachmark?.removeFromSuperview()
+            self.coachmark = nil
+        }
+        
     }
 }
 

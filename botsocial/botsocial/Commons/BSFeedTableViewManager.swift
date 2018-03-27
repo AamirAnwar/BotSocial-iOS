@@ -19,6 +19,11 @@ protocol BSFeedTableViewManagerDelegate:BSUserSnippetTableViewCellDelegate,BSFee
 
 class BSFeedTableViewManager: NSObject, UITableViewDataSource, UITableViewDelegate {
     var delegate:BSFeedTableViewManagerDelegate!
+    var shouldShowFeaturedSection = true
+    
+    private var isShowingFeaturedSection:Int {
+        return self.shouldShowFeaturedSection ? 1:0
+    }
     
     func numberOfSections(in tableView: UITableView) -> Int {
     guard self.delegate.isLoadingPosts == false else {return 1}
@@ -29,7 +34,7 @@ class BSFeedTableViewManager: NSObject, UITableViewDataSource, UITableViewDelega
         guard self.delegate.isLoadingPosts == false else {return 1}
         switch section {
         case 0:
-            return 1
+            return isShowingFeaturedSection
         default:
             return 4
         }
@@ -41,14 +46,17 @@ class BSFeedTableViewManager: NSObject, UITableViewDataSource, UITableViewDelega
         }
         switch indexPath.section {
         case 0:
+            // Featured posts
             let cell = tableView.dequeueReusableCell(withIdentifier: kFeaturedCellReuseID) as! BSFeaturedPostTableViewCell
             cell.featuredPosts = self.delegate.posts
             return cell
         default:
+            // General Feed
             let currentPostIndex = indexPath.section - 1
             let post = self.delegate.posts[currentPostIndex]
             switch indexPath.row {
             case 0:
+                // User Snippet
                 let cell = tableView.dequeueReusableCell(withIdentifier: kFeedUserSnippetCellReuseID) as! BSUserSnippetTableViewCell
                 cell.delegate = self.delegate
                 cell.usernameLabel.text = post.authorName
@@ -57,7 +65,6 @@ class BSFeedTableViewManager: NSObject, UITableViewDataSource, UITableViewDelega
                     APIService.sharedInstance.getProfilePictureFor(userID: authorID, completion: {(url) in
                         cell.setImageURL(url)
                     })
-                    
                     if let currentUser = APIService.sharedInstance.currentUser {
                         if currentUser.uid == authorID {
                             cell.moreButton.isHidden = false
@@ -70,10 +77,12 @@ class BSFeedTableViewManager: NSObject, UITableViewDataSource, UITableViewDelega
                 
                 return cell
             case 1:
+                // Post Image
                 let cell = tableView.dequeueReusableCell(withIdentifier: kFeedImageCellReuseID) as! BSImageTableViewCell
                 cell.setImageURL(post.imageURL)
                 return cell
             case 2:
+                // Post Actions
                 let cell = tableView.dequeueReusableCell(withIdentifier: kFeedActionsCellReuseID) as! BSFeedActionsTableViewCell
                 cell.delegate = self.delegate
                 cell.post = post
@@ -82,10 +91,12 @@ class BSFeedTableViewManager: NSObject, UITableViewDataSource, UITableViewDelega
                 self.delegate.postIsSaved(postID: post.id, saveButton: cell.saveButton)
                 return cell
             case 3:
+                // Post Detail
                 let cell = tableView.dequeueReusableCell(withIdentifier: kFeedPostInfoCellReuseID) as! BSPostDetailTableViewCell
                 cell.post = post
                 return cell
             case 4:
+                // Post comment
                 return tableView.dequeueReusableCell(withIdentifier: kFeedCommentInfoCellReuseID)!
             default:
                 return UITableViewCell()
@@ -114,6 +125,10 @@ class BSFeedTableViewManager: NSObject, UITableViewDataSource, UITableViewDelega
             }
         }
         
+    }
+    
+    func postIndexForCellAt(indexPath:IndexPath) -> Int {
+        return indexPath.section - 1
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {

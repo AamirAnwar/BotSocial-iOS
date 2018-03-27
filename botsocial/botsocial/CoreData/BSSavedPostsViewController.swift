@@ -9,37 +9,19 @@
 import UIKit
 import CoreData
 
-class BSSavedPostsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
-    var managedContext:NSManagedObjectContext! = (UIApplication.shared.delegate as! AppDelegate).coreDataStack.managedContext
-    var posts = [PostObject]()
-    let tableView = UITableView.init(frame: .zero, style: .plain)
-    let kFeedCellReuseIdentifier = "Feed_BSFeedTableViewCell"
-    let kFeaturedCellReuseID = "BSFeaturedPostTableViewCell"
-    let kFeedImageCellReuseID = "BSImageTableViewCell"
-    let kFeedUserSnippetCellReuseID = "BSUserSnippetTableViewCell"
-    let kFeedActionsCellReuseID = "BSFeedActionsTableViewCell"
-    let kFeedPostInfoCellReuseID = "BSPostDetailTableViewCell"
-    let kFeedCommentInfoCellReuseID = "BSAddCommentTableViewCell"
+class BSSavedPostsViewController: BSBaseViewController {
+    var managedContext:NSManagedObjectContext! = DBHelpers.managedContext
+    var posts = [BSPost]()
+    let tableViewManager = BSFeedTableViewManager()
+    var isLoadingPosts: Bool = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
-        self.view.addSubview(self.tableView)
-        self.tableView.delegate = self
-        self.tableView.dataSource = self
-        self.tableView.separatorStyle = .none
-        self.tableView.delaysContentTouches = false
-        self.tableView.register(BSLoaderTableViewCell.self, forCellReuseIdentifier: kLoadingCellReuseID)
-        self.tableView.register(BSFeaturedPostTableViewCell.self, forCellReuseIdentifier: self.kFeaturedCellReuseID)
-        self.tableView.register(BSFeedTableViewCell.self, forCellReuseIdentifier: self.kFeedCellReuseIdentifier)
-        self.tableView.register(BSUserSnippetTableViewCell.self, forCellReuseIdentifier: kFeedUserSnippetCellReuseID)
-        self.tableView.register(BSImageTableViewCell.self, forCellReuseIdentifier: kFeedImageCellReuseID)
-        self.tableView.register(BSFeedActionsTableViewCell.self, forCellReuseIdentifier: kFeedActionsCellReuseID)
-        self.tableView.register(BSPostDetailTableViewCell.self, forCellReuseIdentifier: kFeedPostInfoCellReuseID)
-        self.tableView.register(BSAddCommentTableViewCell.self, forCellReuseIdentifier: kFeedCommentInfoCellReuseID)
-        self.tableView.snp.makeConstraints { (make) in
-            make.edges.equalToSuperview()
-        }
-        
+        self.shouldShowCoachmark = false
+        self.tableViewManager.shouldShowFeaturedSection = false
+        self.tableViewManager.delegate = self
+        self.tableView.delegate = self.tableViewManager
+        self.tableView.dataSource = self.tableViewManager
         self.loadSavedPosts()
     }
     
@@ -50,7 +32,10 @@ class BSSavedPostsViewController: UIViewController, UITableViewDataSource, UITab
         
         do {
             let results = try managedContext.fetch(postsFetch)
-            self.posts = results
+            self.posts = results.map({ (object) -> BSPost in
+                let post = BSPost.initWith(postObject: object)
+                return post
+            })
             self.tableView.reloadData()
         }
         catch let error as NSError {
@@ -58,171 +43,54 @@ class BSSavedPostsViewController: UIViewController, UITableViewDataSource, UITab
         }
     }
     
-    func numberOfSections(in tableView: UITableView) -> Int {
-        
-        return self.posts.count
-    }
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 4
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
-        let currentPostIndex = indexPath.section
-        let post = self.posts[currentPostIndex]
-        switch indexPath.row {
-        case 0:
-            let cell = tableView.dequeueReusableCell(withIdentifier: kFeedUserSnippetCellReuseID) as! BSUserSnippetTableViewCell
-            //                cell.delegate = self
-            cell.usernameLabel.text = post.authorName
-            cell.moreButton.isHidden = true
-            if let authorID = post.authorID {
-                APIService.sharedInstance.getProfilePictureFor(userID: authorID, completion: {(url) in
-                    cell.setImageURL(url)
-                })
-                
-                if let currentUser = APIService.sharedInstance.currentUser {
-                    if currentUser.uid == authorID {
-                        cell.moreButton.isHidden = false
-                    }
-                    else {
-                        cell.moreButton.isHidden = true
-                    }
-                }
-            }
-            
-            return cell
-        case 1:
-            let cell = tableView.dequeueReusableCell(withIdentifier: kFeedImageCellReuseID) as! BSImageTableViewCell
-            //            cell.delegate = self
-            if let imageURL = post.imageURL {
-                cell.setImageURL(imageURL)
-            }
-            return cell
-        case 2:
-            let cell = tableView.dequeueReusableCell(withIdentifier: kFeedActionsCellReuseID) as! BSFeedActionsTableViewCell
-            let savedPost = posts[indexPath.section]
-            let post = BSPost()
-            post.authorID = savedPost.authorID
-            post.authorName = savedPost.authorName
-            post.id = savedPost.id
-            post.caption = savedPost.caption
-            cell.post = post
-            cell.indexPath = IndexPath.init(row: indexPath.row, section: currentPostIndex)
-            cell.saveButton.isSelected = true
-            cell.delegate = self
-            return cell
-        case 3:
-            let cell = tableView.dequeueReusableCell(withIdentifier: kFeedPostInfoCellReuseID) as! BSPostDetailTableViewCell
-            let savedPost = posts[indexPath.section]
-            let post = BSPost()
-            post.authorID = savedPost.authorID
-            post.authorName = savedPost.authorName
-            post.id = savedPost.id
-            post.caption = savedPost.caption
-            cell.post = post
-            return cell
-        case 4:
-            return tableView.dequeueReusableCell(withIdentifier: kFeedCommentInfoCellReuseID)!
-        default:
-            return UITableViewCell()
-        }
-        
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard self.posts.count > 0 else {
-            return
-        }
-        tableView.deselectRow(at: indexPath, animated: true)
-        guard indexPath.section > 0 else {return}
-        let postIndex = indexPath.section
-        let post = self.posts[postIndex]
-        if let authorID = post.authorID {
-            switch indexPath.row {
-            case 0:
-                APIService.sharedInstance.getUserWith(userID: authorID, completion: { (user) in
-                    if let user = user {
-                        let vc = BSAccountViewController()
-                        vc.user = user
-                        self.navigationController?.pushViewController(vc, animated: true)
-                    }
-                })
-            default:
-                break
-            }
-        }
-        
-    }
-    
 }
 extension BSSavedPostsViewController:BSFeedActionsTableViewCellDelegate {
     func didTapLikeButton(forIndexPath indexPath: IndexPath?) {
-        
+        // Do nothing
     }
     
     func didTapCommentsButton(forIndexPath indexPath: IndexPath?) {
-        
+        // Do nothing
     }
     
-    func didTapSavePostButton(forIndexPath indexPath: IndexPath?) {
+    func didTapSavePostButton(sender:BSFeedActionsTableViewCell) {
         let alertController = UIAlertController.init(title: "Delete post", message: "Delete this post?", preferredStyle: .actionSheet)
         let deleteAction = UIAlertAction.init(title: "Delete", style: .destructive) { (action) in
-            if let indexPath = indexPath {
-                let post = self.posts[indexPath.section]
+            if let indexPath = self.tableView.indexPath(for: sender) {
+                let postIndex = self.tableViewManager.postIndexForCellAt(indexPath: indexPath)
+                let post = self.posts[postIndex]
                 // delete post
                 self.deletePost(postID: post.id!)
-                self.posts.remove(at: indexPath.section)
-                
-                self.tableView.beginUpdates()
+                self.posts.remove(at: postIndex)
                 self.tableView.deleteSections(IndexSet.init(integer: indexPath.section), with: .automatic)
-                self.tableView.endUpdates()
-                
             }
         }
         
-        let cancelAction = UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil)
+        let cancelAction = UIAlertAction.init(title: "Cancel", style: .cancel) { (action) in
+            sender.saveButton.isSelected = true
+        }
         alertController.addAction(deleteAction)
         alertController.addAction(cancelAction)
         self.present(alertController, animated: true)
     }
+    
     func deletePost(postID:String) {
-        guard let currentUser = APIService.sharedInstance.currentUser  else {return }
-        
-        do {
-            let userFetch:NSFetchRequest<UserObject> = UserObject.fetchRequest()
-            userFetch.predicate = NSPredicate.init(format:"%K == %@", #keyPath(UserObject.id), currentUser.uid)
-            
-            let results = try managedContext.fetch(userFetch)
-            if results.count > 0 {
-                guard let currentUserObject = results.first else {
-                    return
-                }
-                if let savedPosts = currentUserObject.posts as? NSMutableOrderedSet {
-                    var postToDelete:PostObject? = nil
-                    for post in savedPosts {
-                        if let post = post as? PostObject {
-                            if post.id == postID {
-                                postToDelete = post
-                            }
-                        }
-                    }
-                    if let post = postToDelete {
-                        savedPosts.remove(post)
-                    }
-                    currentUserObject.posts = savedPosts
-                    
-                }
-                try managedContext.save()
-                
-            }
-        }
-        catch let error as NSError {
-            print("Fetch error \(error)")
-        }
-        
+        DBHelpers.deleteSavedPost(postID: postID)
+    }
+}
+
+extension BSSavedPostsViewController:BSFeedTableViewManagerDelegate {
+    
+    func postIsSaved(postID: String, saveButton: UIButton) {
+        saveButton.isSelected = true
     }
     
+    func showProfileFor(user: BSUser) {
+        BSCommons.showUser(user: user, navigationController: self.navigationController)
+    }
     
+    func moreButtonTapped(sender: UITableViewCell) {
+        
+        // Do nothing
+    }
 }

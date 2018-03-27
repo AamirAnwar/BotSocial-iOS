@@ -25,6 +25,31 @@ enum DBHelpers {
         }
     }
     
+    static func refreshCurrentUser() {
+        guard let currentUser = DBHelpers.currentUser else  {return}
+        do {
+            let currentUserFetch:NSFetchRequest<UserObject> = UserObject.fetchRequest()
+            currentUserFetch.predicate = NSPredicate.init(format:"%K == %@", #keyPath(UserObject.id), currentUser.uid)
+            let results = try managedContext.fetch(currentUserFetch)
+            if results.isEmpty == false {
+                //User exists
+            }
+            else {
+                // Create user
+                let entityDesc = NSEntityDescription.entity(forEntityName: "UserObject", in: managedContext)!
+                let savedUser = UserObject.init(entity: entityDesc, insertInto: managedContext)
+                savedUser.id = currentUser.uid
+                savedUser.displayName = currentUser.displayName
+                try managedContext.save()
+            }
+        }
+        catch let error as NSError {
+            print("Fetch Error \(error.userInfo)")
+        }
+        
+        
+    }
+    
     static func savePost(post:BSPost, completion:(() -> Void)? = nil) {
         guard let currentUser = DBHelpers.currentUser else  {completion?();return}
         do {
@@ -85,5 +110,46 @@ enum DBHelpers {
         }
         completion(false)
     }
+    
+    static func deleteSavedPost(postID:String, completion:(()->Void)? = nil) {
+        guard let currentUser = DBHelpers.currentUser  else {completion?();return }
+        
+        do {
+            let userFetch:NSFetchRequest<UserObject> = UserObject.fetchRequest()
+            userFetch.predicate = NSPredicate.init(format:"%K == %@", #keyPath(UserObject.id), currentUser.uid)
+            
+            let results = try managedContext.fetch(userFetch)
+            if results.count > 0 {
+                guard let currentUserObject = results.first else {
+                    return
+                }
+                if let savedPosts = currentUserObject.posts as? NSMutableOrderedSet {
+                    var postToDelete:PostObject? = nil
+                    for post in savedPosts {
+                        if let post = post as? PostObject {
+                            if let id = post.id,id == postID {
+                                postToDelete = post
+                            }
+                        }
+                    }
+                    if let post = postToDelete {
+                        managedContext.delete(post)
+//                        savedPosts.remove(post)
+                    }
+//                    currentUserObject.posts = savedPosts
+                }
+                try managedContext.save()
+                completion?()
+                
+            }
+        }
+        catch let error as NSError {
+            print("Fetch error \(error)")
+            completion?()
+        }
+        
+    }
+    
 }
+
 

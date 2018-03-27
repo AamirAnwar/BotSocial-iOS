@@ -12,6 +12,15 @@ import FirebaseAuthUI
 import FirebaseGoogleAuthUI
 
 enum BSCommons {
+    
+    static func showUser(user:BSUser, navigationController:UINavigationController?) {
+        if let nav = navigationController {
+            let vc = BSAccountViewController()
+            vc.user = user
+            nav.pushViewController(vc, animated: true)
+        }
+    }
+    
     static func addShadowTo(view:UIView) {
         let shadowPath = UIBezierPath(rect: view.bounds)
         view.layer.masksToBounds = false

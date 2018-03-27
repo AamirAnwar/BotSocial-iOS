@@ -10,7 +10,7 @@ import UIKit
 protocol BSFeedActionsTableViewCellDelegate {
     func didTapLikeButton(forIndexPath indexPath:IndexPath?)
     func didTapCommentsButton(forIndexPath indexPath:IndexPath?)
-    func didTapSavePostButton(forIndexPath indexPath:IndexPath?)
+    func didTapSavePostButton(sender:BSFeedActionsTableViewCell)
 }
 
 class BSFeedActionsTableViewCell: UITableViewCell {
@@ -165,6 +165,6 @@ class BSFeedActionsTableViewCell: UITableViewCell {
                 self.saveButton.transform = .identity
             })
         }
-        self.delegate?.didTapSavePostButton(forIndexPath: indexPath)
+        self.delegate?.didTapSavePostButton(sender:self)
     }
 }

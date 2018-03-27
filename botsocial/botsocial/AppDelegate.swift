@@ -28,7 +28,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, FUIAuthDelegate {
         if Auth.auth().currentUser == nil {
             BSCommons.showLoginPage(delegate: self)
         }
-        
+        DBHelpers.refreshCurrentUser()
         return true
     }
     
@@ -53,19 +53,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, FUIAuthDelegate {
         // handle user and error as necessary
         if let user = user {
             APIService.sharedInstance.updateUserDetails(user: user)
-            do {
-                let entityDesc = NSEntityDescription.entity(forEntityName: "UserObject", in: coreDataStack.managedContext)!
-                let savedUser = UserObject.init(entity: entityDesc, insertInto: coreDataStack.managedContext)
-                savedUser.id = user.uid
-                savedUser.displayName = user.displayName
-                try coreDataStack.managedContext.save()
-                
-            }
-            catch let error as NSError {
-                print("Error! \(error)")
-            }
-            
-            
+            DBHelpers.refreshCurrentUser()
             self.resetApp()
         }
     }

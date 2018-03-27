@@ -101,9 +101,10 @@ extension BSFeedViewController:BSFeedActionsTableViewCellDelegate {
     }
     
    
-    func didTapSavePostButton(forIndexPath indexPath: IndexPath?) {
-        if let indexPath = indexPath {
-            let post = self.posts[indexPath.section]
+    func didTapSavePostButton(sender:BSFeedActionsTableViewCell) {
+        if let indexPath = tableView.indexPath(for: sender) {
+            let index = self.feedTableViewManager.postIndexForCellAt(indexPath: indexPath)
+            let post = self.posts[index]
             DBHelpers.savePost(post: post)
         }
     }
@@ -125,15 +126,13 @@ extension BSFeedViewController:BSUserSnippetTableViewCellDelegate {
         alertController.addAction(deleteAction)
         alertController.addAction(cancelAction)
         self.present(alertController, animated: true)
-        
-        
     }
 }
 // MARK: Saved Posts
 extension BSFeedViewController {
     func postIsSaved(postID:String, saveButton:UIButton) {
         DBHelpers.isPostSaved(postID: postID) { (isSaved) in
-            saveButton.isSelected = true
+            saveButton.isSelected = isSaved
         }
     }
 }

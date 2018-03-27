@@ -24,6 +24,16 @@ class BSPost: NSObject {
         }
     }
     
+    static func initWith(postObject:PostObject) -> BSPost {
+        let post = BSPost()
+        post.authorID = postObject.authorID
+        post.authorName = postObject.authorName
+        post.id = postObject.id
+        post.caption = postObject.caption
+        post.imageURL = postObject.imageURL
+        return post
+    }
+    
     static func initWith(postID:String, dict:[String:Any]) -> BSPost {
         let post = BSPost.init()
         post.id = postID

@@ -91,7 +91,7 @@ class BSPostViewController: UITableViewController, UIGestureRecognizerDelegate {
 }
 
 extension BSPostViewController:BSFeedActionsTableViewCellDelegate {
-    func didTapSavePostButton(forIndexPath indexPath: IndexPath?) {
+    func didTapSavePostButton(sender: BSFeedActionsTableViewCell) {
         
     }
     
