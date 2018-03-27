@@ -10,6 +10,13 @@ import UIKit
 
 class BSBaseViewController: UIViewController {
     var tableView = UITableView.init(frame: .zero, style: .plain)
+    private(set) var coachmark:BSCoachmarkView?
+    var shouldShowCoachmark = false {
+        didSet {
+            self.configureCoachmarkButton()
+        }
+    }
+    var isShowingCoachmark = false
     var tableDataSource:UITableViewDataSource? {
         didSet {
             self.tableView.dataSource = tableDataSource
@@ -44,6 +51,20 @@ class BSBaseViewController: UIViewController {
             make.edges.equalToSuperview()
         }
     }
+    
+    func configureCoachmarkButton() {
+        self.coachmark = BSCoachmarkView.getCoachmark(title: "Back to top", withDelegate: self)
+        self.view.addSubview(self.coachmark!)
+    }
+}
+
+extension BSBaseViewController:BSCoachmarkViewDelegate {
+    
+    @objc func didTapCoachmark() {
+        self.tableView.scrollRectToVisible(CGRect.init(x: 0, y: 0, width: 1, height: 1), animated: true)
+        self.coachmark?.hide()
+    }
+    
 }
 
 extension BSBaseViewController:UITableViewDataSource, UITableViewDelegate {

@@ -68,6 +68,8 @@
 		43FFE107206A5CD8002A6EFE /* BSBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43FFE106206A5CD8002A6EFE /* BSBaseViewController.swift */; };
 		43FFE109206A62EB002A6EFE /* BSTableViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43FFE108206A62EB002A6EFE /* BSTableViewDataSource.swift */; };
 		43FFE10B206A669D002A6EFE /* BSFeedTableViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43FFE10A206A669D002A6EFE /* BSFeedTableViewManager.swift */; };
+		43FFE10D206A752F002A6EFE /* BSCoachmarkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43FFE10C206A752F002A6EFE /* BSCoachmarkView.swift */; };
+		43FFE10F206A7B92002A6EFE /* DBHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43FFE10E206A7B92002A6EFE /* DBHelpers.swift */; };
 		6696C21C6D06CDDC0C9C3975 /* Pods_botsocial.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E6D73461FF8EA10B5F94BD03 /* Pods_botsocial.framework */; };
 		91745515BC721B3D3F09F253 /* Pods_botsocialTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4718A2820C609AF2A7866FA5 /* Pods_botsocialTests.framework */; };
 		A2EF02B790F2FFC112BE2E00 /* Pods_botsocialUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 69B79F3524E09D553463AFD5 /* Pods_botsocialUITests.framework */; };
@@ -161,6 +163,8 @@
 		43FFE106206A5CD8002A6EFE /* BSBaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSBaseViewController.swift; sourceTree = "<group>"; };
 		43FFE108206A62EB002A6EFE /* BSTableViewDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSTableViewDataSource.swift; sourceTree = "<group>"; };
 		43FFE10A206A669D002A6EFE /* BSFeedTableViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSFeedTableViewManager.swift; sourceTree = "<group>"; };
+		43FFE10C206A752F002A6EFE /* BSCoachmarkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSCoachmarkView.swift; sourceTree = "<group>"; };
+		43FFE10E206A7B92002A6EFE /* DBHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBHelpers.swift; sourceTree = "<group>"; };
 		4718A2820C609AF2A7866FA5 /* Pods_botsocialTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_botsocialTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		69B79F3524E09D553463AFD5 /* Pods_botsocialUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_botsocialUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8249967623E8A4519A98D9B5 /* Pods-botsocial.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-botsocial.release.xcconfig"; path = "Pods/Target Support Files/Pods-botsocial/Pods-botsocial.release.xcconfig"; sourceTree = "<group>"; };
@@ -200,6 +204,7 @@
 		43910A8D203CC917009171CB = {
 			isa = PBXGroup;
 			children = (
+				43FFE10E206A7B92002A6EFE /* DBHelpers.swift */,
 				43910A98203CC917009171CB /* botsocial */,
 				43910AAF203CC917009171CB /* botsocialTests */,
 				43910ABA203CC918009171CB /* botsocialUITests */,
@@ -297,6 +302,7 @@
 				43B9346420651BAA005FB360 /* BSFonts.swift */,
 				43FFE108206A62EB002A6EFE /* BSTableViewDataSource.swift */,
 				43FFE10A206A669D002A6EFE /* BSFeedTableViewManager.swift */,
+				43FFE10C206A752F002A6EFE /* BSCoachmarkView.swift */,
 			);
 			path = Commons;
 			sourceTree = "<group>";
@@ -750,6 +756,7 @@
 				43B934612064F68E005FB360 /* MobileNet.mlmodel in Sources */,
 				439539222067F50F0035C93D /* PostObject+CoreDataProperties.swift in Sources */,
 				43B9346520651BAA005FB360 /* BSFonts.swift in Sources */,
+				43FFE10F206A7B92002A6EFE /* DBHelpers.swift in Sources */,
 				43ABC92520658D5300229461 /* BSEmptyStateCollectionViewCell.swift in Sources */,
 				430E619E205F076B00AECF27 /* BSFeedTableViewCell.swift in Sources */,
 				4395390D2067D19A0035C93D /* BSChatListViewController.swift in Sources */,
@@ -778,6 +785,7 @@
 				43B9346720651D7A005FB360 /* BSColors.swift in Sources */,
 				430E61B4205F255B00AECF27 /* BSAddCommentTableViewCell.swift in Sources */,
 				430E61A8205F104600AECF27 /* Constants.swift in Sources */,
+				43FFE10D206A752F002A6EFE /* BSCoachmarkView.swift in Sources */,
 				43B9346B206559C6005FB360 /* BSLoaderTableViewCell.swift in Sources */,
 				43E17B5420641EFB006A75FB /* BSNotification.swift in Sources */,
 				436913CD20631BDF0034F527 /* BSPost.swift in Sources */,

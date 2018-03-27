@@ -10,9 +10,11 @@ import UIKit
 
 protocol BSFeedTableViewManagerDelegate:BSUserSnippetTableViewCellDelegate,BSFeedActionsTableViewCellDelegate {
     var posts:[BSPost] {get set}
+    var coachmark:BSCoachmarkView? {get}
     var isLoadingPosts:Bool {get set}
     func postIsSaved(postID: String, saveButton: UIButton)
     func showProfileFor(user:BSUser)
+    
 }
 
 class BSFeedTableViewManager: NSObject, UITableViewDataSource, UITableViewDelegate {
@@ -112,5 +114,24 @@ class BSFeedTableViewManager: NSObject, UITableViewDataSource, UITableViewDelega
             }
         }
         
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let y = scrollView.contentOffset.y
+        if y + scrollView.height() < (scrollView.contentSize.height) {
+            self.delegate.coachmark?.hide()
+        }
+        
+    }
+    
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        let y = scrollView.contentOffset.y
+        if y + scrollView.height() >= (scrollView.contentSize.height) {
+            // Show coachmark
+            self.delegate.coachmark?.show(withTitle: kCoachmarkTitleScrollUp)
+        }
+        else {
+            self.delegate.coachmark?.hide()
+        }
     }
 }

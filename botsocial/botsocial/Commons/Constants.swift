@@ -9,10 +9,6 @@
 import Foundation
 import UIKit
 
-let kCoachmarkTitleScrollUp = "Back to top"
-let kCoachmarkTitleNewPost = "New post"
-let kCoachmarkButtonWidth:CGFloat = 100
-let kCoachmarkButtonHeight:CGFloat = 20
 let kUserThumbnailImageSize:CGFloat = 33
 let kSidePadding:CGFloat = 13
 let kInteritemPadding:CGFloat = 8
