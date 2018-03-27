@@ -26,7 +26,7 @@ class BSChatListViewController: UIViewController, UIGestureRecognizerDelegate {
         self.tableView.dataSource = self
         self.tableView.tableFooterView = UIView()
         self.tableView.register(BSNotificationTableViewCell.self, forCellReuseIdentifier: kNotifCellReuseID)
-        self.tableView.register(BSLoaderTableViewCell.self, forCellReuseIdentifier: "loader_cell")
+        self.tableView.register(BSLoaderTableViewCell.self, forCellReuseIdentifier: kLoadingCellReuseID)
         self.tableView.register(BSEmptyStateTableViewCell.self, forCellReuseIdentifier: "empty_state_cell")
         self.navigationController?.interactivePopGestureRecognizer?.delegate = self
         self.loadUserChats()
@@ -56,7 +56,7 @@ extension BSChatListViewController:UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard self.isLoadingChats == false else {
-            return tableView.dequeueReusableCell(withIdentifier: "loader_cell")!
+            return tableView.dequeueReusableCell(withIdentifier: kLoadingCellReuseID)!
         }
         guard self.chats.isEmpty == false else {
             let cell = tableView.dequeueReusableCell(withIdentifier: "empty_state_cell") as! BSEmptyStateTableViewCell

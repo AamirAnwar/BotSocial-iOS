@@ -7,11 +7,8 @@
 //
 
 import UIKit
-protocol BSImageTableViewCellDelegate {
-    func didUpdateCellHeight()
-}
+
 class BSImageTableViewCell: UITableViewCell {
-    var delegate:BSImageTableViewCellDelegate?
     let storyImageView = UIImageView.init()
     required init?(coder aDecoder: NSCoder) {
         fatalError()

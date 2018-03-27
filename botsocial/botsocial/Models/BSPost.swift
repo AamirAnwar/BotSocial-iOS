@@ -14,7 +14,6 @@ let kAuthorNameKey = "author"
 let kCaptionKey = "caption"
 class BSPost: NSObject {
     var id:String!
-//    var author:BSUser!
     var authorName:String!
     var authorID:String!
     var imageURL:String!
@@ -32,7 +31,6 @@ class BSPost: NSObject {
         post.imageURL = dict[kImageURLKey] as? String ?? ""
         post.authorID = dict[kAuthorIDKey] as? String ?? ""
         post.authorName = dict[kAuthorNameKey] as? String ?? ""
-//        post.author = BSUser.initWith(userID: kAuthorIDKey, dict: dict)
         return post
     }
 }

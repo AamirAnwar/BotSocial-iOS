@@ -10,72 +10,23 @@ import UIKit
 import SnapKit
 import CoreData
 
-class BSFeedViewController: UIViewController {
-
-    let tableView = UITableView.init(frame: .zero, style: .plain)
+class BSFeedViewController: BSBaseViewController {
     var posts = [BSPost]()
-    let kFeedCellReuseIdentifier = "Feed_BSFeedTableViewCell"
-    let kFeaturedCellReuseID = "BSFeaturedPostTableViewCell"
-    let kFeedImageCellReuseID = "BSImageTableViewCell"
-    let kFeedUserSnippetCellReuseID = "BSUserSnippetTableViewCell"
-    let kFeedActionsCellReuseID = "BSFeedActionsTableViewCell"
-    let kFeedPostInfoCellReuseID = "BSPostDetailTableViewCell"
-    let kFeedCommentInfoCellReuseID = "BSAddCommentTableViewCell"
     let coachmarkButton = UIButton.init(type: .system)
     var isShowingCoachmark = false
     var isLoadingPosts = false
-    var navBarHeight:CGFloat {
-        get {
-            if let navBar = self.navigationController?.navigationBar {
-                return navBar.height()
-            }
-            return 0.0
-        }
-    }
     var managedContext:NSManagedObjectContext!
+    let feedTableViewManager = BSFeedTableViewManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationItem.title = "Home"
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem.init(image: #imageLiteral(resourceName: "camera_tab_icon"), style: .plain, target: self, action: #selector(didTapCameraButton))
-        self.navigationItem.leftBarButtonItem?.tintColor = BSColorTextBlack
-        self.navigationController?.navigationBar.tintColor = BSColorTextBlack
-        
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(image: #imageLiteral(resourceName: "chat_icon"), style: .plain, target: self, action: #selector(didTapChatButton))
-        self.navigationItem.rightBarButtonItem?.tintColor = BSColorTextBlack
-        
-        
-        self.view.addSubview(self.tableView)
-        self.view.addSubview(self.coachmarkButton)
-        self.coachmarkButton.titleLabel?.adjustsFontSizeToFitWidth = true
-        self.coachmarkButton.frame = CGRect.init(x: (view.width() - kCoachmarkButtonWidth)/2, y: view.height(), width: kCoachmarkButtonWidth, height: kCoachmarkButtonHeight)
-        self.coachmarkButton.setTitle("Back to top", for: .normal)
-        self.coachmarkButton.layer.cornerRadius = kCoachmarkButtonHeight/2
-        self.coachmarkButton.backgroundColor = UIColor.white
-        self.coachmarkButton.titleLabel?.font = BSFontMiniBold
-        self.coachmarkButton.setTitleColor(BSColorTextBlack, for: .normal)
-        self.coachmarkButton.addTarget(self, action: #selector(didTapCoachmark), for: .touchUpInside)
-        BSCommons.addShadowTo(view:self.coachmarkButton)
-
-        
-        
-        self.tableView.contentInset = UIEdgeInsets.init(top: 0, left: 0, bottom: kCoachmarkButtonHeight, right: 0)
-        self.tableView.delegate = self
-        self.tableView.dataSource = self
-        self.tableView.separatorStyle = .none
-        self.tableView.delaysContentTouches = false
-        self.tableView.register(BSLoaderTableViewCell.self, forCellReuseIdentifier: "loader_cell")
-        self.tableView.register(BSFeaturedPostTableViewCell.self, forCellReuseIdentifier: self.kFeaturedCellReuseID)
-        self.tableView.register(BSFeedTableViewCell.self, forCellReuseIdentifier: self.kFeedCellReuseIdentifier)
-        self.tableView.register(BSUserSnippetTableViewCell.self, forCellReuseIdentifier: kFeedUserSnippetCellReuseID)
-        self.tableView.register(BSImageTableViewCell.self, forCellReuseIdentifier: kFeedImageCellReuseID)
-        self.tableView.register(BSFeedActionsTableViewCell.self, forCellReuseIdentifier: kFeedActionsCellReuseID)
-        self.tableView.register(BSPostDetailTableViewCell.self, forCellReuseIdentifier: kFeedPostInfoCellReuseID)
-        self.tableView.register(BSAddCommentTableViewCell.self, forCellReuseIdentifier: kFeedCommentInfoCellReuseID)
-        self.tableView.snp.makeConstraints { (make) in
-            make.edges.equalToSuperview()
-        }
-        isLoadingPosts = true
+        self.configureNavigationItem()
+        self.configureCoachmarkButton()
+        self.observePosts()
+    }
+    
+    func observePosts() {
+        self.isLoadingPosts = true
         APIService.sharedInstance.getRecentPosts { (post) in
             if let post = post {
                 self.posts.insert(post, at: 0)
@@ -98,7 +49,39 @@ class BSFeedViewController: UIViewController {
             self.tableView.reloadData()
             
         }
+    }
+    
+    func configureCoachmarkButton() {
+        self.view.addSubview(self.coachmarkButton)
+        self.coachmarkButton.titleLabel?.adjustsFontSizeToFitWidth = true
+        self.coachmarkButton.frame = CGRect.init(x: (view.width() - kCoachmarkButtonWidth)/2, y: view.height(), width: kCoachmarkButtonWidth, height: kCoachmarkButtonHeight)
+        self.coachmarkButton.setTitle("Back to top", for: .normal)
+        self.coachmarkButton.layer.cornerRadius = kCoachmarkButtonHeight/2
+        self.coachmarkButton.backgroundColor = UIColor.white
+        self.coachmarkButton.titleLabel?.font = BSFontMiniBold
+        self.coachmarkButton.setTitleColor(BSColorTextBlack, for: .normal)
+        self.coachmarkButton.addTarget(self, action: #selector(didTapCoachmark), for: .touchUpInside)
+        BSCommons.addShadowTo(view:self.coachmarkButton)
 
+    }
+    
+    func configureNavigationItem() {
+        self.navigationItem.title = "Home"
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem.init(image: #imageLiteral(resourceName: "camera_tab_icon"), style: .plain, target: self, action: #selector(didTapCameraButton))
+        self.navigationItem.leftBarButtonItem?.tintColor = BSColorTextBlack
+        self.navigationController?.navigationBar.tintColor = BSColorTextBlack
+        
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(image: #imageLiteral(resourceName: "chat_icon"), style: .plain, target: self, action: #selector(didTapChatButton))
+        self.navigationItem.rightBarButtonItem?.tintColor = BSColorTextBlack
+    }
+    
+    
+    override func configureTableView() {
+        super.configureTableView()
+        self.tableView.contentInset = UIEdgeInsets.init(top: 0, left: 0, bottom: kCoachmarkButtonHeight, right: 0)
+        self.feedTableViewManager.delegate = self
+        self.tableView.delegate = self.feedTableViewManager
+        self.tableView.dataSource = self.feedTableViewManager
     }
     
     @objc func didTapCameraButton() {
@@ -113,107 +96,8 @@ class BSFeedViewController: UIViewController {
     }
 }
 
-extension BSFeedViewController: UITableViewDelegate, UITableViewDataSource {
-    func numberOfSections(in tableView: UITableView) -> Int {
-        guard self.isLoadingPosts == false else {return 1}
-        return 1 + self.posts.count
-    }
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        guard self.isLoadingPosts == false else {return 1}
-        switch section {
-        case 0:
-            return 1
-        default:
-            return 4
-        }
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard self.isLoadingPosts == false else {
-            return tableView.dequeueReusableCell(withIdentifier: "loader_cell")!
-        }
-        switch indexPath.section {
-        case 0:
-            let cell = tableView.dequeueReusableCell(withIdentifier: self.kFeaturedCellReuseID) as! BSFeaturedPostTableViewCell
-            cell.featuredPosts = self.posts
-            return cell
-        default:
-            let currentPostIndex = indexPath.section - 1
-            let post = self.posts[currentPostIndex]
-            switch indexPath.row {
-            case 0:
-                let cell = tableView.dequeueReusableCell(withIdentifier: kFeedUserSnippetCellReuseID) as! BSUserSnippetTableViewCell
-                cell.delegate = self
-                cell.usernameLabel.text = post.authorName
-                cell.moreButton.isHidden = true
-                if let authorID = post.authorID {
-                    APIService.sharedInstance.getProfilePictureFor(userID: authorID, completion: {(url) in
-                        cell.setImageURL(url)
-                    })
-                    
-                    if let currentUser = APIService.sharedInstance.currentUser {
-                        if currentUser.uid == authorID {
-                            cell.moreButton.isHidden = false
-                        }
-                        else {
-                            cell.moreButton.isHidden = true
-                        }
-                    }
-                }
-                
-                return cell
-            case 1:
-                let cell = tableView.dequeueReusableCell(withIdentifier: kFeedImageCellReuseID) as! BSImageTableViewCell
-                cell.setImageURL(post.imageURL)
-                cell.delegate = self
-                return cell
-            case 2:
-                let cell = tableView.dequeueReusableCell(withIdentifier: kFeedActionsCellReuseID) as! BSFeedActionsTableViewCell
-                cell.delegate = self
-                cell.post = post
-                cell.indexPath = IndexPath.init(row: indexPath.row, section: currentPostIndex)
-                cell.saveButton.isSelected = false
-                self.postIsSaved(postID: post.id, saveButton: cell.saveButton)
-                return cell
-            case 3:
-                let cell = tableView.dequeueReusableCell(withIdentifier: kFeedPostInfoCellReuseID) as! BSPostDetailTableViewCell
-                cell.post = post
-                return cell
-            case 4:
-                return tableView.dequeueReusableCell(withIdentifier: kFeedCommentInfoCellReuseID)!
-            default:
-                return UITableViewCell()
-            }
-        }
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard self.posts.count > 0 else {
-            return
-        }
-        tableView.deselectRow(at: indexPath, animated: true)
-        guard indexPath.section > 0 else {return}
-        let postIndex = indexPath.section - 1
-        let post = self.posts[postIndex]
-        if let authorID = post.authorID {
-            switch indexPath.row {
-            case 0:
-                APIService.sharedInstance.getUserWith(userID: authorID, completion: { (user) in
-                    if let user = user {
-                        let vc = BSAccountViewController()
-                        vc.user = user
-                        self.navigationController?.pushViewController(vc, animated: true)
-                    }
-                })
-            default:
-                break
-            }
-        }
-   
-    }
-    
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+extension BSFeedViewController {
+     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let y = scrollView.contentOffset.y
         if y + scrollView.height() < (scrollView.contentSize.height) {
             hideCoachmark()
@@ -259,14 +143,6 @@ extension BSFeedViewController: UITableViewDelegate, UITableViewDataSource {
     
 }
 
-extension BSFeedViewController:BSImageTableViewCellDelegate {
-    func didUpdateCellHeight() {
-//        self.tableView.reloadData()
-    }
-}
-
-
-
 extension BSFeedViewController:BSFeedActionsTableViewCellDelegate {
     func didTapLikeButton(forIndexPath indexPath: IndexPath?) {
         if let indexPath = indexPath {
@@ -284,31 +160,7 @@ extension BSFeedViewController:BSFeedActionsTableViewCellDelegate {
         }
     }
     
-    func postIsSaved(postID:String, saveButton:UIButton){
-        guard let currentUser = APIService.sharedInstance.currentUser else {return}
-        let postsFetch:NSFetchRequest<PostObject> = PostObject.fetchRequest()
-        postsFetch.predicate = NSPredicate.init(format:"%K == %@", #keyPath(PostObject.user.id), currentUser.uid)
-        let asyncFetch:NSAsynchronousFetchRequest<PostObject> = NSAsynchronousFetchRequest<PostObject>.init(fetchRequest: postsFetch) {[unowned self] (result) in
-            if let finalResult = result.finalResult {
-                
-                for post in finalResult {
-                    if post.id == postID {
-                        saveButton.isSelected = true
-                    }
-                }
-            }
-        }
-        
-        do {
-         try managedContext.execute(asyncFetch)
-        }
-        catch let error as NSError {
-            print("Fetch Error! \(error)")
-            return
-        }
-        return
-        
-    }
+   
     
     func didTapSavePostButton(forIndexPath indexPath: IndexPath?) {
         guard let currentUser = APIService.sharedInstance.currentUser  else {return }
@@ -365,6 +217,39 @@ extension BSFeedViewController:BSUserSnippetTableViewCellDelegate {
         alertController.addAction(cancelAction)
         self.present(alertController, animated: true)
         
+        
+    }
+}
+
+extension BSFeedViewController:BSFeedTableViewManagerDelegate {
+
+    func showProfileFor(user: BSUser) {
+        let vc = BSAccountViewController()
+        vc.user = user
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    func postIsSaved(postID:String, saveButton:UIButton){
+        guard let currentUser = APIService.sharedInstance.currentUser else {return}
+        let postsFetch:NSFetchRequest<PostObject> = PostObject.fetchRequest()
+        postsFetch.predicate = NSPredicate.init(format:"%K == %@", #keyPath(PostObject.user.id), currentUser.uid)
+        let asyncFetch:NSAsynchronousFetchRequest<PostObject> = NSAsynchronousFetchRequest<PostObject>.init(fetchRequest: postsFetch) {(result) in
+            if let finalResult = result.finalResult {
+                for post in finalResult {
+                    if post.id == postID {
+                        saveButton.isSelected = true
+                    }
+                }
+            }
+        }
+        do {
+            try managedContext.execute(asyncFetch)
+        }
+        catch let error as NSError {
+            print("Fetch Error! \(error)")
+            return
+        }
+        return
         
     }
 }
