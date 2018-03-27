@@ -32,7 +32,7 @@ class BSCoachmarkView: UIView {
         coachmarkButton.backgroundColor = UIColor.white
         coachmarkButton.titleLabel?.font = BSFontMiniBold
         coachmarkButton.setTitleColor(BSColorTextBlack, for: .normal)
-        coachmarkButton.addTarget(self, action: #selector(didTapCoachmark), for: .touchUpInside)
+        
         BSCommons.addShadowTo(view:coachmarkButton)
         
         let coachmarkView = BSCoachmarkView()
@@ -40,6 +40,9 @@ class BSCoachmarkView: UIView {
         coachmarkView.button = coachmarkButton
         coachmarkView.addSubview(coachmarkButton)
         coachmarkView.frame = coachmarkButton.bounds
+        
+        coachmarkButton.addTarget(coachmarkView, action: #selector(didTapCoachmark), for: .touchUpInside)
+        
         return coachmarkView
     }
     
