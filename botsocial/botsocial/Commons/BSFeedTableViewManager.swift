@@ -8,6 +8,17 @@
 
 import UIKit
 
+struct TableItemInfo {
+    var reuseIdentifier:String
+    var configHandler:(_ cell:UITableViewCell)->UITableViewCell
+}
+
+struct TableDataItem {
+    var post:BSPost?
+    var info:[TableItemInfo] = []
+    
+}
+
 protocol BSFeedTableViewManagerDelegate:BSUserSnippetTableViewCellDelegate,BSFeedActionsTableViewCellDelegate {
     var posts:[BSPost] {get set}
     var coachmark:BSCoachmarkView? {get}
@@ -19,24 +30,100 @@ protocol BSFeedTableViewManagerDelegate:BSUserSnippetTableViewCellDelegate,BSFee
 
 class BSFeedTableViewManager: NSObject, UITableViewDataSource, UITableViewDelegate {
     var delegate:BSFeedTableViewManagerDelegate!
+    var dataModel:[TableDataItem] {
+        get {
+            var model:[TableDataItem] = []
+            
+                // Add featured section to model
+            var item = TableDataItem()
+            if self.shouldShowFeaturedSection {
+                let featuredPostsInfo = TableItemInfo.init(reuseIdentifier: kFeaturedCellReuseID, configHandler: { (cell) -> UITableViewCell in
+                    if let cell = cell as? BSFeaturedPostTableViewCell {
+                        cell.featuredPosts = self.delegate.posts
+                    }
+                    return cell
+                })
+                item.info.append(featuredPostsInfo)
+            }
+            model += [item]
+            
+            
+            // Add all posts using map while checking options on the manager
+            let posts = self.delegate.posts.map({ (post) -> TableDataItem in
+                var item = TableDataItem()
+                item.post = post
+                // Customize rows in this section here
+                
+                // User Snippet
+                let userSnippetInfo = TableItemInfo.init(reuseIdentifier: kFeedUserSnippetCellReuseID, configHandler: { (cell) -> UITableViewCell in
+                    if let cell = cell as? BSUserSnippetTableViewCell {
+                        cell.delegate = self.delegate
+                        cell.configureWith(post:post)
+                        return cell
+                    }
+                    return cell
+                })
+                
+                item.info += [userSnippetInfo]
+                
+                // Post Image
+                let postImageInfo = TableItemInfo.init(reuseIdentifier: kFeedImageCellReuseID, configHandler: { (cell) -> UITableViewCell in
+                    if let cell = cell as? BSImageTableViewCell {
+                        cell.setImageURL(post.imageURL)
+                    }
+                    return cell
+                })
+                item.info += [postImageInfo]
+                
+                
+                // Post actions
+                if self.shouldShowActions {
+                    let postActionsInfo = TableItemInfo.init(reuseIdentifier: kFeedActionsCellReuseID, configHandler: { (cell) -> UITableViewCell in
+                        if let cell = cell as? BSFeedActionsTableViewCell {
+                            cell.delegate = self.delegate
+                            cell.post = post
+                            cell.saveButton.isSelected = false
+                            self.delegate.postIsSaved(postID: post.id, saveButton: cell.saveButton)
+                            return cell
+                        }
+                        return cell
+                    })
+                    item.info += [postActionsInfo]
+                }
+                
+                // Post detail
+                let postDetailInfo = TableItemInfo.init(reuseIdentifier: kFeedPostInfoCellReuseID, configHandler: { (cell) -> UITableViewCell in
+                    if let cell = cell as? BSPostDetailTableViewCell {
+                        cell.post = post
+                    }
+                    return cell
+                })
+                
+                item.info += [postDetailInfo]
+                return item
+            })
+            model += posts
+            return model
+        }
+    }
+    // Controls whether the featured posts section will be shown
     var shouldShowFeaturedSection = true
     
-    private var isShowingFeaturedSection:Int {
-        return self.shouldShowFeaturedSection ? 1:0
-    }
-    
+    // Controls whether like and comment actions are shown
+    var shouldShowActions = true
+
     func numberOfSections(in tableView: UITableView) -> Int {
-    guard self.delegate.isLoadingPosts == false else {return 1}
-    return 1 + self.delegate.posts.count
+        guard self.delegate.isLoadingPosts == false else {return 1}
+        return 1 + self.delegate.posts.count
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         guard self.delegate.isLoadingPosts == false else {return 1}
         switch section {
         case 0:
-            return isShowingFeaturedSection
+            return self.shouldShowFeaturedSection.intValue
         default:
-            return 4
+            return self.shouldShowActions.intValue + 3
         }
     }
     
@@ -44,64 +131,13 @@ class BSFeedTableViewManager: NSObject, UITableViewDataSource, UITableViewDelega
         guard self.delegate.isLoadingPosts == false else {
             return tableView.dequeueReusableCell(withIdentifier: kLoadingCellReuseID)!
         }
-        switch indexPath.section {
-        case 0:
-            // Featured posts
-            let cell = tableView.dequeueReusableCell(withIdentifier: kFeaturedCellReuseID) as! BSFeaturedPostTableViewCell
-            cell.featuredPosts = self.delegate.posts
-            return cell
-        default:
-            // General Feed
-            let currentPostIndex = indexPath.section - 1
-            let post = self.delegate.posts[currentPostIndex]
-            switch indexPath.row {
-            case 0:
-                // User Snippet
-                let cell = tableView.dequeueReusableCell(withIdentifier: kFeedUserSnippetCellReuseID) as! BSUserSnippetTableViewCell
-                cell.delegate = self.delegate
-                cell.usernameLabel.text = post.authorName
-                cell.moreButton.isHidden = true
-                if let authorID = post.authorID {
-                    APIService.sharedInstance.getProfilePictureFor(userID: authorID, completion: {(url) in
-                        cell.setImageURL(url)
-                    })
-                    if let currentUser = APIService.sharedInstance.currentUser {
-                        if currentUser.uid == authorID {
-                            cell.moreButton.isHidden = false
-                        }
-                        else {
-                            cell.moreButton.isHidden = true
-                        }
-                    }
-                }
-                
-                return cell
-            case 1:
-                // Post Image
-                let cell = tableView.dequeueReusableCell(withIdentifier: kFeedImageCellReuseID) as! BSImageTableViewCell
-                cell.setImageURL(post.imageURL)
-                return cell
-            case 2:
-                // Post Actions
-                let cell = tableView.dequeueReusableCell(withIdentifier: kFeedActionsCellReuseID) as! BSFeedActionsTableViewCell
-                cell.delegate = self.delegate
-                cell.post = post
-                cell.indexPath = IndexPath.init(row: indexPath.row, section: currentPostIndex)
-                cell.saveButton.isSelected = false
-                self.delegate.postIsSaved(postID: post.id, saveButton: cell.saveButton)
-                return cell
-            case 3:
-                // Post Detail
-                let cell = tableView.dequeueReusableCell(withIdentifier: kFeedPostInfoCellReuseID) as! BSPostDetailTableViewCell
-                cell.post = post
-                return cell
-            case 4:
-                // Post comment
-                return tableView.dequeueReusableCell(withIdentifier: kFeedCommentInfoCellReuseID)!
-            default:
-                return UITableViewCell()
-            }
-        }
+        let item = self.dataModel[indexPath.section]
+        let itemInfo = item.info[indexPath.row]
+        let cellIdentifier = itemInfo.reuseIdentifier
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier)!
+        return itemInfo.configHandler(cell)
+        
+        
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -148,5 +184,11 @@ class BSFeedTableViewManager: NSObject, UITableViewDataSource, UITableViewDelega
         else {
             self.delegate.coachmark?.hide()
         }
+    }
+}
+
+extension Bool {
+    var intValue:Int {
+        return self ? 1:0
     }
 }
