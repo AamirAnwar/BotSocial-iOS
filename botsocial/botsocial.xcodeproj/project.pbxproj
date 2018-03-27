@@ -204,7 +204,6 @@
 		43910A8D203CC917009171CB = {
 			isa = PBXGroup;
 			children = (
-				43FFE10E206A7B92002A6EFE /* DBHelpers.swift */,
 				43910A98203CC917009171CB /* botsocial */,
 				43910AAF203CC917009171CB /* botsocialTests */,
 				43910ABA203CC918009171CB /* botsocialUITests */,
@@ -290,6 +289,7 @@
 				437590CA2060E8B800A7AAEA /* GoogleService-Info.plist */,
 				43B9346620651D7A005FB360 /* BSColors.swift */,
 				430E61A7205F104600AECF27 /* Constants.swift */,
+				43FFE10E206A7B92002A6EFE /* DBHelpers.swift */,
 				430E61A9205F117900AECF27 /* CustomUIKitExtensions.swift */,
 				436913CA206309FC0034F527 /* BSFunctions.swift */,
 				43910AA4203CC917009171CB /* LaunchScreen.storyboard */,
