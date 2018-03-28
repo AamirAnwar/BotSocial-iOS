@@ -10,6 +10,7 @@ import UIKit
 
 class BSBaseViewController: UIViewController {
     var tableView = UITableView.init(frame: .zero, style: .plain)
+    var handles:[UInt] = []
     private(set) var coachmark:BSCoachmarkView?
     var shouldShowCoachmark = false {
         didSet {
@@ -49,6 +50,13 @@ class BSBaseViewController: UIViewController {
         self.tableView.delegate = self
         self.tableView.dataSource = self
         self.configureTableView()
+    }
+    
+    deinit {
+        for handle in self.handles {
+            APIService.sharedInstance.cancelHandle(handle)
+        }
+        handles = []
     }
     
     public func configureTableView() {

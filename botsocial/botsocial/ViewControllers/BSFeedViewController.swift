@@ -25,8 +25,9 @@ class BSFeedViewController: BSBaseViewController {
     
     func observePosts() {
         self.isLoadingPosts = true
-        APIService.sharedInstance.getRecentPosts { (post) in
-            if let post = post {
+        APIService.sharedInstance.getRecentPosts { (post, handle) in
+            if let post = post, let handle = handle {
+                self.handles.append(handle)
                 self.posts.insert(post, at: 0)
                 
                 // If in between the list then show coachmark
