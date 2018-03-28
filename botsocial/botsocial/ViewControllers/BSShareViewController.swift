@@ -10,22 +10,7 @@ import UIKit
 import Firebase
 
 let kPlaceholderText = "Write a caption..."
-class BSShareViewController: UIViewController, UIGestureRecognizerDelegate {
-    let loaderOverlayView: UIView = {
-            let view = UIView()
-            view.isHidden = true
-            view.backgroundColor = UIColor.black.withAlphaComponent(0.7)
-            return view
-        
-    }()
-    
-    let loader:UIActivityIndicatorView =  {
-        
-            let view = UIActivityIndicatorView.init()
-            view.activityIndicatorViewStyle = .whiteLarge
-            return view
-        }()
-
+class BSShareViewController: BSBaseViewController{
     var postImage:UIImage? {
         didSet {
             self.postImageView.image = postImage
@@ -62,7 +47,8 @@ class BSShareViewController: UIViewController, UIGestureRecognizerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationController?.isNavigationBarHidden = true
+        self.tableView.isHidden = true
+        self.hideNavigationBar()
         NotificationCenter.default.addObserver(self, selector: #selector(willShowKeyboard(notification:)), name: kNotificationWillShowKeyboard.name, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(willHideKeyboard), name: kNotificationWillHideKeyboard.name, object: nil)
         self.contentView.addGestureRecognizer(UITapGestureRecognizer.init(target: self, action: #selector(didTapView)))
@@ -76,11 +62,6 @@ class BSShareViewController: UIViewController, UIGestureRecognizerDelegate {
         self.contentView.addSubview(self.postImageView)
         self.contentView.addSubview(self.textView)
         
-        
-        
-        self.view.backgroundColor = UIColor.white
-        self.navigationController?.interactivePopGestureRecognizer?
-            .delegate = self
         self.scrollView.snp.makeConstraints { (make) in
             make.leading.equalToSuperview()
             make.trailing.equalToSuperview()
@@ -165,6 +146,7 @@ class BSShareViewController: UIViewController, UIGestureRecognizerDelegate {
             }
         }
     }
+    
     @objc func didTapView() {
         self.contentView.endEditing(true)
     }
@@ -197,28 +179,6 @@ class BSShareViewController: UIViewController, UIGestureRecognizerDelegate {
         self.textView.attributedText = nil
         self.textView.font = BSFontMediumParagraph
         self.textView.textColor = BSColorTextBlack
-    }
-    
-    
-    func showLoader() {
-        guard self.loaderOverlayView.isHidden else {return}
-        self.loaderOverlayView.alpha = 0
-        self.loaderOverlayView.isHidden = false
-        UIView.animate(withDuration: 0.3) {
-            self.loaderOverlayView.alpha = 1.0
-            self.loader.startAnimating()
-        }
-    }
-    
-    func hideLoader() {
-        guard self.loaderOverlayView.isHidden == false else {return}
-        self.loader.stopAnimating()
-        UIView.animate(withDuration: 0.3, animations: {
-            self.loaderOverlayView.alpha = 0
-        }) { (_) in
-            self.loaderOverlayView.isHidden = true
-        }
-        
     }
 }
 

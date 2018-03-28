@@ -72,6 +72,25 @@ class BSUserSnippetTableViewCell: UITableViewCell {
         
     }
     
+    func configureWith(post:BSPost) {
+        usernameLabel.text = post.authorName
+        moreButton.isHidden = true
+        if let authorID = post.authorID {
+            APIService.sharedInstance.getProfilePictureFor(userID: authorID, completion: {(url) in
+                self.setImageURL(url)
+            })
+            if let currentUser = APIService.sharedInstance.currentUser {
+                if currentUser.uid == authorID {
+                    self.moreButton.isHidden = false
+                }
+                else {
+                    self.moreButton.isHidden = true
+                }
+            }
+        }
+        
+    }
+    
     func setImageURL(_ url:URL?) {
         if let url = url {
             self.userImageView.pin_setImage(from:url)

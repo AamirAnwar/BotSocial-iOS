@@ -8,9 +8,9 @@
 
 import UIKit
 protocol BSFeedActionsTableViewCellDelegate {
-    func didTapLikeButton(forIndexPath indexPath:IndexPath?)
-    func didTapCommentsButton(forIndexPath indexPath:IndexPath?)
-    func didTapSavePostButton(forIndexPath indexPath:IndexPath?)
+    func didTapLikeButton(sender:BSFeedActionsTableViewCell)
+    func didTapCommentsButton(sender:BSFeedActionsTableViewCell)
+    func didTapSavePostButton(sender:BSFeedActionsTableViewCell)
 }
 
 class BSFeedActionsTableViewCell: UITableViewCell {
@@ -132,21 +132,15 @@ class BSFeedActionsTableViewCell: UITableViewCell {
     
     @objc func commentButtonTapped() {
         
-        self.delegate?.didTapCommentsButton(forIndexPath: self.indexPath)
+        self.delegate?.didTapCommentsButton(sender:self)
     }
     
     @objc func didTapLikeActionButton() {
         UIView.transition(with: self.likeActionButton, duration: 0.3, options: .curveEaseIn, animations: {
             self.likeActionButton.isSelected = !self.likeActionButton.isSelected
         })
-        UIView.animate(withDuration: 0.3, animations: {
-            self.likeActionButton.transform = self.likeActionButton.transform.scaledBy(x: 1.1, y: 1.1)
-        }) { (_) in
-            UIView.animate(withDuration: 0.8, delay: 0.0, usingSpringWithDamping: 0.4, initialSpringVelocity: 0.5, options: .curveEaseInOut, animations: {
-                self.likeActionButton.transform = .identity
-            })
-        }
-        self.delegate?.didTapLikeButton(forIndexPath: self.indexPath)
+        BSCommons.applyBounceAnimationTo(self.likeActionButton)
+        self.delegate?.didTapLikeButton(sender:self)
     }
     
     @objc func didTapLikeButton() {
@@ -157,14 +151,7 @@ class BSFeedActionsTableViewCell: UITableViewCell {
         UIView.transition(with: self.saveButton, duration: 0.3, options: .curveEaseIn, animations: {
             self.saveButton.isSelected = !self.saveButton.isSelected
         })
-        
-        UIView.animate(withDuration: 0.3, animations: {
-            self.saveButton.transform = self.saveButton.transform.scaledBy(x: 1.1, y: 1.1)
-        }) { (_) in
-            UIView.animate(withDuration: 0.8, delay: 0.0, usingSpringWithDamping: 0.4, initialSpringVelocity: 0.5, options: .curveEaseInOut, animations: {
-                self.saveButton.transform = .identity
-            })
-        }
-        self.delegate?.didTapSavePostButton(forIndexPath: indexPath)
+        BSCommons.applyBounceAnimationTo(self.saveButton)
+        self.delegate?.didTapSavePostButton(sender:self)
     }
 }

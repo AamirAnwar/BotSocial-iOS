@@ -37,9 +37,7 @@ class APIService: NSObject {
                 let post = BSPost.initWith(postID: snapshot.key, dict: value)
                 completion(post)
             })
-
         }
-        
     }
     
     
@@ -52,16 +50,17 @@ class APIService: NSObject {
         })
     }
     
-    func getRecentPosts(completion:@escaping ((_ posts:BSPost?) -> Void)) {
+    func getRecentPosts(completion:@escaping ((_ posts:BSPost?, _ handle:UInt?) -> Void)) {
         guard let _ = self.currentUser else {return}
         self.databaseRef.child("posts").observeSingleEvent(of: .value) { (snapshot) in
             if snapshot.exists() == false {
-                completion(nil)
+                completion(nil, nil)
             }
-            self.databaseRef.child("posts").queryLimited(toLast: 30).observe(DataEventType.childAdded, with: { (snapshot) in
-                guard let dict = snapshot.value as? [String:AnyObject] else {completion(nil);return}
+            var handle:UInt? = nil
+            handle = self.databaseRef.child("posts").queryLimited(toLast: 30).observe(DataEventType.childAdded, with: { (snapshot) in
+                guard let dict = snapshot.value as? [String:AnyObject] else {completion(nil, nil);return}
                 let post = BSPost.initWith(postID: snapshot.key, dict: dict)
-                completion(post)
+                completion(post, handle)
             })
 
         }

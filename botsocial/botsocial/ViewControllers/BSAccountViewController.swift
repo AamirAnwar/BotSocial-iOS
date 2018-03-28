@@ -64,7 +64,7 @@ class BSAccountViewController: UIViewController, UIGestureRecognizerDelegate {
         }
         self.collectionView.delegate = self
         self.collectionView.dataSource = self
-        self.collectionView.register(BSLoaderCollectionViewCell.self, forCellWithReuseIdentifier: "loader_cell")
+        self.collectionView.register(BSLoaderCollectionViewCell.self, forCellWithReuseIdentifier: kLoadingCellReuseID)
         self.collectionView.register(BSEmptyStateCollectionViewCell.self, forCellWithReuseIdentifier: "empty_state_cell")
         self.collectionView.register(BSUserProfileCollectionViewCell.self, forCellWithReuseIdentifier: kUserProfileCellReuseID)
         self.collectionView.register(BSImageCollectionViewCell.self, forCellWithReuseIdentifier: kImageCellReuseID)
@@ -114,7 +114,7 @@ extension BSAccountViewController:UICollectionViewDelegate, UICollectionViewData
             }
             return cell
         case 1:
-            guard self.isLoading == false else {return collectionView.dequeueReusableCell(withReuseIdentifier: "loader_cell", for: indexPath)}
+            guard self.isLoading == false else {return collectionView.dequeueReusableCell(withReuseIdentifier: kLoadingCellReuseID, for: indexPath)}
             guard self.userPosts.isEmpty == false else {
                 
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "empty_state_cell", for: indexPath) as! BSEmptyStateCollectionViewCell

@@ -8,11 +8,29 @@
 
 import UIKit
 import AVFoundation
-import CoreML
-import Vision
+
+enum CameraControllerError: Swift.Error {
+    case captureSessionAlreadyRunning
+    case captureSessionIsMissing
+    case inputsAreInvalid
+    case invalidOperation
+    case noCamerasAvailable
+    case unknown
+}
+
+public enum CameraPosition {
+    case front
+    case rear
+}
+
+public enum FlowType {
+    case Post
+    case ProfilePicture
+}
 
 let kCameraViewHeight:CGFloat = UIScreen.main.bounds.width
-class BSCameraViewController: UIViewController {
+
+class BSCameraViewController: BSBaseViewController {
     var captureSession: AVCaptureSession?
     var frontCamera: AVCaptureDevice?
     var rearCamera: AVCaptureDevice?
@@ -56,7 +74,6 @@ class BSCameraViewController: UIViewController {
     }()
     let filterView = BSFilterView()
     let libPreviewButton:UIButton = UIButton.init(type: .system)
-    let model = MobileNet()
     let objectCollectionView:UICollectionView = {
         let layout = UICollectionViewFlowLayout.init()
         layout.estimatedItemSize = CGSize.init(width: 1.0, height: 1.0)
@@ -67,31 +84,13 @@ class BSCameraViewController: UIViewController {
     
     let kVisionCellReuseID = "BSVisionObjectCell"
     var visionObjects:[String] = []
-    
-    let loaderOverlayView: UIView = {
-        let view = UIView()
-        view.isHidden = true
-        view.backgroundColor = UIColor.black.withAlphaComponent(0.7)
-        return view
-        
-    }()
-    
-    let loader:UIActivityIndicatorView =  {
-        
-        let view = UIActivityIndicatorView.init()
-        view.activityIndicatorViewStyle = .whiteLarge
-        return view
-    }()
 
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-//        self.imagePickerController.modalPresentationStyle = .currentContext
+        self.tableView.isHidden = true
         imagePickerController.sourceType = UIImagePickerControllerSourceType.photoLibrary
         self.imagePickerController.delegate = self
         self.navigationController?.isNavigationBarHidden = true
-        NotificationCenter.default.addObserver(self, selector: #selector(willShowKeyboard(notification:)), name: kNotificationWillShowKeyboard.name, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(willHideKeyboard), name: kNotificationWillHideKeyboard.name, object: nil)
         self.view.backgroundColor = UIColor.white
         
         
@@ -437,73 +436,15 @@ class BSCameraViewController: UIViewController {
         self.captureButton.isHidden = true
         self.libPreviewButton.isHidden = true
         self.stopSessionIfNeeded()
-        self.detectObjectsWith(image:image)
-    }
-    
-    func detectObjectsWith(image:UIImage) {
-        guard let visionModel = try? VNCoreMLModel(for: model.model) else {
-            return
-        }
-        
-        let request = VNCoreMLRequest(model: visionModel) { request, error in
-            if let observations = request.results as? [VNClassificationObservation] {
-                
-                // The observations appear to be sorted by confidence already, so we
-                // take the top 5 and map them to an array of (String, Double) tuples.
-                let top5 = observations.prefix(through: 4)
-                    .map { ($0.identifier, Double($0.confidence)) }
-                print(top5)
-                let objects = top5.map({ (id,con) -> String in
-                    return id
-                })
-                for item in objects {
-                    
-                    var explodedString = item.components(separatedBy: ",")
-                    let firstObjectExploded = explodedString.first!.components(separatedBy: " ")
-                    explodedString[0] = firstObjectExploded[1]
-                    for i in 1..<explodedString.count {
-                        explodedString[i].remove(at: explodedString[i].startIndex)
-                    }
-                    if explodedString.isEmpty == false {
-                        self.visionObjects += explodedString
-                    }
-                }
-                if self.visionObjects.isEmpty == false {
-                    self.objectCollectionView.isHidden = false
-                    self.objectCollectionView.reloadData()
-                }
-//                self.show(results: top5)
+        BSCommons.detectObjectsIn(image: image) { (objects) in
+            if objects.isEmpty == false {
+                self.visionObjects = objects
+                self.objectCollectionView.isHidden = false
+                self.objectCollectionView.reloadData()
             }
         }
-        request.imageCropAndScaleOption = .centerCrop
-        let handler = VNImageRequestHandler(cgImage: image.cgImage!)
-        try? handler.perform([request])
     }
-    
-    
-    
-    
-    @objc func willShowKeyboard(notification:NSNotification) {
-        guard self.view.window != nil else {return}
-        
-        if let keyboardFrame = notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue {
-            let keyboardHeight = keyboardFrame.cgRectValue.height
-            var tabBarHeight:CGFloat = 0.0
-            if let tabbar = self.tabBarController?.tabBar {
-                tabBarHeight = tabbar.height()
-            }
-            
-            
-        }
-    }
-    
-    @objc func willHideKeyboard() {
-        guard self.view.window != nil else {return}
-        UIView.animate(withDuration: 1, animations: {
-            
-        })
-    }
-    
+
     @objc func didTapNextButton() {
         let vc = BSShareViewController()
         vc.postImage = self.capturedImageView.image
@@ -588,22 +529,12 @@ class BSCameraViewController: UIViewController {
         catch {
             print(error)
         }
-        
-//        switch self.currentCameraPosition {
-//        case .some(.front):
-//            toggleCameraButton.setImage(#imageLiteral(resourceName: "Front Camera Icon"), for: .normal)
-//
-//        case .some(.rear):
-//            toggleCameraButton.setImage(#imageLiteral(resourceName: "Rear Camera Icon"), for: .normal)
-//
-//        case .none:
-//            return
-//        }
     }
     
     @objc func didTapLibPreviewThumb(_ sender:AnyObject) {
         self.showImagePicker()
     }
+    
     @objc func didTapSaveButton() {
         self.showLoader()
         self.saveButton.isEnabled = false
@@ -613,27 +544,6 @@ class BSCameraViewController: UIViewController {
                 self.saveButton.isEnabled = true
                 self.dismiss(animated: true)
             })
-        }
-        
-    }
-    
-    func showLoader() {
-        guard self.loaderOverlayView.isHidden else {return}
-        self.loaderOverlayView.alpha = 0
-        self.loaderOverlayView.isHidden = false
-        UIView.animate(withDuration: 0.3) {
-            self.loaderOverlayView.alpha = 1.0
-            self.loader.startAnimating()
-        }
-    }
-    
-    func hideLoader() {
-        guard self.loaderOverlayView.isHidden == false else {return}
-        self.loader.stopAnimating()
-        UIView.animate(withDuration: 0.3, animations: {
-            self.loaderOverlayView.alpha = 0
-        }) { (_) in
-            self.loaderOverlayView.isHidden = true
         }
         
     }
@@ -648,34 +558,12 @@ extension BSCameraViewController:UITextFieldDelegate {
     
 }
 
-extension BSCameraViewController {
-    enum CameraControllerError: Swift.Error {
-        case captureSessionAlreadyRunning
-        case captureSessionIsMissing
-        case inputsAreInvalid
-        case invalidOperation
-        case noCamerasAvailable
-        case unknown
-    }
-    
-    public enum CameraPosition {
-        case front
-        case rear
-    }
-    
-    public enum FlowType {
-        case Post
-        case ProfilePicture
-    }
-}
-
 extension BSCameraViewController:UIImagePickerControllerDelegate,UINavigationControllerDelegate {
     fileprivate func showImagePicker() {
         present(imagePickerController, animated: true)
     }
     
     // MARK: - UIImagePickerControllerDelegate
-    
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         let image = info[UIImagePickerControllerOriginalImage]
         if let image = image as? UIImage {
@@ -695,11 +583,7 @@ extension BSCameraViewController:UICollectionViewDelegate, UICollectionViewDataS
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.visionObjects.count
     }
-    
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-//        return CGSize.init(width: 130, height: 130)
-//    }
-    
+
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kVisionCellReuseID, for: indexPath) as! BSVisionObjectCollectionViewCell
         cell.titleLabel.text = visionObjects[indexPath.item]

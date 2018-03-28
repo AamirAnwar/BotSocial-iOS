@@ -14,7 +14,6 @@ let kAuthorNameKey = "author"
 let kCaptionKey = "caption"
 class BSPost: NSObject {
     var id:String!
-//    var author:BSUser!
     var authorName:String!
     var authorID:String!
     var imageURL:String!
@@ -25,6 +24,16 @@ class BSPost: NSObject {
         }
     }
     
+    static func initWith(postObject:PostObject) -> BSPost {
+        let post = BSPost()
+        post.authorID = postObject.authorID
+        post.authorName = postObject.authorName
+        post.id = postObject.id
+        post.caption = postObject.caption
+        post.imageURL = postObject.imageURL
+        return post
+    }
+    
     static func initWith(postID:String, dict:[String:Any]) -> BSPost {
         let post = BSPost.init()
         post.id = postID
@@ -32,7 +41,6 @@ class BSPost: NSObject {
         post.imageURL = dict[kImageURLKey] as? String ?? ""
         post.authorID = dict[kAuthorIDKey] as? String ?? ""
         post.authorName = dict[kAuthorNameKey] as? String ?? ""
-//        post.author = BSUser.initWith(userID: kAuthorIDKey, dict: dict)
         return post
     }
 }
