@@ -37,9 +37,7 @@ class APIService: NSObject {
                 let post = BSPost.initWith(postID: snapshot.key, dict: value)
                 completion(post)
             })
-
         }
-        
     }
     
     

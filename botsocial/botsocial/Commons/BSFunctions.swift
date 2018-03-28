@@ -11,8 +11,49 @@ import UIKit
 import Photos
 import FirebaseAuthUI
 import FirebaseGoogleAuthUI
+import CoreML
+import Vision
 
 enum BSCommons {
+    
+    static func detectObjectsIn(image:UIImage, completion:@escaping (_ objects:[String])->Void) {
+        let mobileNetInstance = MobileNet()
+        guard let visionModel = try? VNCoreMLModel(for: mobileNetInstance.model) else {
+            return
+        }
+        
+        let request = VNCoreMLRequest(model: visionModel) { request, error in
+            if let observations = request.results as? [VNClassificationObservation] {
+                
+                // The observations appear to be sorted by confidence already, so we
+                // take the top 5 and map them to an array of (String, Double) tuples.
+                let top5 = observations.prefix(through: 4)
+                    .map { ($0.identifier, Double($0.confidence)) }
+                print(top5)
+                let objects = top5.map({ (id,con) -> String in
+                    return id
+                })
+                
+                var detectedObjects = [String]()
+                for item in objects {
+                    
+                    var explodedString = item.components(separatedBy: ",")
+                    let firstObjectExploded = explodedString.first!.components(separatedBy: " ")
+                    explodedString[0] = firstObjectExploded[1]
+                    for i in 1..<explodedString.count {
+                        explodedString[i].remove(at: explodedString[i].startIndex)
+                    }
+                    if explodedString.isEmpty == false {
+                        detectedObjects += explodedString
+                    }
+                }
+                completion(detectedObjects)
+            }
+        }
+        request.imageCropAndScaleOption = .centerCrop
+        let handler = VNImageRequestHandler(cgImage: image.cgImage!)
+        try? handler.perform([request])
+    }
     
     static func showUser(user:BSUser, navigationController:UINavigationController?) {
         if let nav = navigationController {

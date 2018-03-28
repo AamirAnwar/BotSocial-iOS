@@ -28,8 +28,24 @@ class BSBaseViewController: UIViewController {
         }
     }
     
+    let loaderOverlayView: UIView = {
+        let view = UIView()
+        view.isHidden = true
+        view.backgroundColor = UIColor.black.withAlphaComponent(0.7)
+        return view
+        
+    }()
+    
+    let loader:UIActivityIndicatorView =  {
+        
+        let view = UIActivityIndicatorView.init()
+        view.activityIndicatorViewStyle = .whiteLarge
+        return view
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.view.backgroundColor = UIColor.white
         self.tableView.delegate = self
         self.tableView.dataSource = self
         self.configureTableView()
@@ -61,7 +77,34 @@ class BSBaseViewController: UIViewController {
             self.coachmark?.removeFromSuperview()
             self.coachmark = nil
         }
-        
+    }
+    
+    func showLoader() {
+        guard self.loaderOverlayView.isHidden else {return}
+        self.loaderOverlayView.alpha = 0
+        self.loaderOverlayView.isHidden = false
+        UIView.animate(withDuration: 0.3) {
+            self.loaderOverlayView.alpha = 1.0
+            self.loader.startAnimating()
+        }
+    }
+    
+    func hideLoader() {
+        guard self.loaderOverlayView.isHidden == false else {return}
+        self.loader.stopAnimating()
+        UIView.animate(withDuration: 0.3, animations: {
+            self.loaderOverlayView.alpha = 0
+        }) { (_) in
+            self.loaderOverlayView.isHidden = true
+        }
+    }
+    
+}
+
+extension BSBaseViewController:UIGestureRecognizerDelegate {
+    func hideNavigationBar() {
+        self.navigationController?.isNavigationBarHidden = true
+        self.navigationController?.interactivePopGestureRecognizer?.delegate = self
     }
 }
 
