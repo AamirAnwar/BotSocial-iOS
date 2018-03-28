@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 import Photos
 import FirebaseAuthUI
 import FirebaseGoogleAuthUI
@@ -44,6 +45,17 @@ enum BSCommons {
         }
     }
     
+    static func applyBounceAnimationTo(_ view:UIView) {
+        UIView.animate(withDuration: 0.3, animations: {
+            view.transform = view.transform.scaledBy(x: 1.1, y: 1.1)
+        }) { (_) in
+            UIView.animate(withDuration: 0.8, delay: 0.0, usingSpringWithDamping: 0.4, initialSpringVelocity: 0.5, options: .curveEaseInOut, animations: {
+                view.transform = .identity
+            })
+        }
+    
+    }
+    
     static func showLoginPage(delegate:FUIAuthDelegate) {
         let authUI = FUIAuth.defaultAuthUI()
         
@@ -60,16 +72,3 @@ enum BSCommons {
         }
     }
 }
-
-//protocol UIViewControllerLoadingState {
-//    var loaderOverlayView:UIView {get}
-//    var loader:UIActivityIndicatorView {get}
-//    func showLoader()
-//    func hideLoader()
-//}
-//
-
-
-
-
-

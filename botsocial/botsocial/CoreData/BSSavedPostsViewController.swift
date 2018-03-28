@@ -45,12 +45,20 @@ class BSSavedPostsViewController: BSBaseViewController {
     
 }
 extension BSSavedPostsViewController:BSFeedActionsTableViewCellDelegate {
-    func didTapLikeButton(forIndexPath indexPath: IndexPath?) {
-        // Do nothing
+    func didTapLikeButton(sender:BSFeedActionsTableViewCell) {
+        if let indexPath = self.tableView.indexPath(for: sender) {
+            let post = self.posts[indexPath.section]
+            APIService.sharedInstance.likePost(post:post)
+        }
     }
     
-    func didTapCommentsButton(forIndexPath indexPath: IndexPath?) {
-        // Do nothing
+    func didTapCommentsButton(sender:BSFeedActionsTableViewCell) {
+        if let indexPath = self.tableView.indexPath(for: sender) {
+            let post = self.posts[indexPath.section]
+            let vc = BSPostCommentsViewController()
+            vc.post = post
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
     }
     
     func didTapSavePostButton(sender:BSFeedActionsTableViewCell) {
@@ -81,6 +89,12 @@ extension BSSavedPostsViewController:BSFeedActionsTableViewCellDelegate {
 
 extension BSSavedPostsViewController:BSFeedTableViewManagerDelegate {
     
+    func showCommentsFor(post: BSPost) {
+        let vc = BSPostCommentsViewController()
+        vc.post = post
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
     func postIsSaved(postID: String, saveButton: UIButton) {
         saveButton.isSelected = true
     }
@@ -90,7 +104,6 @@ extension BSSavedPostsViewController:BSFeedTableViewManagerDelegate {
     }
     
     func moreButtonTapped(sender: UITableViewCell) {
-        
         // Do nothing
     }
 }

@@ -19,12 +19,14 @@ struct TableDataItem {
     
 }
 
-protocol BSFeedTableViewManagerDelegate:BSUserSnippetTableViewCellDelegate,BSFeedActionsTableViewCellDelegate {
+protocol BSFeedTableViewManagerDelegate:BSUserSnippetTableViewCellDelegate {
+    var tableView:UITableView {get}
     var posts:[BSPost] {get set}
     var coachmark:BSCoachmarkView? {get}
     var isLoadingPosts:Bool {get set}
     func postIsSaved(postID: String, saveButton: UIButton)
     func showProfileFor(user:BSUser)
+    func showCommentsFor(post:BSPost)
     
 }
 
@@ -34,7 +36,7 @@ class BSFeedTableViewManager: NSObject, UITableViewDataSource, UITableViewDelega
         get {
             var model:[TableDataItem] = []
             
-                // Add featured section to model
+            // Add featured section to model
             var item = TableDataItem()
             if self.shouldShowFeaturedSection {
                 let featuredPostsInfo = TableItemInfo.init(reuseIdentifier: kFeaturedCellReuseID, configHandler: { (cell) -> UITableViewCell in
@@ -80,7 +82,7 @@ class BSFeedTableViewManager: NSObject, UITableViewDataSource, UITableViewDelega
                 if self.shouldShowActions {
                     let postActionsInfo = TableItemInfo.init(reuseIdentifier: kFeedActionsCellReuseID, configHandler: { (cell) -> UITableViewCell in
                         if let cell = cell as? BSFeedActionsTableViewCell {
-                            cell.delegate = self.delegate
+                            cell.delegate = self
                             cell.post = post
                             cell.saveButton.isSelected = false
                             self.delegate.postIsSaved(postID: post.id, saveButton: cell.saveButton)
@@ -179,13 +181,44 @@ class BSFeedTableViewManager: NSObject, UITableViewDataSource, UITableViewDelega
         let y = scrollView.contentOffset.y
         if y + scrollView.height() >= (scrollView.contentSize.height) {
             // Show coachmark
-            self.delegate.coachmark?.show(withTitle: kCoachmarkTitleScrollUp)
+            if self.delegate.posts.count > 1 {
+                self.delegate.coachmark?.show(withTitle: kCoachmarkTitleScrollUp)
+            }
         }
         else {
             self.delegate.coachmark?.hide()
         }
     }
 }
+
+extension BSFeedTableViewManager:BSFeedActionsTableViewCellDelegate {
+    func didTapLikeButton(sender:BSFeedActionsTableViewCell) {
+        if let indexPath = self.delegate.tableView.indexPath(for: sender) {
+            let index = self.postIndexForCellAt(indexPath: indexPath)
+            let post = self.delegate.posts[index]
+            APIService.sharedInstance.likePost(post:post)
+        }
+    }
+    
+    func didTapCommentsButton(sender:BSFeedActionsTableViewCell) {
+        if let indexPath = self.delegate.tableView.indexPath(for: sender) {
+            let index = self.postIndexForCellAt(indexPath: indexPath)
+            let post = self.delegate.posts[index]
+            self.delegate.showCommentsFor(post: post)
+
+        }
+    }
+    
+    
+    func didTapSavePostButton(sender:BSFeedActionsTableViewCell) {
+        if let indexPath = self.delegate.tableView.indexPath(for: sender) {
+            let index = self.postIndexForCellAt(indexPath: indexPath)
+            let post = self.delegate.posts[index]
+            DBHelpers.savePost(post: post)
+        }
+    }
+}
+
 
 extension Bool {
     var intValue:Int {

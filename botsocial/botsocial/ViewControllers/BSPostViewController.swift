@@ -87,28 +87,27 @@ class BSPostViewController: UITableViewController, UIGestureRecognizerDelegate {
             }
         }
     }
-    
 }
 
 extension BSPostViewController:BSFeedActionsTableViewCellDelegate {
-    func didTapSavePostButton(sender: BSFeedActionsTableViewCell) {
-        
-    }
-    
-    func didTapLikeButton(forIndexPath indexPath: IndexPath?) {
+    func didTapLikeButton(sender: BSFeedActionsTableViewCell) {
         if  let post = self.post {
             APIService.sharedInstance.likePost(post:post)
         }
     }
     
-    func didTapCommentsButton(forIndexPath indexPath: IndexPath?) {
+    func didTapCommentsButton(sender: BSFeedActionsTableViewCell) {
         if let post = self.post {
             let vc = BSPostCommentsViewController()
             vc.post = post
             self.navigationController?.pushViewController(vc, animated: true)
         }
-        
+    }
+    
+    func didTapSavePostButton(sender: BSFeedActionsTableViewCell) {
+        if let post = self.post {
+            DBHelpers.savePost(post: post)
+        }
     }
 }
-
 

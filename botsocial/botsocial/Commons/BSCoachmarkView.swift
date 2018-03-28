@@ -51,7 +51,6 @@ class BSCoachmarkView: UIView {
     }
     
     func show(withTitle title:String) {
-//        guard self.posts.count > 1 && isShowingCoachmark == false else {return}
         guard self.isVisible == false else {return}
         guard let coachmarkSuperview = self.superview else {return}
         self.button.setTitle(title, for: .normal)
@@ -71,6 +70,13 @@ class BSCoachmarkView: UIView {
         }) { (_) in
             self.isVisible = false
         }
+    }
+    
+    override func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        guard let sView = self.superview else {return}
+        self.frame = CGRect.init(x: (sView.width() - self.width())/2, y: sView.height(), width: self.width(), height: self.height())
+        
     }
 
 }

@@ -83,33 +83,6 @@ extension BSFeedViewController {
     }
 }
 
-extension BSFeedViewController:BSFeedActionsTableViewCellDelegate {
-    func didTapLikeButton(forIndexPath indexPath: IndexPath?) {
-        if let indexPath = indexPath {
-            let post = self.posts[indexPath.section]
-            APIService.sharedInstance.likePost(post:post)
-        }
-    }
-    
-    func didTapCommentsButton(forIndexPath indexPath: IndexPath?) {
-        if let indexPath = indexPath {
-            let post = self.posts[indexPath.section]
-            let vc = BSPostCommentsViewController()
-            vc.post = post
-            self.navigationController?.pushViewController(vc, animated: true)
-        }
-    }
-    
-   
-    func didTapSavePostButton(sender:BSFeedActionsTableViewCell) {
-        if let indexPath = tableView.indexPath(for: sender) {
-            let index = self.feedTableViewManager.postIndexForCellAt(indexPath: indexPath)
-            let post = self.posts[index]
-            DBHelpers.savePost(post: post)
-        }
-    }
-}
-
 extension BSFeedViewController:BSUserSnippetTableViewCellDelegate {
     func moreButtonTapped(sender:UITableViewCell) {
         let alertController = UIAlertController.init(title: "Delete post", message: "Delete this post?", preferredStyle: .actionSheet)
@@ -138,10 +111,14 @@ extension BSFeedViewController {
 }
 
 extension BSFeedViewController:BSFeedTableViewManagerDelegate {
-    func showProfileFor(user: BSUser) {
-        let vc = BSAccountViewController()
-        vc.user = user
+    func showCommentsFor(post:BSPost) {
+        let vc = BSPostCommentsViewController()
+        vc.post = post
         self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    func showProfileFor(user: BSUser) {
+        BSCommons.showUser(user: user, navigationController: self.navigationController)
     }
 }
 
