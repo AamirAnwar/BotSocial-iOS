@@ -94,7 +94,7 @@ class BSUserProfileCollectionViewCell: UICollectionViewCell {
         if let user = user {
             self.changePictureImageView.alpha = 0
             self.usernameLabel.text = user.displayName
-            APIService.sharedInstance.getProfilePictureFor(userID: user.id, completion: { (url) in
+            APIService.sharedInstance.getProfilePictureFor(userID: user.id, completion: { (url, handle) in
                 self.userThumbnailImageView.pin_setImage(from: url)
             })
         }

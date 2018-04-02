@@ -76,7 +76,7 @@ class BSUserSnippetTableViewCell: UITableViewCell {
         usernameLabel.text = post.authorName
         moreButton.isHidden = true
         if let authorID = post.authorID {
-            APIService.sharedInstance.getProfilePictureFor(userID: authorID, completion: {(url) in
+            APIService.sharedInstance.getProfilePictureFor(userID: authorID, completion: {(url,handle) in
                 self.setImageURL(url)
             })
             if let currentUser = APIService.sharedInstance.currentUser {

@@ -9,19 +9,17 @@
 import UIKit
 import Firebase
 
-class BSSettingsViewController: UIViewController,UIGestureRecognizerDelegate {
-    let tableView = UITableView.init(frame: .zero, style: .plain)
+class BSSettingsViewController: BSBaseViewController {
     let options = ["Saved posts","Log Out"]
     let headerLabel = UILabel()
     let customNavBar = UIView()
     let titleLabel = UILabel()
     let backButton = UIButton.init(type: .system)
+    let kCellReuseID = "standard_cell"
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationItem.title = "Settings"
-        self.view.backgroundColor = UIColor.white
-        self.view.addSubview(self.tableView)
         self.view.addSubview(self.customNavBar)
         self.customNavBar.addSubview(self.titleLabel)
         self.customNavBar.addSubview(self.backButton)
@@ -47,20 +45,12 @@ class BSSettingsViewController: UIViewController,UIGestureRecognizerDelegate {
             make.trailing.equalToSuperview()
             make.top.equalToSuperview()
         }
-        
-        self.tableView.tableFooterView = UIView()
-        self.tableView.separatorStyle = .none
-        self.tableView.snp.makeConstraints { (make) in
+        self.tableView.snp.remakeConstraints { (make) in
             make.leading.equalToSuperview()
             make.trailing.equalToSuperview()
             make.bottom.equalToSuperview()
             make.top.equalTo(self.customNavBar.snp.bottom)
         }
-        self.tableView.contentInset = UIEdgeInsets.init(top: 10, left: 0, bottom: 0, right: 0)
-        self.tableView.delegate = self
-        self.tableView.dataSource = self
-        self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-        self.navigationController?.interactivePopGestureRecognizer?.delegate = self
         
         self.headerLabel.text = "Account"
         self.headerLabel.font = BSFontMediumBold
@@ -71,15 +61,21 @@ class BSSettingsViewController: UIViewController,UIGestureRecognizerDelegate {
         self.tableView.tableHeaderView = view
         
     }
+    
+    override func configureTableView() {
+        super.configureTableView()
+        self.tableView.contentInset = UIEdgeInsets.init(top: 10, left: 0, bottom: 0, right: 0)
+        self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: kCellReuseID)
+    }
 }
 
-extension BSSettingsViewController: UITableViewDelegate, UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+extension BSSettingsViewController {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return options.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell")!
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: kCellReuseID)!
         cell.textLabel?.text = options[indexPath.row]
         cell.textLabel?.font = BSFontMediumParagraph
         cell.textLabel?.textColor = BSColorTextBlack
@@ -103,8 +99,6 @@ extension BSSettingsViewController: UITableViewDelegate, UITableViewDataSource {
         
         let logOutAction = UIAlertAction.init(title: "Logout", style: .destructive) { (action) in
             if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
-                
-                
                 do {
                     try Auth.auth().signOut()
                     BSCommons.showLoginPage(delegate: appDelegate)

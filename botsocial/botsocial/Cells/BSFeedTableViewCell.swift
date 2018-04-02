@@ -62,7 +62,7 @@ extension BSFeedTableViewCell:UITableViewDelegate, UITableViewDataSource {
         case 0:
             let cell = tableView.dequeueReusableCell(withIdentifier: kFeedUserSnippetCellReuseID) as! BSUserSnippetTableViewCell
             if let post = self.post {
-                APIService.sharedInstance.getProfilePictureFor(userID: post.authorID, completion: {[weak cell] (url) in
+                APIService.sharedInstance.getProfilePictureFor(userID: post.authorID, completion: {[weak cell] (url, handle) in
                     if let strongCell = cell {
                         if let url = url {
                             strongCell.setImageURL(url)

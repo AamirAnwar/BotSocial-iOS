@@ -26,11 +26,11 @@ class BSFeedViewController: BSBaseViewController {
     func observePosts() {
         self.isLoadingPosts = true
         APIService.sharedInstance.getRecentPosts { (post, handle) in
-            if let post = post, let handle = handle {
-                self.handles.append(handle)
+            self.addHandle(handle)
+            if let post = post {
                 self.posts.insert(post, at: 0)
                 
-                // If in between the list then show coachmark
+                // If in between the list then show coachmark. Still a work in progress
                 if let indexPaths = self.tableView.indexPathsForVisibleRows {
                     var min = Int.max
                     for path in indexPaths {

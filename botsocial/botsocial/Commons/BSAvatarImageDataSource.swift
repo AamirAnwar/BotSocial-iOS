@@ -12,13 +12,13 @@ import JSQMessagesViewController
 class BSAvatarImageDataSource: NSObject {
     var image:UIImage?
     
-    func setImageWith(userID:String, completion:@escaping ()->Void) {
-        APIService.sharedInstance.getProfilePictureFor(userID: userID, completion: { (url) in
+    func setImageWith(userID:String, completion:@escaping (_ handle:UInt?)->Void) {
+        APIService.sharedInstance.getProfilePictureFor(userID: userID, completion: { (url, handle) in
             let imageView = UIImageView()
             imageView.pin_setImage(from: url, placeholderImage: nil, completion: { (result) in
                 if let image = result.image {
                     self.image = image
-                    completion()
+                    completion(handle)
                 }
             })
         })

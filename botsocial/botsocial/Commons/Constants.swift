@@ -25,6 +25,7 @@ let kFeedUserSnippetCellReuseID = "BSUserSnippetTableViewCell"
 let kFeedActionsCellReuseID = "BSFeedActionsTableViewCell"
 let kFeedPostInfoCellReuseID = "BSPostDetailTableViewCell"
 let kFeedCommentInfoCellReuseID = "BSAddCommentTableViewCell"
+let kEmptyStateCellReuseID = "empty_state_cell"
 let kLoadingCellReuseID = "loader_cell"
 //let kTestImageURL = "https://avatars3.githubusercontent.com/u/12379620?s=460&v=4"
 var kTestImageURL:String {

@@ -8,8 +8,7 @@
 
 import UIKit
 
-class BSNotificationsViewController: UIViewController, UIGestureRecognizerDelegate {
-    let tableView = UITableView.init(frame: .zero, style: .plain)
+class BSNotificationsViewController: BSBaseViewController {
     let kNotifCellReuseID = "BSNotificationTableViewCell"
     var notifications:[BSNotification] = []
     let refreshControl:UIRefreshControl = {
@@ -22,36 +21,23 @@ class BSNotificationsViewController: UIViewController, UIGestureRecognizerDelega
     var notificationSet:Set<String> = Set<String>()
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.addSubview(self.tableView)
-        self.tableView.snp.makeConstraints { (make) in
-            make.edges.equalToSuperview()
-        }
         self.navigationController?.navigationBar.tintColor = BSColorTextBlack
         self.navigationItem.title = "Notifications"
-        self.tableView.delegate = self
-        self.tableView.separatorStyle = .none
-        self.tableView.dataSource = self
-        self.tableView.tableFooterView = UIView()
         self.tableView.refreshControl = self.refreshControl
         self.tableView.register(BSNotificationTableViewCell.self, forCellReuseIdentifier: kNotifCellReuseID)
         self.tableView.register(BSLoaderTableViewCell.self, forCellReuseIdentifier: kLoadingCellReuseID)
-        self.tableView.register(BSEmptyStateTableViewCell.self, forCellReuseIdentifier: "empty_state_cell")
-        self.navigationController?.interactivePopGestureRecognizer?.delegate = self
+        self.tableView.register(BSEmptyStateTableViewCell.self, forCellReuseIdentifier: kEmptyStateCellReuseID)
         self.refreshControl.addTarget(self, action: #selector(didPromptRefresh), for: UIControlEvents.valueChanged)
-        self.loadNotifications()
+        self.observeNotifications()
         
-    }
-    @objc func didPromptRefresh() {
-        self.loadNotifications()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.tabBarItem.badgeValue = nil
-        APIService.sharedInstance.cancelHandle(self.handleRef)
     }
     
-    func loadNotifications() {
+    func observeNotifications() {
         isLoadingNotifications = true
         notificationSet = Set<String>()
         self.notifications.removeAll()
@@ -82,21 +68,25 @@ class BSNotificationsViewController: UIViewController, UIGestureRecognizerDelega
             }
         }
     }
+    
+    @objc func didPromptRefresh() {
+        self.observeNotifications()
+    }
 }
 
-extension BSNotificationsViewController:UITableViewDelegate, UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+extension BSNotificationsViewController {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         guard self.isLoadingNotifications == false else {return 1}
         guard self.notifications.isEmpty == false else {return 1}
         return self.notifications.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard self.isLoadingNotifications == false else {
             return tableView.dequeueReusableCell(withIdentifier: kLoadingCellReuseID)!
         }
         guard self.notifications.isEmpty == false else {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "empty_state_cell") as! BSEmptyStateTableViewCell
+            let cell = tableView.dequeueReusableCell(withIdentifier: kEmptyStateCellReuseID) as! BSEmptyStateTableViewCell
             cell.titleLabel.text = "No notifications"
             return cell
         }
@@ -107,7 +97,8 @@ extension BSNotificationsViewController:UITableViewDelegate, UITableViewDataSour
             cell.configureWith(authorName:notification.authorName, title: text)
         }
         if let authorID = notification.userID, authorID.isEmpty == false {
-            APIService.sharedInstance.getProfilePictureFor(userID: authorID, completion: { (url) in
+            APIService.sharedInstance.getProfilePictureFor(userID: authorID, completion: { (url, handle) in
+                self.addHandle(handle)
                 if let url = url {
                     cell.userThumbnailImageView.pin_setImage(from: url)
                 }

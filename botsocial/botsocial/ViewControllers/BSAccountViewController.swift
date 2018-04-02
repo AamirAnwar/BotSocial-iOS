@@ -8,7 +8,7 @@
 
 import UIKit
 
-class BSAccountViewController: UIViewController, UIGestureRecognizerDelegate {
+class BSAccountViewController: BSBaseViewController {
     let kUserProfileCellReuseID = "BSUserProfileCollectionViewCell"
     let kImageCellReuseID = "BSImageCollectionViewCell"
     var userPosts = [BSPost]()
@@ -36,28 +36,10 @@ class BSAccountViewController: UIViewController, UIGestureRecognizerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.tableView.isHidden = true
         self.navigationController?.interactivePopGestureRecognizer?.delegate = self
         self.isLoading = true
-        if let user = self.user {
-            APIService.sharedInstance.getPostsWith(userID: user.id, completion: { (post) in
-                self.isLoading = false
-                if let post = post {
-                    self.userPosts.insert(post, at: 0)
-                }
-                self.collectionView.reloadData()
-            })
-            
-        }
-        else {
-            APIService.sharedInstance.getUserPosts { (post) in
-                self.isLoading = false
-                if let post = post {
-                    self.userPosts.insert(post, at: 0)
-                }
-                self.collectionView.reloadData()
-            }
-        }
-        
+        self.observeUserPosts()
         self.view.addSubview(self.collectionView)
         self.collectionView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview()
@@ -65,9 +47,34 @@ class BSAccountViewController: UIViewController, UIGestureRecognizerDelegate {
         self.collectionView.delegate = self
         self.collectionView.dataSource = self
         self.collectionView.register(BSLoaderCollectionViewCell.self, forCellWithReuseIdentifier: kLoadingCellReuseID)
-        self.collectionView.register(BSEmptyStateCollectionViewCell.self, forCellWithReuseIdentifier: "empty_state_cell")
+        self.collectionView.register(BSEmptyStateCollectionViewCell.self, forCellWithReuseIdentifier: kEmptyStateCellReuseID)
         self.collectionView.register(BSUserProfileCollectionViewCell.self, forCellWithReuseIdentifier: kUserProfileCellReuseID)
         self.collectionView.register(BSImageCollectionViewCell.self, forCellWithReuseIdentifier: kImageCellReuseID)
+    }
+    
+    func observeUserPosts() {
+        let handlePost = { (post:BSPost?) -> Void in
+            if let post = post {
+                self.userPosts.insert(post, at: 0)
+            }
+            self.collectionView.reloadData()
+        }
+        
+        if let user = self.user {
+            APIService.sharedInstance.getPostsWith(userID: user.id, completion: { (post, handle) in
+                self.addHandle(handle)
+                self.isLoading = false
+                handlePost(post)
+            })
+            
+        }
+        else {
+            APIService.sharedInstance.getUserPosts { (post, handle) in
+                self.addHandle(handle)
+                self.isLoading = false
+                handlePost(post)
+            }
+        }
     }
 }
 
@@ -117,7 +124,7 @@ extension BSAccountViewController:UICollectionViewDelegate, UICollectionViewData
             guard self.isLoading == false else {return collectionView.dequeueReusableCell(withReuseIdentifier: kLoadingCellReuseID, for: indexPath)}
             guard self.userPosts.isEmpty == false else {
                 
-                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "empty_state_cell", for: indexPath) as! BSEmptyStateCollectionViewCell
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kEmptyStateCellReuseID, for: indexPath) as! BSEmptyStateCollectionViewCell
                 cell.titleLabel.text = "No posts yet"
                 return cell
                 

@@ -9,10 +9,10 @@
 import UIKit
 import JSQMessagesViewController
 import Firebase
-//import JSQSystemSoundPlayer
 
-class BSChatViewController: JSQMessagesViewController {
+class BSChatViewController: JSQMessagesViewController, HandleCollector {
     public var receiver:BSUser!
+    var handles: Set<UInt> = Set<UInt>()
     var receiverID:String! {
         get {
             return self.receiver.id
@@ -24,20 +24,23 @@ class BSChatViewController: JSQMessagesViewController {
     
     var senderAvatarImageSource = BSAvatarImageDataSource()
     var receiverAvatarImageSource = BSAvatarImageDataSource()
-    private var localTyping = false // 2
+    private var localTyping = false
     var userIsTypingRef:DatabaseReference?
     var isTyping: Bool {
         get {
             return localTyping
         }
         set {
-            // 3
             localTyping = newValue
             if let ref = userIsTypingRef {
                 ref.child(senderId).setValue(newValue)
             }
             
         }
+    }
+    
+    deinit {
+        self.clearHandles()
     }
     
     override func viewDidLoad() {
@@ -47,14 +50,16 @@ class BSChatViewController: JSQMessagesViewController {
         let size:CGFloat = 22
         self.collectionView!.collectionViewLayout.incomingAvatarViewSize = CGSize.init(width:size , height: size)
         self.collectionView!.collectionViewLayout.outgoingAvatarViewSize = CGSize.init(width:size , height: size)
-        self.senderAvatarImageSource.setImageWith(userID: self.senderId) {
+        self.senderAvatarImageSource.setImageWith(userID: self.senderId) { (handle) in
+            self.addHandle(handle)
             self.collectionView.reloadData()
         }
-        self.receiverAvatarImageSource.setImageWith(userID: self.receiverID) {
+        self.receiverAvatarImageSource.setImageWith(userID: self.receiverID) { (handle) in
+            self.addHandle(handle)
             self.collectionView.reloadData()
         }
         
-        observeMessages()
+        self.observeMessages()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -66,8 +71,6 @@ class BSChatViewController: JSQMessagesViewController {
                     self.showTypingIndicator = value
                     self.scrollToBottom(animated: true)
                 }
-                
-                print(snapshot)
             })
         })
     }
@@ -103,10 +106,10 @@ class BSChatViewController: JSQMessagesViewController {
     }
     
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageBubbleImageDataForItemAt indexPath: IndexPath!) -> JSQMessageBubbleImageDataSource! {
-        let message = messages[indexPath.item] // 1
-        if message.senderId == senderId { // 2
+        let message = messages[indexPath.item] 
+        if message.senderId == senderId {
             return outgoingBubbleImageView
-        } else { // 3
+        } else {
             return incomingBubbleImageView
         }
     }
@@ -158,6 +161,6 @@ class BSChatViewController: JSQMessagesViewController {
         // If the text is not empty, the user is typing
         isTyping = textView.text != ""
     }
-
-
 }
+
+
