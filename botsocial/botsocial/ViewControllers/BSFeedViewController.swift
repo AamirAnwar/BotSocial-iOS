@@ -26,11 +26,11 @@ class BSFeedViewController: BSBaseViewController {
     func observePosts() {
         self.isLoadingPosts = true
         APIService.sharedInstance.getRecentPosts { (post, handle) in
-            if let post = post, let handle = handle {
-                self.handles.append(handle)
+            self.addHandle(handle)
+            if let post = post {
                 self.posts.insert(post, at: 0)
                 
-                // If in between the list then show coachmark
+                // If in between the list then show coachmark. Still a work in progress
                 if let indexPaths = self.tableView.indexPathsForVisibleRows {
                     var min = Int.max
                     for path in indexPaths {
@@ -112,6 +112,24 @@ extension BSFeedViewController {
 }
 
 extension BSFeedViewController:BSFeedTableViewManagerDelegate {
+    
+    func didTapSavePostButton(sender:BSFeedActionsTableViewCell) {
+        if let indexPath = self.tableView.indexPath(for: sender) {
+            let index = self.feedTableViewManager.postIndexForCellAt(indexPath: indexPath)
+            let post = self.posts[index]
+            DBHelpers.isPostSaved(postID: post.id) { (isSaved) in
+                if isSaved == false {
+                    DBHelpers.savePost(post: post)
+                }
+                else {
+                    DBHelpers.deleteSavedPost(postID: post.id)
+                }
+                sender.saveButton.isSelected = !isSaved
+            }
+            
+        }
+    }
+    
     func showCommentsFor(post:BSPost) {
         let vc = BSPostCommentsViewController()
         vc.post = post

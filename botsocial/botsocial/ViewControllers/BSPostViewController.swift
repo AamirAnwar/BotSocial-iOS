@@ -8,7 +8,7 @@
 
 import UIKit
 
-class BSPostViewController: UITableViewController, UIGestureRecognizerDelegate {
+class BSPostViewController: BSBaseViewController {
     let kFeedImageCellReuseID = "BSImageTableViewCell"
     let kFeedUserSnippetCellReuseID = "BSUserSnippetTableViewCell"
     let kFeedActionsCellReuseID = "BSFeedActionsTableViewCell"
@@ -23,17 +23,13 @@ class BSPostViewController: UITableViewController, UIGestureRecognizerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        self.tableView.delegate = self
-        self.tableView.dataSource = self
-        self.tableView.tableFooterView = UIView()
-        self.tableView.separatorStyle = .none
         self.tableView.register(BSUserSnippetTableViewCell.self, forCellReuseIdentifier: kFeedUserSnippetCellReuseID)
         self.tableView.register(BSImageTableViewCell.self, forCellReuseIdentifier: kFeedImageCellReuseID)
         self.tableView.register(BSFeedActionsTableViewCell.self, forCellReuseIdentifier: kFeedActionsCellReuseID)
         self.tableView.register(BSPostDetailTableViewCell.self, forCellReuseIdentifier: kFeedPostInfoCellReuseID)
         self.tableView.register(BSAddCommentTableViewCell.self, forCellReuseIdentifier: kFeedCommentInfoCellReuseID)
         self.tableView.delaysContentTouches = false
-        self.navigationController?.interactivePopGestureRecognizer?.delegate = self
+        
     }
     
     
@@ -48,7 +44,8 @@ class BSPostViewController: UITableViewController, UIGestureRecognizerDelegate {
             let cell = tableView.dequeueReusableCell(withIdentifier: kFeedUserSnippetCellReuseID) as! BSUserSnippetTableViewCell
             if let post = self.post {
                 cell.usernameLabel.text = self.post?.authorName
-                APIService.sharedInstance.getProfilePictureFor(userID: post.authorID, completion: { (url) in
+                APIService.sharedInstance.getProfilePictureFor(userID: post.authorID, completion: { (url, handle) in
+                    self.addHandle(handle)
                     cell.setImageURL(url)
                 })
             }
@@ -63,6 +60,12 @@ class BSPostViewController: UITableViewController, UIGestureRecognizerDelegate {
             let cell = tableView.dequeueReusableCell(withIdentifier: kFeedActionsCellReuseID) as! BSFeedActionsTableViewCell
             cell.post = self.post
             cell.delegate = self
+            cell.saveButton.isSelected = false
+            if let post = self.post {
+                DBHelpers.isPostSaved(postID: post.id) { (isSaved) in
+                    cell.saveButton.isSelected = isSaved
+                }
+            }
             return cell
         case 3:
             let cell = tableView.dequeueReusableCell(withIdentifier: kFeedPostInfoCellReuseID) as! BSPostDetailTableViewCell
@@ -75,7 +78,7 @@ class BSPostViewController: UITableViewController, UIGestureRecognizerDelegate {
         }
     }
     
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         if indexPath.row == 0 {
             if let authorID = self.post?.authorID {
@@ -104,9 +107,17 @@ extension BSPostViewController:BSFeedActionsTableViewCellDelegate {
         }
     }
     
-    func didTapSavePostButton(sender: BSFeedActionsTableViewCell) {
-        if let post = self.post {
-            DBHelpers.savePost(post: post)
+    
+    func didTapSavePostButton(sender:BSFeedActionsTableViewCell) {
+        guard let post = self.post else {return}
+        DBHelpers.isPostSaved(postID: post.id) { (isSaved) in
+            if isSaved == false {
+                DBHelpers.savePost(post: post)
+            }
+            else {
+                DBHelpers.deleteSavedPost(postID: post.id)
+            }
+            sender.saveButton.isSelected = !isSaved
         }
     }
 }

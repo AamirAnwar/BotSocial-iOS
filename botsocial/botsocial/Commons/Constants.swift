@@ -17,6 +17,7 @@ let kVisionObjectsListViewHeight:CGFloat = 30
 let kLibPhotoPreviewSize:CGFloat = 44
 let kNotificationWillShowKeyboard = Notification(name: Notification.Name.UIKeyboardWillShow)
 let kNotificationWillHideKeyboard = Notification(name: Notification.Name.UIKeyboardWillHide)
+let kNotificationUpdateSavedPosts = Notification(name:Notification.Name.init("SavedPostsUpdated"))
 let kCommentPlaceholderText = "Post a comment..."
 let kFeedCellReuseIdentifier = "Feed_BSFeedTableViewCell"
 let kFeaturedCellReuseID = "BSFeaturedPostTableViewCell"
@@ -25,6 +26,7 @@ let kFeedUserSnippetCellReuseID = "BSUserSnippetTableViewCell"
 let kFeedActionsCellReuseID = "BSFeedActionsTableViewCell"
 let kFeedPostInfoCellReuseID = "BSPostDetailTableViewCell"
 let kFeedCommentInfoCellReuseID = "BSAddCommentTableViewCell"
+let kEmptyStateCellReuseID = "empty_state_cell"
 let kLoadingCellReuseID = "loader_cell"
 //let kTestImageURL = "https://avatars3.githubusercontent.com/u/12379620?s=460&v=4"
 var kTestImageURL:String {

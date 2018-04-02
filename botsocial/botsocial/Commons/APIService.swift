@@ -10,10 +10,12 @@ import UIKit
 import Firebase
 
 class APIService: NSObject {
+    
     static let sharedInstance = APIService()
     fileprivate let storageRef = Storage.storage().reference()
     fileprivate let databaseRef = Database.database().reference()
     
+    // Get currently logged in user
     var currentUser:User? {
         get {
             return Auth.auth().currentUser
@@ -25,75 +27,15 @@ class APIService: NSObject {
         }
     }
     
-    func getUserPosts(completion:@escaping ((_ post:BSPost?) -> Void)) {
-        guard let user = self.currentUser else {return}
-        self.databaseRef.child("user-posts").child("\(user.uid)").observeSingleEvent(of: .value) { (snapshot) in
-            if snapshot.exists() == false {
-                completion(nil)
-            }
-            
-            self.databaseRef.child("user-posts").child("\(user.uid)").queryLimited(toLast: 30).observe(DataEventType.childAdded, with: { (snapshot) in
-                guard let value = snapshot.value as? [String:AnyObject] else {completion(nil);return}
-                let post = BSPost.initWith(postID: snapshot.key, dict: value)
-                completion(post)
-            })
+    func cancelHandle(_ handle:UInt?) {
+        if let handle = handle {
+            self.databaseRef.removeObserver(withHandle: handle)
         }
     }
-    
-    
-    func getPostsWith(userID:String, completion:@escaping ((_ post:BSPost?) -> Void)) {
-        guard userID.isEmpty == false else {return}
-        self.databaseRef.child("user-posts").child("\(userID)").queryLimited(toLast: 30).observe(DataEventType.childAdded, with: { (snapshot) in
-            guard let value = snapshot.value as? [String:AnyObject] else {completion(nil);return}
-            let post = BSPost.initWith(postID: snapshot.key, dict: value)
-            completion(post)
-        })
-    }
-    
-    func getRecentPosts(completion:@escaping ((_ posts:BSPost?, _ handle:UInt?) -> Void)) {
-        guard let _ = self.currentUser else {return}
-        self.databaseRef.child("posts").observeSingleEvent(of: .value) { (snapshot) in
-            if snapshot.exists() == false {
-                completion(nil, nil)
-            }
-            var handle:UInt? = nil
-            handle = self.databaseRef.child("posts").queryLimited(toLast: 30).observe(DataEventType.childAdded, with: { (snapshot) in
-                guard let dict = snapshot.value as? [String:AnyObject] else {completion(nil, nil);return}
-                let post = BSPost.initWith(postID: snapshot.key, dict: dict)
-                completion(post, handle)
-            })
+}
 
-        }
-    }
-    
-    func getPostWith(postID:String, completion:@escaping ((_ posts:BSPost?) -> Void)) {
-        self.databaseRef.child("posts").child(postID).observeSingleEvent(of: .value) { (snapshot) in
-            guard let postDict = snapshot.value as? [String:AnyObject] else {completion(nil);return}
-            let post = BSPost.initWith(postID: snapshot.key, dict: postDict)
-            completion(post)
-            
-        }
-    }
-    
-    func getUserProfileImageURL(completion:@escaping ((_ url:URL?)->Void)) {
-        guard let user = self.currentUser else {completion(nil);return}
-        self.databaseRef.child("users").child(user.uid).observe(DataEventType.value, with: { (snapshot) in
-            let value = snapshot.value as? NSDictionary
-            print(value ?? "")
-            let profileImageURL = value?["userPhoto"] as? String ?? ""
-            print("Profile image url is \(profileImageURL)")
-            completion(URL(string:profileImageURL))
-        })
-    }
-    
-    func getProfilePictureFor(userID:String,completion:@escaping ((_ url:URL?)->Void)) {
-        guard userID.isEmpty == false else {completion(nil);return}
-        self.databaseRef.child("users").child(userID).observe(DataEventType.value, with: { (snapshot) in
-            let value = snapshot.value as? NSDictionary
-            let profileImageURL = value?["userPhoto"] as? String ?? ""
-            completion(URL(string:profileImageURL))
-        })
-    }
+// MARK: User
+extension APIService {
     
     func updateUserDetails(user:User) {
         guard let name = user.displayName else {return}
@@ -108,6 +50,30 @@ class APIService: NSObject {
                 completion(userObject)
             }
         }
+    }
+}
+
+// MARK: Profile Picture
+extension APIService {
+    func getUserProfileImageURL(completion:@escaping ((_ url:URL?)->Void)) {
+        guard let user = self.currentUser else {completion(nil);return}
+        self.databaseRef.child("users").child(user.uid).observe(DataEventType.value, with: { (snapshot) in
+            let value = snapshot.value as? NSDictionary
+            print(value ?? "")
+            let profileImageURL = value?["userPhoto"] as? String ?? ""
+            print("Profile image url is \(profileImageURL)")
+            completion(URL(string:profileImageURL))
+        })
+    }
+    
+    func getProfilePictureFor(userID:String,completion:@escaping ((_ url:URL?, _ handle:UInt?)->Void)) {
+        guard userID.isEmpty == false else {completion(nil, nil);return}
+        var handle:UInt?
+        handle = self.databaseRef.child("users").child(userID).observe(DataEventType.value, with: { (snapshot) in
+            let value = snapshot.value as? NSDictionary
+            let profileImageURL = value?["userPhoto"] as? String ?? ""
+            completion(URL(string:profileImageURL), handle)
+        })
     }
     
     func updateUserProfilePicture(image:UIImage, completion:@escaping()->Void) {
@@ -136,95 +102,10 @@ class APIService: NSObject {
             }
         }
     }
-    
-    func deletePost(post:BSPost, completion:@escaping (() -> Void)) {
-        guard let user = self.currentUser, let postID = post.id, user.uid == post.authorID else {return}
-        let postUpdatePaths = ["/posts/\(postID)":NSNull(),
-                               "/user-posts/\(user.uid)/\(postID)/":NSNull()]
-        self.databaseRef.updateChildValues(postUpdatePaths) { (err, ref) in
-            completion()
-        }
-    }
-    
-    
-    func createPost(caption:String? = String(), image:UIImage, completion:@escaping (() -> Void)) {
-        guard let user = self.currentUser else {return}
-        let postKey = self.databaseRef.child("posts").childByAutoId().key
-        let imageData = UIImageJPEGRepresentation(image, 0.8)!
-        let filePath = "\(postKey)"
-        let storageRef = Storage.storage().reference()
-        let metaData = StorageMetadata()
-        
-        metaData.contentType = "image/jpg"
-        storageRef.child(filePath).putData(imageData, metadata: metaData){(metaData,error) in
-            if let error = error {
-                print(error.localizedDescription)
-                return
-            }
-            else {
-                let downloadURL = metaData!.downloadURL()!.absoluteString
-                
-                let post = ["uid": user.uid,
-                            "author": user.displayName!,
-                            "caption": caption,
-                            "image_url": downloadURL
-                ]
-                let childUpdates = ["/posts/\(postKey)": post,
-                                    "/user-posts/\(user.uid)/\(postKey)/": post]
-                self.databaseRef.updateChildValues(childUpdates)
-            }
-            completion()
-        }
-    }
-    
-    func isPostLiked(post:BSPost, completion:@escaping ((_ isLiked:Bool) -> Void) ) {
-        guard let user = self.currentUser, let postID = post.id else {return}
-        self.databaseRef.child("/posts/\(postID)/likes/\(user.uid)").observeSingleEvent(of: .value) { (snapshot) in
-            completion(snapshot.exists())
-        }
-    }
-    
-    func likePost(post:BSPost) {
-        guard let user = self.currentUser, let postID = post.id else {return}
-        
-        self.databaseRef.child("/posts/\(postID)/likes/\(user.uid)").observeSingleEvent(of: .value) { (snapshot) in
-            guard user.uid.isEmpty == false, let authorID = post.authorID else {return}
-            let isLiked = snapshot.exists()
-            
-            let paths = [
-                "/posts/\(postID)/likes/\(user.uid)",
-                "/user-posts/\(authorID)/\(postID)/likes/\(user.uid)",
-                "users/\(user.uid)/likes/\(postID)"
-            ]
-            if isLiked {
-                for path in paths {
-                    self.databaseRef.child(path).removeValue()
-                }
-                if let postAuthorID = post.authorID {
-                    self.databaseRef.child("users").child("\(postAuthorID)").child("notifications").child("\(user.uid)_\(postID)_like").removeValue()
-                }
-            }
-            else {
-                var childUpdates:[String:Any] = [:]
-                for path in paths {
-                    childUpdates[path] = true
-                }
-                self.databaseRef.updateChildValues(childUpdates, withCompletionBlock: { (error, ref) in
-                    if let username = user.displayName, let postAuthorID = post.authorID {
-                        let notification = [
-                            "author_name": username,
-                            "text":"liked your post",
-                            "user_id": user.uid,
-                            "post_id": postID
-                        ]
-                        let newNotificationChild = self.databaseRef.child("users").child("\(postAuthorID)").child("notifications").childByAutoId()
-                        newNotificationChild.setValue(notification)
-                    }
-                })
-            }
-        }
-    }
-    
+}
+
+// MARK: Notifications
+extension APIService {
     func getNotifications(completion:@escaping ((_ notification:BSNotification?, _ handle:UInt) -> Void) ) {
         guard let user = self.currentUser else {completion(nil, 0);return}
         self.databaseRef.child("users").child("\(user.uid)").child("notifications").observeSingleEvent(of: .value) { (snapshot) in
@@ -243,68 +124,10 @@ class APIService: NSObject {
             }
         }
     }
-    
-    func getLikesForPost(post:BSPost, completion:@escaping ((_ likesCount:Int) -> Void) ) {
-        if let postID = post.id, postID.isEmpty == false {
-            self.databaseRef.child("posts").child(postID).child("likes").observe(DataEventType.value, with: { (data) in
-                completion(Int(data.childrenCount))
-            })
-        }
-    }
-    
-    func getCommentCountForPost(post:BSPost, completion:@escaping ((_ commentCount:Int) -> Void) ) {
-        if let postID = post.id, postID.isEmpty == false {
-            self.databaseRef.child("posts").child(postID).child("comments").observe(DataEventType.value, with: { (data) in
-                completion(Int(data.childrenCount))
-            })
-        }
-    }
-    
-    func commentOnPostWith(post:BSPost, comment:String, completion:@escaping (() -> Void)) {
-        guard let user = self.currentUser, let postID = post.id else {
-            completion()
-            return
-        }
-        let commentKey = self.databaseRef.child("comments").childByAutoId().key
-        let commentPayload = ["author_id": user.uid,
-                       "author_name": user.displayName!,
-                       "text": comment,
-                       ]
-        let childUpdates:[String:Any] = ["/comments/\(commentKey)/": commentPayload,
-                                            "/posts/\(postID)/comments/\(commentKey)/":commentPayload,
-                                            "/user-posts/\(post.authorID)/\(postID)/comments/\(commentKey)/":commentPayload]
-        self.databaseRef.updateChildValues(childUpdates, withCompletionBlock: { (error, ref) in
-            completion()
-            if let username = user.displayName, let postAuthorID = post.authorID {
-                let notification = [
-                    "author_name": username,
-                    "text":"commented on your post: \(comment)",
-                    "user_id": user.uid,
-                    "post_id": postID
-                ]
-                let newNotificationChild = self.databaseRef.child("users").child("\(postAuthorID)").child("notifications").childByAutoId()
-                newNotificationChild.setValue(notification)
-            }
-        })
-        
-    }
-    
-    func getCommentsForPostWith(postID:String, completion:@escaping ((_ comment:BSComment) -> Void)) {
-        guard postID.isEmpty == false else {return}
-        self.databaseRef.child("posts").child(postID).child("comments").observe(DataEventType.childAdded, with: { (snapshot) in
-            guard let commentDict = snapshot.value as? [String:AnyObject] else {return}
-                let comment = BSComment.initWith(commentID: snapshot.key, dict: commentDict)
-                completion(comment)
-        })
-        
-    }
-    
-    func cancelHandle(_ handle:UInt?) {
-        if let handle = handle {
-            self.databaseRef.removeObserver(withHandle: handle)
-        }
-    }
-    
+}
+
+// MARK: Chat
+extension APIService {
     func sendMessageTo(receiver:BSUser, message:String ,completion:@escaping ((_ message:BSMessage?) -> Void)) {
         
         guard let user = self.currentUser,let receiverID = receiver.id, receiverID.isEmpty == false && message.isEmpty == false, let senderName = user.displayName else {
@@ -331,7 +154,7 @@ class APIService: NSObject {
         // Check Sender
         senderRef.observeSingleEvent(of: .value) { (snapshot) in
             if snapshot.exists() {
-                let senderChatKey = snapshot.key
+                let _ = snapshot.key
                 // Check the receiver as well
                 let receiverRef = self.databaseRef.child("user_chats").child(receiverID).child(senderID)
                 receiverRef.observeSingleEvent(of: .value) { (snapshot) in
@@ -477,16 +300,26 @@ class APIService: NSObject {
         guard let _ = self.currentUser else {completion(nil);return}
         self.databaseRef.child("user_chats").child(senderID).child(receiverID).observeSingleEvent(of: .value) { (snapshot) in
             if snapshot.exists() {
-                let ref = self.databaseRef.child("chats").child(snapshot.key).child("typing_indicator").child(receiverID)
-                ref.onDisconnectRemoveValue()
-                completion(self.databaseRef.child("chats").child(snapshot.key).child("typing_indicator"))
+                if let value = snapshot.value as? [String:AnyObject], let chatID = value.keys.first {
+                    let ref = self.databaseRef.child("chats").child(chatID).child("typing_indicator").child(receiverID)
+                    ref.onDisconnectRemoveValue()
+                    completion(self.databaseRef.child("chats").child(chatID).child("typing_indicator"))
+                }
+                else {
+                    completion(nil)
+                }
+                
             }
             else {
                 self.databaseRef.child("user_chats").child(receiverID).child(senderID).observeSingleEvent(of: .value) { (snapshot) in
                     if snapshot.exists() {
-                        let ref = self.databaseRef.child("chats").child(snapshot.key).child("typing_indicator").child(receiverID)
+                        guard let value = snapshot.value as? [String:AnyObject], let chatID = value.keys.first else {
+                            completion(nil)
+                            return
+                        }
+                        let ref = self.databaseRef.child("chats").child(chatID).child("typing_indicator").child(receiverID)
                         ref.onDisconnectRemoveValue()
-                        completion(self.databaseRef.child("chats").child(snapshot.key).child("typing_indicator"))
+                        completion(self.databaseRef.child("chats").child(chatID).child("typing_indicator"))
                     }
                     else {
                         completion(nil)
@@ -498,15 +331,14 @@ class APIService: NSObject {
         
     }
     
-    func getUserChats(completion:@escaping (_ chat:BSChatInstance?) -> Void) {
+    func getUserChats(completion:@escaping (_ chat:BSChatInstance?, _ handle:UInt?) -> Void) {
         guard let currentUser = self.currentUser else {return}
         self.databaseRef.child("user_chats").child(currentUser.uid).observeSingleEvent(of: .value) { (snapshot) in
             if snapshot.exists() {
-                self.databaseRef.child("user_chats").child(currentUser.uid).observe(.childAdded) { (snapshot) in
+                var handle:UInt? = nil
+                handle = self.databaseRef.child("user_chats").child(currentUser.uid).observe(.childAdded) { (snapshot) in
                     var chat:BSChatInstance? = nil
                     if let value = snapshot.value as? [String:AnyObject] {
-                        print("Checking chats for ID \(currentUser.uid)")
-                        print(value)
                         let receiverID = snapshot.key
                         if let chatID = value.keys.first {
                             if let chatInfoDict = value[chatID] as? [String:AnyObject]{
@@ -518,14 +350,217 @@ class APIService: NSObject {
                         }
                         
                     }
-                    completion(chat)
+                    completion(chat, handle)
                 }
             }
             else {
-                completion(nil)
+                completion(nil, nil)
             }
         }
+        
+    }
+}
 
+// MARK: Posts
+extension APIService {
+    
+    func getUserPosts(completion:@escaping ((_ post:BSPost?, _ handle:UInt?) -> Void)) {
+        guard let user = self.currentUser else {return}
+        self.databaseRef.child("user-posts").child("\(user.uid)").observeSingleEvent(of: .value) { (snapshot) in
+            if snapshot.exists() == false {
+                completion(nil, nil)
+            }
+            var handle:UInt?
+            handle = self.databaseRef.child("user-posts").child("\(user.uid)").queryLimited(toLast: 30).observe(DataEventType.childAdded, with: { (snapshot) in
+                guard let value = snapshot.value as? [String:AnyObject] else {completion(nil, nil);return}
+                let post = BSPost.initWith(postID: snapshot.key, dict: value)
+                completion(post, handle)
+            })
+        }
     }
     
+    func getPostsWith(userID:String, completion:@escaping ((_ post:BSPost?,_ handle:UInt?) -> Void)) {
+        guard userID.isEmpty == false else {completion(nil, nil);return}
+        var handle:UInt?
+        handle = self.databaseRef.child("user-posts").child("\(userID)").queryLimited(toLast: 30).observe(DataEventType.childAdded, with: { (snapshot) in
+            guard let value = snapshot.value as? [String:AnyObject] else {completion(nil, nil);return}
+            let post = BSPost.initWith(postID: snapshot.key, dict: value)
+            completion(post, handle)
+        })
+    }
+    
+    func getRecentPosts(completion:@escaping ((_ posts:BSPost?, _ handle:UInt?) -> Void)) {
+        guard let _ = self.currentUser else {return}
+        self.databaseRef.child("posts").observeSingleEvent(of: .value) { (snapshot) in
+            if snapshot.exists() == false {
+                completion(nil, nil)
+            }
+            var handle:UInt? = nil
+            handle = self.databaseRef.child("posts").queryLimited(toLast: 30).observe(DataEventType.childAdded, with: { (snapshot) in
+                guard let dict = snapshot.value as? [String:AnyObject] else {completion(nil, nil);return}
+                let post = BSPost.initWith(postID: snapshot.key, dict: dict)
+                completion(post, handle)
+            })
+            
+        }
+    }
+    
+    func getPostWith(postID:String, completion:@escaping ((_ posts:BSPost?) -> Void)) {
+        self.databaseRef.child("posts").child(postID).observeSingleEvent(of: .value) { (snapshot) in
+            guard let postDict = snapshot.value as? [String:AnyObject] else {completion(nil);return}
+            let post = BSPost.initWith(postID: snapshot.key, dict: postDict)
+            completion(post)
+            
+        }
+    }
+    
+    func deletePost(post:BSPost, completion:@escaping (() -> Void)) {
+        guard let user = self.currentUser, let postID = post.id, user.uid == post.authorID else {return}
+        let postUpdatePaths = ["/posts/\(postID)":NSNull(),
+                               "/user-posts/\(user.uid)/\(postID)/":NSNull()]
+        self.databaseRef.updateChildValues(postUpdatePaths) { (err, ref) in
+            completion()
+        }
+    }
+    
+    
+    func createPost(caption:String? = String(), image:UIImage, completion:@escaping (() -> Void)) {
+        guard let user = self.currentUser else {return}
+        let postKey = self.databaseRef.child("posts").childByAutoId().key
+        let imageData = UIImageJPEGRepresentation(image, 0.8)!
+        let filePath = "\(postKey)"
+        let storageRef = Storage.storage().reference()
+        let metaData = StorageMetadata()
+        
+        metaData.contentType = "image/jpg"
+        storageRef.child(filePath).putData(imageData, metadata: metaData){(metaData,error) in
+            if let error = error {
+                print(error.localizedDescription)
+                return
+            }
+            else {
+                let downloadURL = metaData!.downloadURL()!.absoluteString
+                
+                let post = ["uid": user.uid,
+                            "author": user.displayName!,
+                            "caption": caption,
+                            "image_url": downloadURL
+                ]
+                let childUpdates = ["/posts/\(postKey)": post,
+                                    "/user-posts/\(user.uid)/\(postKey)/": post]
+                self.databaseRef.updateChildValues(childUpdates)
+            }
+            completion()
+        }
+    }
+}
+
+
+// MARK : Like System
+extension APIService {
+    
+    func isPostLiked(post:BSPost, completion:@escaping ((_ isLiked:Bool) -> Void) ) {
+        guard let user = self.currentUser, let postID = post.id else {return}
+        self.databaseRef.child("/posts/\(postID)/likes/\(user.uid)").observeSingleEvent(of: .value) { (snapshot) in
+            completion(snapshot.exists())
+        }
+    }
+    
+    func likePost(post:BSPost) {
+        guard let user = self.currentUser, let postID = post.id else {return}
+        
+        self.databaseRef.child("/posts/\(postID)/likes/\(user.uid)").observeSingleEvent(of: .value) { (snapshot) in
+            guard user.uid.isEmpty == false, let authorID = post.authorID else {return}
+            let isLiked = snapshot.exists()
+            
+            let paths = [
+                "/posts/\(postID)/likes/\(user.uid)",
+                "/user-posts/\(authorID)/\(postID)/likes/\(user.uid)",
+                "users/\(user.uid)/likes/\(postID)"
+            ]
+            if isLiked {
+                for path in paths {
+                    self.databaseRef.child(path).removeValue()
+                }
+                if let postAuthorID = post.authorID {
+                    self.databaseRef.child("users").child("\(postAuthorID)").child("notifications").child("\(user.uid)_\(postID)_like").removeValue()
+                }
+            }
+            else {
+                var childUpdates:[String:Any] = [:]
+                for path in paths {
+                    childUpdates[path] = true
+                }
+                self.databaseRef.updateChildValues(childUpdates, withCompletionBlock: { (error, ref) in
+                    if let username = user.displayName, let postAuthorID = post.authorID {
+                        let notification = [
+                            "author_name": username,
+                            "text":"liked your post",
+                            "user_id": user.uid,
+                            "post_id": postID
+                        ]
+                        let newNotificationChild = self.databaseRef.child("users").child("\(postAuthorID)").child("notifications").childByAutoId()
+                        newNotificationChild.setValue(notification)
+                    }
+                })
+            }
+        }
+    }
+    
+    func getLikesForPost(post:BSPost, completion:@escaping ((_ likesCount:Int) -> Void) ) {
+        if let postID = post.id, postID.isEmpty == false {
+            self.databaseRef.child("posts").child(postID).child("likes").observe(DataEventType.value, with: { (data) in
+                completion(Int(data.childrenCount))
+            })
+        }
+    }
+}
+
+// MARK: Comment System
+extension APIService {
+    func commentOnPostWith(post:BSPost, comment:String, completion:@escaping (() -> Void)) {
+        guard let user = self.currentUser, let postID = post.id else {
+            completion()
+            return
+        }
+        let commentKey = self.databaseRef.child("comments").childByAutoId().key
+        let commentPayload = ["author_id": user.uid,
+                              "author_name": user.displayName!,
+                              "text": comment,
+                              ]
+        let childUpdates:[String:Any] = ["/comments/\(commentKey)/": commentPayload,
+                                         "/posts/\(postID)/comments/\(commentKey)/":commentPayload,
+                                         "/user-posts/\(post.authorID)/\(postID)/comments/\(commentKey)/":commentPayload]
+        self.databaseRef.updateChildValues(childUpdates, withCompletionBlock: { (error, ref) in
+            completion()
+            if let username = user.displayName, let postAuthorID = post.authorID {
+                let notification = [
+                    "author_name": username,
+                    "text":"commented on your post: \(comment)",
+                    "user_id": user.uid,
+                    "post_id": postID
+                ]
+                let newNotificationChild = self.databaseRef.child("users").child("\(postAuthorID)").child("notifications").childByAutoId()
+                newNotificationChild.setValue(notification)
+            }
+        })
+        
+    }
+    
+    func getCommentsForPostWith(postID:String, completion:@escaping ((_ comment:BSComment) -> Void)) {
+        guard postID.isEmpty == false else {return}
+        self.databaseRef.child("posts").child(postID).child("comments").observe(DataEventType.childAdded, with: { (snapshot) in
+            guard let commentDict = snapshot.value as? [String:AnyObject] else {return}
+            let comment = BSComment.initWith(commentID: snapshot.key, dict: commentDict)
+            completion(comment)
+        })
+    }
+    
+    func getCommentCountForPost(post:BSPost, completion:@escaping ((_ commentCount:Int) -> Void) ) {
+        if let postID = post.id, postID.isEmpty == false {
+            self.databaseRef.child("posts").child(postID).child("comments").observe(DataEventType.value, with: { (data) in
+                completion(Int(data.childrenCount))
+            })
+        }
+    }
 }

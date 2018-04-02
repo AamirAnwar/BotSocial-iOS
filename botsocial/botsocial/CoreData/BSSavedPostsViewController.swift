@@ -23,6 +23,7 @@ class BSSavedPostsViewController: BSBaseViewController {
         self.tableView.delegate = self.tableViewManager
         self.tableView.dataSource = self.tableViewManager
         self.loadSavedPosts()
+        NotificationCenter.default.addObserver(self, selector: #selector(didUpdatePosts), name: kNotificationUpdateSavedPosts.name, object: nil)
     }
     
     func loadSavedPosts() {
@@ -61,6 +62,13 @@ extension BSSavedPostsViewController:BSFeedActionsTableViewCellDelegate {
         }
     }
     
+    func deletePost(postID:String) {
+        DBHelpers.deleteSavedPost(postID: postID)
+    }
+}
+
+extension BSSavedPostsViewController:BSFeedTableViewManagerDelegate {
+    
     func didTapSavePostButton(sender:BSFeedActionsTableViewCell) {
         let alertController = UIAlertController.init(title: "Delete post", message: "Delete this post?", preferredStyle: .actionSheet)
         let deleteAction = UIAlertAction.init(title: "Delete", style: .destructive) { (action) in
@@ -82,13 +90,6 @@ extension BSSavedPostsViewController:BSFeedActionsTableViewCellDelegate {
         self.present(alertController, animated: true)
     }
     
-    func deletePost(postID:String) {
-        DBHelpers.deleteSavedPost(postID: postID)
-    }
-}
-
-extension BSSavedPostsViewController:BSFeedTableViewManagerDelegate {
-    
     func showCommentsFor(post: BSPost) {
         let vc = BSPostCommentsViewController()
         vc.post = post
@@ -105,5 +106,12 @@ extension BSSavedPostsViewController:BSFeedTableViewManagerDelegate {
     
     func moreButtonTapped(sender: UITableViewCell) {
         // Do nothing
+    }
+    
+    @objc func didUpdatePosts() {
+        guard self.view.window == nil else {
+            return
+        }
+        self.loadSavedPosts()
     }
 }

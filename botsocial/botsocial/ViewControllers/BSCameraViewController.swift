@@ -192,10 +192,11 @@ class BSCameraViewController: BSBaseViewController {
         
         // LibImage Thumbnail View
         self.libPreviewButton.tintColor = UIColor.gray.withAlphaComponent(0.1)
-//        self.libPreviewButton.imageView?.contentMode = .scaleAspectFill
-//        self.libPreviewButton.imageView?.clipsToBounds = true
+        self.libPreviewButton.clipsToBounds = true
         self.libPreviewButton.layer.cornerRadius = kCornerRadius
         self.libPreviewButton.imageView?.backgroundColor = UIColor.gray.withAlphaComponent(0.1)
+        self.libPreviewButton.layer.borderWidth = 1.0
+        self.libPreviewButton.layer.borderColor = BSLightGray.cgColor
         
         self.libPreviewButton.snp.makeConstraints { (make) in
             make.leading.equalToSuperview().offset(2*kSidePadding)

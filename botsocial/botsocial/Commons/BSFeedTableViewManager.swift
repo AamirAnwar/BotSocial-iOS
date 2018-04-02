@@ -25,6 +25,7 @@ protocol BSFeedTableViewManagerDelegate:BSUserSnippetTableViewCellDelegate {
     var coachmark:BSCoachmarkView? {get}
     var isLoadingPosts:Bool {get set}
     func postIsSaved(postID: String, saveButton: UIButton)
+    func didTapSavePostButton(sender:BSFeedActionsTableViewCell)
     func showProfileFor(user:BSUser)
     func showCommentsFor(post:BSPost)
     
@@ -211,17 +212,6 @@ extension BSFeedTableViewManager:BSFeedActionsTableViewCellDelegate {
     
     
     func didTapSavePostButton(sender:BSFeedActionsTableViewCell) {
-        if let indexPath = self.delegate.tableView.indexPath(for: sender) {
-            let index = self.postIndexForCellAt(indexPath: indexPath)
-            let post = self.delegate.posts[index]
-            DBHelpers.savePost(post: post)
-        }
-    }
-}
-
-
-extension Bool {
-    var intValue:Int {
-        return self ? 1:0
+        self.delegate.didTapSavePostButton(sender: sender)
     }
 }

@@ -8,9 +8,10 @@
 
 import UIKit
 
-class BSBaseViewController: UIViewController {
+class BSBaseViewController: UIViewController,HandleCollector {
     var tableView = UITableView.init(frame: .zero, style: .plain)
-    var handles:[UInt] = []
+    var handles = Set<UInt>()
+    
     private(set) var coachmark:BSCoachmarkView?
     var shouldShowCoachmark = false {
         didSet {
@@ -38,12 +39,11 @@ class BSBaseViewController: UIViewController {
     }()
     
     let loader:UIActivityIndicatorView =  {
-        
         let view = UIActivityIndicatorView.init()
         view.activityIndicatorViewStyle = .whiteLarge
         return view
     }()
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = UIColor.white
@@ -53,10 +53,7 @@ class BSBaseViewController: UIViewController {
     }
     
     deinit {
-        for handle in self.handles {
-            APIService.sharedInstance.cancelHandle(handle)
-        }
-        handles = []
+        self.clearHandles()
     }
     
     public func configureTableView() {
@@ -72,7 +69,10 @@ class BSBaseViewController: UIViewController {
         self.tableView.register(BSPostDetailTableViewCell.self, forCellReuseIdentifier: kFeedPostInfoCellReuseID)
         self.tableView.register(BSAddCommentTableViewCell.self, forCellReuseIdentifier: kFeedCommentInfoCellReuseID)
         self.tableView.snp.makeConstraints { (make) in
-            make.edges.equalToSuperview()
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview()
+            make.bottom.equalToSuperview()
+            make.top.equalToSuperview()
         }
     }
     
@@ -107,6 +107,19 @@ class BSBaseViewController: UIViewController {
         }
     }
     
+    func willShowKeyboardWith(height:CGFloat) {
+        guard self.view.window != nil else {return}
+        UIView.animate(withDuration: 0.3, animations: {
+            self.tableView.contentInset = UIEdgeInsets.init(top: 0, left: 0, bottom: height, right: 0)
+        })
+    }
+    
+    func willHideKeyboardWith(height:CGFloat) {
+        guard self.view.window != nil else {return}
+        UIView.animate(withDuration: 0.3, animations: {
+            self.tableView.contentInset = .zero
+        })
+    }
 }
 
 extension BSBaseViewController:UIGestureRecognizerDelegate {
@@ -156,4 +169,31 @@ extension BSBaseViewController {
     }
     
 }
+
+// MARK: Handle Keyboard
+extension BSBaseViewController {
+    func enableKeyboardListeners() {
+        NotificationCenter.default.addObserver(self, selector: #selector(willShowKeyboard(notification:)), name: kNotificationWillShowKeyboard.name, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(willHideKeyboard), name: kNotificationWillHideKeyboard.name, object: nil)
+        
+    }
+    
+    @objc func willShowKeyboard(notification:NSNotification) {
+        guard self.view.window != nil else {return}
+        if let keyboardFrame = notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue {
+            let keyboardHeight = keyboardFrame.cgRectValue.height
+            self.willShowKeyboardWith(height: keyboardHeight - self.tabBarHeight)
+        }
+    }
+    
+    @objc func willHideKeyboard(notification:NSNotification) {
+        guard self.view.window != nil else {return}
+        if let keyboardFrame = notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue {
+            let keyboardHeight = keyboardFrame.cgRectValue.height
+            self.willHideKeyboardWith(height: keyboardHeight - self.tabBarHeight)
+        }
+        
+    }
+}
+
 

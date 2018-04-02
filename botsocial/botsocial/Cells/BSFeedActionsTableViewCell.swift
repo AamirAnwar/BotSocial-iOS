@@ -93,6 +93,9 @@ class BSFeedActionsTableViewCell: UITableViewCell {
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(didUpdateSavedPosts), name: kNotificationUpdateSavedPosts.name, object: nil)
+        
         self.contentView.addSubview(self.likeButton)
 //        self.contentView.addSubview(self.dislikeButton)
         self.contentView.addSubview(self.commentButton)
@@ -131,7 +134,6 @@ class BSFeedActionsTableViewCell: UITableViewCell {
     }
     
     @objc func commentButtonTapped() {
-        
         self.delegate?.didTapCommentsButton(sender:self)
     }
     
@@ -153,5 +155,13 @@ class BSFeedActionsTableViewCell: UITableViewCell {
         })
         BSCommons.applyBounceAnimationTo(self.saveButton)
         self.delegate?.didTapSavePostButton(sender:self)
+    }
+    
+    @objc func didUpdateSavedPosts() {
+        if let postID = post?.id {
+            DBHelpers.isPostSaved(postID: postID) { (isSaved) in
+                self.saveButton.isSelected = isSaved
+            }
+        }
     }
 }

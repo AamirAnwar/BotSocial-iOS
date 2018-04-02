@@ -76,7 +76,7 @@ class BSUserSnippetTableViewCell: UITableViewCell {
         usernameLabel.text = post.authorName
         moreButton.isHidden = true
         if let authorID = post.authorID {
-            APIService.sharedInstance.getProfilePictureFor(userID: authorID, completion: {(url) in
+            APIService.sharedInstance.getProfilePictureFor(userID: authorID, completion: {(url,handle) in
                 self.setImageURL(url)
             })
             if let currentUser = APIService.sharedInstance.currentUser {
@@ -92,17 +92,18 @@ class BSUserSnippetTableViewCell: UITableViewCell {
     }
     
     func setImageURL(_ url:URL?) {
+        self.userImageView.image = #imageLiteral(resourceName: "placeholder_image")
         if let url = url {
             self.userImageView.pin_setImage(from:url)
         }
-        else {
-            self.userImageView.image = #imageLiteral(resourceName: "placeholder_image")
-        }
-        
     }
     
     @objc func moreButtonTapped() {
         self.delegate?.moreButtonTapped(sender: self)
     }
-
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        self.userImageView.image = #imageLiteral(resourceName: "placeholder_image")
+        
+    }
 }

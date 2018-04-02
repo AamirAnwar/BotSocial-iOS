@@ -10,7 +10,7 @@ import UIKit
 import Firebase
 
 let kPlaceholderText = "Write a caption..."
-class BSShareViewController: BSBaseViewController{
+class BSShareViewController: BSBaseViewController {
     var postImage:UIImage? {
         didSet {
             self.postImageView.image = postImage
@@ -151,21 +151,11 @@ class BSShareViewController: BSBaseViewController{
         self.contentView.endEditing(true)
     }
     
-    @objc func willShowKeyboard(notification:NSNotification) {
-        guard self.view.window != nil else {return}
-        
-        if let keyboardFrame = notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue {
-            let keyboardHeight = keyboardFrame.cgRectValue.height
-            var tabBarHeight:CGFloat = 0.0
-            if let tabbar = self.tabBarController?.tabBar {
-                tabBarHeight = tabbar.height()
-            }
-            self.scrollView.contentInset = UIEdgeInsets.init(top: 0, left: 0, bottom: keyboardHeight - tabBarHeight, right: 0)
-        }
+    override func willShowKeyboardWith(height: CGFloat) {
+        self.scrollView.contentInset = UIEdgeInsets.init(top: 0, left: 0, bottom: height, right: 0)
     }
     
-    @objc func willHideKeyboard() {
-        guard self.view.window != nil else {return}
+    override func willHideKeyboardWith(height: CGFloat) {
         self.scrollView.contentInset = .zero
         self.loaderOverlayView.snp.updateConstraints({ (make) in
             make.bottom.equalToSuperview()
