@@ -117,7 +117,16 @@ extension BSFeedViewController:BSFeedTableViewManagerDelegate {
         if let indexPath = self.tableView.indexPath(for: sender) {
             let index = self.feedTableViewManager.postIndexForCellAt(indexPath: indexPath)
             let post = self.posts[index]
-            DBHelpers.savePost(post: post)
+            DBHelpers.isPostSaved(postID: post.id) { (isSaved) in
+                if isSaved == false {
+                    DBHelpers.savePost(post: post)
+                }
+                else {
+                    DBHelpers.deleteSavedPost(postID: post.id)
+                }
+                sender.saveButton.isSelected = !isSaved
+            }
+            
         }
     }
     

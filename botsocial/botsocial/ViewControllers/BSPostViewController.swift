@@ -60,6 +60,12 @@ class BSPostViewController: BSBaseViewController {
             let cell = tableView.dequeueReusableCell(withIdentifier: kFeedActionsCellReuseID) as! BSFeedActionsTableViewCell
             cell.post = self.post
             cell.delegate = self
+            cell.saveButton.isSelected = false
+            if let post = self.post {
+                DBHelpers.isPostSaved(postID: post.id) { (isSaved) in
+                    cell.saveButton.isSelected = isSaved
+                }
+            }
             return cell
         case 3:
             let cell = tableView.dequeueReusableCell(withIdentifier: kFeedPostInfoCellReuseID) as! BSPostDetailTableViewCell
@@ -101,9 +107,17 @@ extension BSPostViewController:BSFeedActionsTableViewCellDelegate {
         }
     }
     
-    func didTapSavePostButton(sender: BSFeedActionsTableViewCell) {
-        if let post = self.post {
-            DBHelpers.savePost(post: post)
+    
+    func didTapSavePostButton(sender:BSFeedActionsTableViewCell) {
+        guard let post = self.post else {return}
+        DBHelpers.isPostSaved(postID: post.id) { (isSaved) in
+            if isSaved == false {
+                DBHelpers.savePost(post: post)
+            }
+            else {
+                DBHelpers.deleteSavedPost(postID: post.id)
+            }
+            sender.saveButton.isSelected = !isSaved
         }
     }
 }

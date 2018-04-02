@@ -23,6 +23,7 @@ class BSSavedPostsViewController: BSBaseViewController {
         self.tableView.delegate = self.tableViewManager
         self.tableView.dataSource = self.tableViewManager
         self.loadSavedPosts()
+        NotificationCenter.default.addObserver(self, selector: #selector(didUpdatePosts), name: kNotificationUpdateSavedPosts.name, object: nil)
     }
     
     func loadSavedPosts() {
@@ -105,5 +106,12 @@ extension BSSavedPostsViewController:BSFeedTableViewManagerDelegate {
     
     func moreButtonTapped(sender: UITableViewCell) {
         // Do nothing
+    }
+    
+    @objc func didUpdatePosts() {
+        guard self.view.window == nil else {
+            return
+        }
+        self.loadSavedPosts()
     }
 }

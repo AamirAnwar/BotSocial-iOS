@@ -82,12 +82,12 @@ enum DBHelpers {
             print("Fetch error \(error)")
             completion?()
         }
-        
+        NotificationCenter.default.post(name: kNotificationUpdateSavedPosts.name, object: nil, userInfo: nil)
     }
     
     
     static func isPostSaved(postID:String, completion:@escaping (_ saved:Bool) -> Void) {
-        guard let currentUser = APIService.sharedInstance.currentUser else {return}
+        guard let currentUser = APIService.sharedInstance.currentUser else {completion(false);return}
         let postsFetch:NSFetchRequest<PostObject> = PostObject.fetchRequest()
         postsFetch.predicate = NSPredicate.init(format:"%K == %@", #keyPath(PostObject.user.id), currentUser.uid)
         let asyncFetch:NSAsynchronousFetchRequest<PostObject> = NSAsynchronousFetchRequest<PostObject>.init(fetchRequest: postsFetch) {(result) in
@@ -96,9 +96,12 @@ enum DBHelpers {
                     if post.id == postID {
                         // Yes it's saved!
                         completion(true)
+                        return
                     }
                 }
             }
+            completion(false)
+            
         }
         do {
             try managedContext.execute(asyncFetch)
@@ -108,7 +111,7 @@ enum DBHelpers {
             completion(false)
             return
         }
-        completion(false)
+        
     }
     
     static func deleteSavedPost(postID:String, completion:(()->Void)? = nil) {
@@ -147,7 +150,7 @@ enum DBHelpers {
             print("Fetch error \(error)")
             completion?()
         }
-        
+        NotificationCenter.default.post(name: kNotificationUpdateSavedPosts.name, object: nil, userInfo: nil)
     }
     
 }
