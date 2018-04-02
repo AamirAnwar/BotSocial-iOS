@@ -300,16 +300,26 @@ extension APIService {
         guard let _ = self.currentUser else {completion(nil);return}
         self.databaseRef.child("user_chats").child(senderID).child(receiverID).observeSingleEvent(of: .value) { (snapshot) in
             if snapshot.exists() {
-                let ref = self.databaseRef.child("chats").child(snapshot.key).child("typing_indicator").child(receiverID)
-                ref.onDisconnectRemoveValue()
-                completion(self.databaseRef.child("chats").child(snapshot.key).child("typing_indicator"))
+                if let value = snapshot.value as? [String:AnyObject], let chatID = value.keys.first {
+                    let ref = self.databaseRef.child("chats").child(chatID).child("typing_indicator").child(receiverID)
+                    ref.onDisconnectRemoveValue()
+                    completion(self.databaseRef.child("chats").child(chatID).child("typing_indicator"))
+                }
+                else {
+                    completion(nil)
+                }
+                
             }
             else {
                 self.databaseRef.child("user_chats").child(receiverID).child(senderID).observeSingleEvent(of: .value) { (snapshot) in
                     if snapshot.exists() {
-                        let ref = self.databaseRef.child("chats").child(snapshot.key).child("typing_indicator").child(receiverID)
+                        guard let value = snapshot.value as? [String:AnyObject], let chatID = value.keys.first else {
+                            completion(nil)
+                            return
+                        }
+                        let ref = self.databaseRef.child("chats").child(chatID).child("typing_indicator").child(receiverID)
                         ref.onDisconnectRemoveValue()
-                        completion(self.databaseRef.child("chats").child(snapshot.key).child("typing_indicator"))
+                        completion(self.databaseRef.child("chats").child(chatID).child("typing_indicator"))
                     }
                     else {
                         completion(nil)

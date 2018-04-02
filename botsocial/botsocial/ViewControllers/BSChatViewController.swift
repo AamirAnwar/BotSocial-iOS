@@ -65,13 +65,15 @@ class BSChatViewController: JSQMessagesViewController, HandleCollector {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(true)
         APIService.sharedInstance.isUserTyping(senderID: self.senderId, receiverID: self.receiverID, completion: { (ref) in
-            self.userIsTypingRef = ref
-            ref?.child(self.receiverID).observe(.value, with: { (snapshot) in
-                if let value = snapshot.value as? Bool {
-                    self.showTypingIndicator = value
-                    self.scrollToBottom(animated: true)
-                }
-            })
+            if let ref = ref {
+                self.userIsTypingRef = ref
+                ref.child(self.receiverID).observe(.value, with: { (snapshot) in
+                    if let value = snapshot.value as? Bool {
+                        self.showTypingIndicator = value
+                        self.scrollToBottom(animated: true)
+                    }
+                })
+            }
         })
     }
     
