@@ -112,6 +112,15 @@ extension BSFeedViewController {
 }
 
 extension BSFeedViewController:BSFeedTableViewManagerDelegate {
+    
+    func didTapSavePostButton(sender:BSFeedActionsTableViewCell) {
+        if let indexPath = self.tableView.indexPath(for: sender) {
+            let index = self.feedTableViewManager.postIndexForCellAt(indexPath: indexPath)
+            let post = self.posts[index]
+            DBHelpers.savePost(post: post)
+        }
+    }
+    
     func showCommentsFor(post:BSPost) {
         let vc = BSPostCommentsViewController()
         vc.post = post

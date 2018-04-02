@@ -34,9 +34,8 @@ class BSChatListViewController: BSBaseViewController {
             self.addHandle(handle)
             if let chat = chat {
                 self.chats.insert(chat, at: 0)
-                self.tableView.reloadData()
             }
-            
+            self.tableView.reloadData()
         }
     }
 }

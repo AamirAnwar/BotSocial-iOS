@@ -61,6 +61,13 @@ extension BSSavedPostsViewController:BSFeedActionsTableViewCellDelegate {
         }
     }
     
+    func deletePost(postID:String) {
+        DBHelpers.deleteSavedPost(postID: postID)
+    }
+}
+
+extension BSSavedPostsViewController:BSFeedTableViewManagerDelegate {
+    
     func didTapSavePostButton(sender:BSFeedActionsTableViewCell) {
         let alertController = UIAlertController.init(title: "Delete post", message: "Delete this post?", preferredStyle: .actionSheet)
         let deleteAction = UIAlertAction.init(title: "Delete", style: .destructive) { (action) in
@@ -81,13 +88,6 @@ extension BSSavedPostsViewController:BSFeedActionsTableViewCellDelegate {
         alertController.addAction(cancelAction)
         self.present(alertController, animated: true)
     }
-    
-    func deletePost(postID:String) {
-        DBHelpers.deleteSavedPost(postID: postID)
-    }
-}
-
-extension BSSavedPostsViewController:BSFeedTableViewManagerDelegate {
     
     func showCommentsFor(post: BSPost) {
         let vc = BSPostCommentsViewController()

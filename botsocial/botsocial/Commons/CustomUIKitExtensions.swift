@@ -91,3 +91,10 @@ extension UIButton {
         return button
     }
 }
+
+
+extension Bool {
+    var intValue:Int {
+        return self ? 1:0
+    }
+}
