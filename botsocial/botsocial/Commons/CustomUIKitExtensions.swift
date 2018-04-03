@@ -98,3 +98,7 @@ extension Bool {
         return self ? 1:0
     }
 }
+
+extension Notification.Name {
+    static let didUpdateSavedPosts = Notification.Name.init("SavedPostsUpdated")
+}

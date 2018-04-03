@@ -82,7 +82,7 @@ enum DBHelpers {
             print("Fetch error \(error)")
             completion?()
         }
-        NotificationCenter.default.post(name: kNotificationUpdateSavedPosts.name, object: nil, userInfo: nil)
+        NotificationCenter.default.post(name: Notification.Name.didUpdateSavedPosts, object: nil, userInfo: nil)
     }
     
     
@@ -150,7 +150,7 @@ enum DBHelpers {
             print("Fetch error \(error)")
             completion?()
         }
-        NotificationCenter.default.post(name: kNotificationUpdateSavedPosts.name, object: nil, userInfo: nil)
+        NotificationCenter.default.post(name: Notification.Name.didUpdateSavedPosts, object: nil, userInfo: nil)
     }
     
 }

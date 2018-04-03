@@ -94,7 +94,7 @@ class BSFeedActionsTableViewCell: UITableViewCell {
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(didUpdateSavedPosts), name: kNotificationUpdateSavedPosts.name, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(didUpdateSavedPosts), name: Notification.Name.didUpdateSavedPosts, object: nil)
         
         self.contentView.addSubview(self.likeButton)
 //        self.contentView.addSubview(self.dislikeButton)
